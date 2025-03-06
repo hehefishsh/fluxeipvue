@@ -1,15 +1,10 @@
 <template>
-    <div>
-      <!-- 假設 header 與 leftside 由全域或父層組件處理，此處只包含內容區塊 -->
-      <!-- 內容標題 -->
-      <div>
-        <h2>會議室管理</h2>
-      </div>
-      <!-- 內容區塊 -->
       <div class="card card-default" id="page-views">
         <div class="card-header">
           <h2>會議室管理</h2>
-          <a href="/meetings/new" class="btn btn-primary btn-pill">預約會議室</a>
+          <RouterLink class="btn btn-primary btn-pill" to="/meeting/create">
+                      <span class="nav-text">新增會議</span>
+          </RouterLink>
         </div>
         <div class="card-body py-0" data-simplebar>
           <div v-if="meetings && meetings.length">
@@ -41,7 +36,6 @@
         </div>
         <div class="bg-white py-4"></div>
       </div>
-    </div>
   </template>
   
   <script setup>
@@ -77,7 +71,5 @@
   </script>
   
   <style>
-  @import url('/css/style.css');
-  /* 其他插件的 CSS 請於 index.html 或全域樣式中引入 */
   </style>
   

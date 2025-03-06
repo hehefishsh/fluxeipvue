@@ -1,6 +1,10 @@
 <template>
-                <!-- 輸入頁面內容 -->
-                <form @submit.prevent="submitForm">
+    <div class="card card-default" id="page-views">
+        <div class="card-header">
+            <h2>新增員工</h2>
+        </div>
+        <div class="card-body py-0" data-simplebar>
+            <form @submit.prevent="submitForm">
                     <div class="form-group">
                         <label for="employeeName">員工姓名</label>
                         <input type="text" class="form-control rounded-0" id="employeeName" placeholder="姓名"
@@ -40,6 +44,9 @@
                         <button type="button" @click="goBack" class="btn btn-light btn-pill">取消</button>
                     </div>
                 </form>
+            </div>
+            <div class="bg-white py-4"></div>
+        </div>
 </template>
 
 <script >

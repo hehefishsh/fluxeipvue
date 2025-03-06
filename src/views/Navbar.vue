@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper ">
     <!-- ====================================
   ——— LEFT SIDEBAR WITH OUT FOOTER
 ===================================== -->
@@ -16,17 +16,19 @@
           <!-- sidebar menu -->
           <ul class="nav sidebar-inner" id="sidebar-menu">
 
+            <!-- 單目錄的導引欄--個人資訊 -->
             <li :class="{ active: route.path === '/employee/detail' }">
               <RouterLink class="sidenav-item-link" to="/employee/detail"><i class="mdi mdi-account"></i>
                 <span class="nav-text">個人資訊</span>
               </RouterLink>
             </li>
+            <!-- 單目錄的導引欄結束 -->
 
             <!-- 有的子目錄的導引欄--員工管理 -->
-            <li class="has-sub" :class="{ active: /^\/employee\/manage(\/.*)?$/.test(route.path) }">
+            <li class="has-sub expand" :class="{ active: /^\/employee\/manage(\/.*)?$/.test(route.path) }">
               <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#employee"
                 aria-expanded="false" aria-controls="employee">
-                <i class="mdi mdi-account"></i>
+                <i class="mdi mdi-account-box-multiple"></i>
                 <span class="nav-text">員工管理</span> <b class="caret"></b>
               </a>
               <ul class="collapse" id="employee" data-parent="#sidebar-menu">
@@ -48,7 +50,7 @@
 
 
             <!-- 有的子目錄的導引欄--出勤與打卡 -->
-            <li class="has-sub" :class="{ active: /^\/attendance(\/.*)?$/.test(route.path) }">
+            <li class="has-sub expand" :class="{ active: /^\/attendance(\/.*)?$/.test(route.path) }">
               <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#attendance"
                 aria-expanded="false" aria-controls="attendance">
                 <i class="mdi mdi-clock-outline"></i>
@@ -71,26 +73,48 @@
             </li>
             <!-- 有的子目錄的導引欄結束 -->
 
-            <li>
-              <a class="sidenav-item-link" href="meetingroom.html">
-                <i class="mdi mdi-theater"></i>
-                <span class="nav-text">會議室管理</span>
-              </a>
-            </li>
 
-            <li>
-              <a class="sidenav-item-link" href="bulletin.html">
-                <i class="mdi mdi-bulletin-board"></i>
+            <!-- 單目錄的導引欄--公佈欄 -->
+            <li :class="{ active: route.path === '/bulletin' }">
+              <RouterLink class="sidenav-item-link" to="/bulletin"><i class="mdi mdi-bulletin-board"></i>
                 <span class="nav-text">公佈欄</span>
-              </a>
+              </RouterLink>
             </li>
+            <!-- 單目錄的導引欄結束 -->
 
-            <li>
-              <a class="sidenav-item-link" href="guideline.html">
-                <i class="mdi mdi-folder-outline"></i>
-                <span class="nav-text">智庫</span>
+
+            <!-- 有的子目錄的導引欄--會議管理 -->
+            <li class="has-sub expand" :class="{ active: /^\/meeting(\/.*)?$/.test(route.path) }">
+              <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#meeting"
+                aria-expanded="false" aria-controls="meeting">
+                <i class="mdi mdi-theater"></i>
+                <span class="nav-text">會議</span> <b class="caret"></b>
               </a>
+              <ul class="collapse" id="meeting" data-parent="#sidebar-menu">
+                <div class="sub-menu">
+                  <li :class="{ active: route.path === '/meeting/manage' }">
+                    <RouterLink class="sidenav-item-link" to="/meeting/manage">
+                      <span class="nav-text">會議室管理</span>
+                    </RouterLink>
+                  </li>
+                  <li :class="{ active: route.path === '/meeting/create' }">
+                    <RouterLink class="sidenav-item-link" to="/meeting/create">
+                      <span class="nav-text">預約會議室</span>
+                    </RouterLink>
+                  </li>
+                </div>
+              </ul>
             </li>
+            <!-- 有的子目錄的導引欄結束 -->
+
+
+            <!-- 單目錄的導引欄--智庫 -->
+            <li :class="{ active: route.path === '/guideline/all' }">
+              <RouterLink class="sidenav-item-link" to="/guideline/all"><i class="mdi mdi-folder-outline"></i>
+                <span class="nav-text">智庫</span>
+              </RouterLink>
+            </li>
+            <!-- 單目錄的導引欄結束 -->
 
           </ul>
         </div>

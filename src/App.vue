@@ -1,9 +1,11 @@
 <template>
+  <RouterView v-if="isLoginPage"></RouterView>
   <nav class="navbar-fixed sidebar-fixed" id="body">
-    <Navbar>
+    <Navbar v-if="!isLoginPage">
       <RouterView></RouterView>
     </Navbar>
   </nav>
+  
   
 
 </template>
@@ -11,6 +13,11 @@
 <script setup>
 import { RouterLink, RouterView } from "vue-router";
 import Navbar from "@/views/Navbar.vue";
+import { computed } from 'vue';
+
+const isLoginPage = computed(() => {
+  return window.location.pathname === '/login';
+});
 
 
 /* 插件們*/

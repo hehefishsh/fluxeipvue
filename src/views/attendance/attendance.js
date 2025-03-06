@@ -1,4 +1,3 @@
-// src/router/attendance.js
 import AttendanceClock from "@/views/attendance/Clock.vue";
 import AttendanceLog from "@/views/attendance/AttendanceLog.vue";
 
