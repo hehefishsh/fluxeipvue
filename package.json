@@ -1,0 +1,29 @@
+{
+  "name": "fluxeipvue",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "axios": "^1.8.1",
+    "bootstrap": "^4.1.0",
+    "datatables": "^1.10.18",
+    "daterangepicker": "^3.0.3",
+    "jquery": "^3.2.1",
+    "jvectormap": "^2.0.3",
+    "moment": "^2.30.1",
+    "nprogress": "^0.2.0",
+    "simplebar": "^5.1.0",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^6.1.0",
+    "vite-plugin-vue-devtools": "^7.7.2"
+  }
+}
