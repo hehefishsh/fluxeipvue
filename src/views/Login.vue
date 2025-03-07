@@ -17,7 +17,7 @@
               </div>
               <div class="card-body px-5 pb-5 pt-0">
                 <h4 class="text-dark mb-6 text-center">登入系統</h4>
-                <form @submit.prevent="handleSubmit">
+                <!-- <form> -->
                   <div class="row">
                     <div class="form-group col-md-12 mb-4">
                       <input
@@ -50,14 +50,10 @@
                         </div>
                         <a class="text-color" href="#"> 忘記密碼？ </a>
                       </div>
-                      <button type="submit" class="btn btn-primary btn-pill mb-4">登入</button>
-                      <p v-if="error" class="error">{{ error }}</p>
-                      <p>
-                        Don't have an account yet ? <a class="text-blue" href="sign-up.html">Sign Up</a>
-                      </p>
+                      <button class="btn btn-primary btn-pill mb-4" @click="login">登入</button>
                     </div>
                   </div>
-                </form>
+                <!-- </form> -->
               </div>
             </div>
           </div>
@@ -68,30 +64,59 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import axios from 'axios'
+import { ref } from 'vue';
+import axiosapi from "@/plugins/axios";
+import Swal from 'sweetalert2';
+import { useRouter } from 'vue-router';
+import useUserStore from "@/stores/user";
+const userStore=useUserStore()
 
 const username = ref('')
 const password = ref('')
 const rememberMe = ref(false)
-const error = ref('')
+const router=useRouter();
 
-const handleSubmit = async () => {
-  try {
-    // 發送登入請求至 /perform_login（根據實際需求調整 API 路徑與參數）
-    const response = await axios.post('/perform_login', {
-      username: username.value,
-      password: password.value,
-      rememberMe: rememberMe.value
-    })
-    console.log('Login successful:', response.data)
-    // 登入成功後可依需求導向其他頁面，例如：
-    // window.location.href = '/dashboard'
-  } catch (err) {
-    console.error(err)
-    error.value = '登入失敗，請檢查帳號或密碼'
-  }
+async function login(){
+    if(username.value===""){
+        username.value=null;
+    }
+    if(password.value===""){
+        password.value=null;
+    }
+    const data={
+        "userId":username.value,
+        "password":password.value
+    };
+    axiosapi.defaults.headers.common['Authorization']=``;
+    // userStore.setid("");
+    console.log("data",data)
+    try{
+        const response= await axiosapi.post("/secure/ajax/login",data);
+        console.log("response",response)
+        if(response.data.success){
+            await Swal.fire({
+                title:response.data.message,
+                icon:"success"
+            });
+            axiosapi.defaults.headers.common['Authorization']=`Bearer ${response.data.token}`;
+            userStore.setid(response.data.employeeId)
+            router.push("/");
+        }else{
+            Swal.fire({
+                title:response.data.message,
+                icon:"warning"
+            })
+        }
+    }catch(error){
+        console.log("error",error);
+        Swal.fire({
+            title:"錯誤"+error.message,
+            icon:"error"
+        })
+    }
+
 }
+
 </script>
 
 <style>
