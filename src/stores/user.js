@@ -3,17 +3,21 @@ import { ref } from "vue";
 
 const useUserStore = defineStore("user",
     function () {
-        const id = ref("");
-        function setid(data) {
-            id.value = data;
+        const empId = ref("");
+        const empName = ref("");
+        const empPhoto = ref("")
+        function set(data) {
+            empId.value = data.empId,
+                empName.value = data.empName,
+                empPhoto.value = data.empPhoto
         }
         return {
-            id, setid
+            empId, empName, empPhoto, set
         }
     }, {
     persist: {
         storage: sessionStorage,
-        paths: ["id"]
+        paths: ["empId", "empName", "empPhoto"]
     }
 }
 );

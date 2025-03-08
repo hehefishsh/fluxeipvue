@@ -99,7 +99,12 @@ async function login(){
                 icon:"success"
             });
             axiosapi.defaults.headers.common['Authorization']=`Bearer ${response.data.token}`;
-            userStore.setid(response.data.employeeId)
+            const emp={
+              "empId":response.data.employeeId,
+              "empName":response.data.employeeName,
+              "empPhoto":response.data.photo
+            }
+            userStore.set(emp)
             router.push("/");
         }else{
             Swal.fire({
