@@ -33,4 +33,9 @@ const router = createRouter({
   routes,
 });
 
+// 讓頁面標題，html head裡的title可以跟著變動
+router.afterEach((to) => {
+  document.title = to.meta.title || "預設標題";
+});
+
 export default router;
