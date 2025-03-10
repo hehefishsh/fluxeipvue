@@ -434,8 +434,9 @@
                   </li>
 
                   <li class="dropdown-footer">
-                    <a class="dropdown-link-item" href="sign-in.html">
-                      <i class="mdi mdi-logout"></i> Log Out
+                    <a class="dropdown-link-item" >
+                      <button @click="logOut">
+                      <i class="mdi mdi-logout"></i> Log Out</button>
                     </a>
                   </li>
                 </ul>
@@ -580,6 +581,15 @@ const route = useRoute(); // 取得當前路由資訊
 const pageTitle = computed(() => route.meta.title || '未命名頁面');
 import useUserStore from '@/stores/user';
 const user=useUserStore();
+import { useRouter } from 'vue-router';
+const router=useRouter();
+import axiosapi from "@/plugins/axios";
+
+function logOut(){
+  axiosapi.defaults.headers.common['Authorization']=``;
+  user.clear();
+  router.push("/login");
+}
 
 
 

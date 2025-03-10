@@ -6,13 +6,18 @@ const useUserStore = defineStore("user",
         const empId = ref("");
         const empName = ref("");
         const empPhoto = ref("")
+        function clear() {
+            empId.value = "",
+                empName.value = "",
+                empPhoto.value = ""
+        }
         function set(data) {
             empId.value = data.empId,
                 empName.value = data.empName,
                 empPhoto.value = data.empPhoto
         }
         return {
-            empId, empName, empPhoto, set
+            empId, empName, empPhoto, set, clear
         }
     }, {
     persist: {

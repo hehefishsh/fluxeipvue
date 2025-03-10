@@ -1,109 +1,168 @@
 <template>
-    <div class="card card-default" id="page-views">
-        <div class="card-header">
-            <h2>新增員工</h2>
-        </div>
-        <div class="card-body py-0" data-simplebar>
-            <form @submit.prevent="submitForm">
-                    <div class="form-group">
+        <div class="form-group">
                         <label for="employeeName">員工姓名</label>
                         <input type="text" class="form-control rounded-0" id="employeeName" placeholder="姓名"
-                            v-model="employeeName" required />
+                            v-model="employee.employeeName" required />
                     </div>
-                    <div class="form-group">
-                        <label for="password">密碼</label>
-                        <input type="password" class="form-control rounded-0" id="password" placeholder="密碼"
-                            v-model="password" required />
-                    </div>
-                    <div class="form-group">
+        
+        <div class="form-group">
                         <label for="departmentId">部門</label>
-                        <select class="form-control rounded-0" id="departmentId" v-model="selectedDepartmentId"
-                            required>
-                            <option v-for="department in departments" :key="department.departmentId"
-                                :value="department.departmentId">
+                        <select class="form-control rounded-0" id="departmentId" v-model="employee.departmentName"
+                            required >
+                            <option v-for="department in departments" :key="department.departmentName"
+                                :value="department.departmentName">
                                 {{ department.departmentName }}
                             </option>
                         </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="positionId">職位</label>
-                        <select class="form-control rounded-0" id="positionId" v-model="selectedPositionId" required>
-                            <option v-for="position in positions" :key="position.positionId"
-                                :value="position.positionId">
+        </div>
+        <div class="form-group">
+                        <label for="departmentId">職位</label>
+                        <select class="form-control rounded-0" id="positionId" v-model="employee.positionName"
+                            required>
+                            <option v-for="position in positions" :key="position.positionName"
+                                :value="position.positionName">
                                 {{ position.positionName }}
                             </option>
                         </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="startDate">入職時間</label>
-                        <input type="date" id="startDate" v-model="startDate" class="custom-select my-1 mr-sm-2 w-auto"
-                            required />
-                    </div>
-                    <div class="form-footer">
-                        <button type="submit" class="btn btn-secondary btn-pill">提交</button>
-                        <button type="button" @click="goBack" class="btn btn-light btn-pill">取消</button>
-                    </div>
-                </form>
-            </div>
-            <div class="bg-white py-4"></div>
         </div>
+        <div class="form-group">
+                        <label for="startDate">入職時間</label>
+                        <input type="date" id="startDate" v-model="employee.hireDate" class="custom-select my-1 mr-sm-2 w-auto"
+                            required />
+        </div>
+        <div>
+        <label for="email">電子郵件:</label>
+        <input
+            type="email"
+            id="email"
+            v-model="employee.email"
+            placeholder="請輸入電子郵件"
+            required
+            class="form-control rounded-"
+        />
+        <small v-if="employee.email && !isValidEmail" style="color: red;">
+            請輸入有效的電子郵件格式。
+        </small>
+        </div>
+        <div>
+            <label>性別:</label>
+            <input type="radio" id="male" value="男" v-model="employee.gender" /> 男性
+            <input type="radio" id="female" value="女" v-model="employee.gender" /> 女性
+        </div>
+        <div class="form-group">
+            <label for="idCard">身分證字號:</label>
+            <input
+                type="text"
+                id="idCard"
+                v-model="employee.identityCard"
+                maxlength="10"
+                placeholder="輸入身分證字號"
+                pattern="^[A-Z]{1}[1-2]{1}[0-9]{8}$"
+                required
+                class="form-control rounded-0"
+            />
+            <small v-if="employee.identityCard && !isValidIdCard" style="color: red;">格式不正確，請輸入有效的身分證字號。</small>
+        </div>
+        <div class="form-group">
+            <label for="phone">電話號碼:</label>
+            <input
+                type="tel"
+                id="phone"
+                v-model="employee.phone"
+                maxlength="10"
+                placeholder="輸入電話號碼"
+                required
+                class="form-control rounded-0"
+            />
+            <small v-if="employee.phone && !isValidPhone" style="color: red;">輸入正確電話格式</small>
+        </div>
+        <button type="button" class="btn btn-secondary btn-pill" @click="submit">提交</button>
 </template>
+    
+<script setup lang='ts'>
+import { ref, onMounted,computed  } from 'vue';
+import axiosapi from "@/plugins/axios";
+import Swal from "sweetalert2";
 
-<script >
-    export default {
-        name: 'AddEmployee',
-        data() {
-            return {
-                employeeName: '',
-                password: '',
-                selectedDepartmentId: null,
-                selectedPositionId: null,
-                startDate: '',
-                departments: [], // 部門資料
-                positions: []    // 職位資料
-            };
-        },
-        mounted() {
-            this.fetchDepartments();
-            this.fetchPositions();
-        },
-        methods: {
-            fetchDepartments() {
-                // 在這裡發送請求獲取部門資料
-                // 例如使用 axios
-                // axios.get('/api/departments').then(response => {
-                //   this.departments = response.data;
-                // });
-            },
-            fetchPositions() {
-                // 在這裡發送請求獲取職位資料
-                // 例如使用 axios
-                // axios.get('/api/positions').then(response => {
-                //   this.positions = response.data;
-                // });
-            },
-            submitForm() {
-                // 提交表單的邏輯
-                const employeeData = {
-                    employeeName: this.employeeName,
-                    password: this.password,
-                    departmentId: this.selectedDepartmentId,
-                    positionId: this.selectedPositionId,
-                    startDate: this.startDate
-                };
+const employee=ref({
+    email:"",
+    gender:"",
+    phone:"",
+    identityCard:"",
+    hireDate:"",
+    departmentName:"",
+    positionName:"",
+    employeeName:""
+});
 
-                // 例如使用 axios 提交表單
-                // axios.post('/api/employees', employeeData).then(response => {
-                //   // 處理成功回應
-                // });
-            },
-            goBack() {
-                window.history.back();
-            }
+const departments = ref([]);
+const positions=ref([]);
+
+const isValidEmail = computed(() => {
+        const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return regex.test(employee.value.email);
+    });
+
+const isValidPhone = computed(() => {
+    const regex = /^09\d{8}$/;
+        return regex.test(employee.value.phone);
+    });
+
+const isValidIdCard = computed(() => {
+        const regex = /^[A-Z]{1}[1-2]{1}[0-9]{8}$/;
+        return regex.test(employee.value.identityCard);
+    });
+
+async function departmentFind(){
+    try {
+    const response = await axiosapi.get("/department/find");  
+    departments.value = response.data;  
+    } catch (error) {
+    console.error("獲取部門資料失敗:", error);
+    }
+}
+
+async function positionFind(){
+    try {
+    const response = await axiosapi.get("/position/find");  
+    positions.value = response.data;  
+    } catch (error) {
+    console.error("獲取部門資料失敗:", error);
+    }
+}
+
+function submit(){
+    axiosapi.post("/employee/create",employee.value)
+    .then(function(response){
+        if(response.data.success){
+            Swal.fire({
+                title:response.data.message,
+                icon:"success"
+            })
+        }else{
+            Swal.fire({
+                title:response.data.message,
+                icon:"warning"
+            })
         }
-    };
-</script>
+    }).catch(function(error){
+        console.log("error",error);
+        Swal.fire({
+            title:"失敗"+error.message,
+            icon:"error"
+        });
+    })
+    console.log(employee.value.employeeName
+    )
+}
 
-<style scoped>
-    /* 在這裡添加樣式 */
+
+onMounted(function(){
+    departmentFind();
+    positionFind();
+})
+</script>
+    
+<style>
+    
 </style>

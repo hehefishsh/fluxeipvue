@@ -88,11 +88,8 @@ async function login(){
         "password":password.value
     };
     axiosapi.defaults.headers.common['Authorization']=``;
-    // userStore.setid("");
-    console.log("data",data)
     try{
         const response= await axiosapi.post("/secure/ajax/login",data);
-        console.log("response",response)
         if(response.data.success){
             await Swal.fire({
                 title:response.data.message,
