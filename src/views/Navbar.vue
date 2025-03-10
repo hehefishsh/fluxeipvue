@@ -405,8 +405,8 @@
               <!-- User Account -->
               <li class="dropdown user-menu">
                 <button class="dropdown-toggle nav-link" data-toggle="dropdown">
-                  <img src="@/images/user/u-xl-1.jpg" class="user-image rounded-circle" alt="User Image" />
-                  <span class="d-none d-lg-inline-block">John Doe</span>
+                  <img :src="user.empPhoto" class="user-image rounded-circle" alt="User Image" />
+                  <span class="d-none d-lg-inline-block">{{ user.empName }}</span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-right">
                   <li>
@@ -578,7 +578,8 @@ import logo from "@/images/dashboard.png"
 import { computed } from 'vue';
 const route = useRoute(); // 取得當前路由資訊
 const pageTitle = computed(() => route.meta.title || '未命名頁面');
-
+import useUserStore from '@/stores/user';
+const user=useUserStore();
 
 
 
