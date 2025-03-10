@@ -1,7 +1,7 @@
 // src/router/index.js
 import { createRouter, createWebHistory } from "vue-router";
 import Home from "@/views/Home.vue";
-import Login from "@/views/Login.vue"
+import Login from "@/views/Login.vue";
 import attendanceRoutes from "@/views/attendance/attendance.js";
 import employeeRoutes from "@/views/employee/employee.js";
 import meetingRoutes from "@/views/meeting/meeting";
@@ -10,16 +10,16 @@ import bulletinRoutes from "@/views/bulletin/bulletin";
 
 const routes = [
   {
-    path: "/", 
+    path: "/",
     component: Home,
-    name: "home-link", 
-    meta: { title: '首頁' }
+    name: "home-link",
+    meta: { title: "首頁" },
   },
   {
-    path: "/login", 
+    path: "/login",
     component: Login,
-    name: "login-link", 
-    meta: { title: '登入' }
+    name: "login-link",
+    meta: { title: "登入" },
   },
   attendanceRoutes,
   employeeRoutes,
