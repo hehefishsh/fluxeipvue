@@ -10,9 +10,17 @@
           <div class="card-header">
             <h2>所有員工</h2>
             部門查詢<select id="departmentId" v-model="department"
-                            required @change="dochange(department)">
+                            required @change="dochangeDep()">
+                            <option value="">全部</option>
                             <option v-for="department in departments" :key="department.departmentName" :value="department.departmentName">
                                 {{ department.departmentName }}
+                            </option>
+                        </select>
+                        職位查詢<select id="positionId" v-model="position"
+                            required @change="dochange()">
+                            <option value="">全部</option>
+                            <option v-for="position in positions" :key="position.positionName" :value="position.positionName">
+                                {{ position.positionName }}
                             </option>
                         </select>
             <RouterLink class="btn btn-primary btn-pill" to="/employee/manage/create">
@@ -88,9 +96,38 @@ async function departmentFind(){
     }
 }
 
-function dochange(department){
-  empFind(page)
-  console.log(department)
+const position=ref("");
+const positions=ref([]);
+async function positionFind(){
+  if(department){
+    try {
+        const response = await axiosapi.get(`/position/find/${department.value}`);  
+        positions.value = response.data;  
+        // console.log(positions.value)
+        } catch (error) {
+        console.error("獲取職位1資料失敗:", error);
+        }
+  }else{
+    try {
+    const response = await axiosapi.get("/position/find");  
+    positions.value = response.data;  
+    } catch (error) {
+    console.error("獲取部門資料失敗:", error);
+    }
+  }
+
+}
+
+function dochangeDep(){
+  current.value=1
+  position.value=""
+  empFind(current.value)
+  positionFind();
+}
+
+function dochange(){
+  current.value=1
+  empFind(current.value)
 }
 
 async function empFind(page){
@@ -98,18 +135,24 @@ async function empFind(page){
         current.value=page
         // start.value=rows.value*(current.value-1)
     }
+    if(department.value==""){
+      department.value=null;
+    }if(position.value==""){
+      position.value=null;
+    }
   const data={
       "current":current.value-1,
       "rows":rows.value,
-      "department":department.value
+      "department":department.value,
+      "position":position.value
   };
   try{
       const response=await axiosapi.post("/employee/find",data);
-      employees.value=response.data.list.content;
+      employees.value=response.data.lists.content;
       total.value=response.data.count;
       pages.value=Math.ceil(total.value/rows.value);
       // lastPageRows.value=total.value % rows.value
-      // console.log(employees.value.array)
+      // console.log(position.value)
   }catch(error){
       console.log("error",error);
       // Swal.fire({
@@ -130,6 +173,7 @@ function formatDate(date) {
 onMounted(function(){
   empFind();
   departmentFind();
+  positionFind();
 })
 </script>
 

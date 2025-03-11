@@ -8,7 +8,7 @@
         <div class="form-group">
                         <label for="departmentId">部門</label>
                         <select class="form-control rounded-0" id="departmentId" v-model="employee.departmentName"
-                            required >
+                            required @change="positionFind">
                             <option v-for="department in departments" :key="department.departmentName"
                                 :value="department.departmentName">
                                 {{ department.departmentName }}
@@ -123,11 +123,21 @@ async function departmentFind(){
 }
 
 async function positionFind(){
-    try {
-    const response = await axiosapi.get("/position/find");  
-    positions.value = response.data;  
+    if (employee.value.departmentName) {
+        try {
+        const response = await axiosapi.get(`/position/find/${employee.value.departmentName}`);  
+        positions.value = response.data;  
+        console.log(positions.value)
+        } catch (error) {
+        console.error("獲取職位1資料失敗:", error);
+        }
+    }else{
+        try {
+        const response = await axiosapi.get("/position/find");  
+        positions.value = response.data;  
     } catch (error) {
-    console.error("獲取部門資料失敗:", error);
+        console.error("獲取職位2資料失敗:", error);
+    } 
     }
 }
 
