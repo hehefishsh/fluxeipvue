@@ -4,6 +4,7 @@ import useUserStore from "@/stores/user";
 import Home from "@/views/Home.vue";
 import Login from "@/views/Login.vue";
 import attendanceRoutes from "@/views/attendance/attendance.js";
+import requestformRoutes from "@/views/requestform/requestform";
 import employeeRoutes from "@/views/employee/employee.js";
 import meetingRoutes from "@/views/meeting/meeting";
 import guidelineRoutes from "@/views/guideline/guideline";
@@ -23,6 +24,7 @@ const routes = [
     meta: { title: "登入",hideNavbar: true },
   },
   attendanceRoutes,
+  requestformRoutes,
   employeeRoutes,
   meetingRoutes,
   guidelineRoutes,
