@@ -84,6 +84,9 @@ import { ref, onMounted,computed  } from 'vue';
 import axiosapi from "@/plugins/axios-login";
 import Swal from "sweetalert2";
 
+import { useRouter } from "vue-router";
+const router = useRouter();
+
 const employee=ref({
     email:"",
     gender:"",
@@ -149,6 +152,7 @@ function submit(){
                 title:response.data.message,
                 icon:"success"
             })
+            router.push("manage/search");
         }else{
             Swal.fire({
                 title:response.data.message,
@@ -162,8 +166,6 @@ function submit(){
             icon:"error"
         });
     })
-    console.log(employee.value.employeeName
-    )
 }
 
 
