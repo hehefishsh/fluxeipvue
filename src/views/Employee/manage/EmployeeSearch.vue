@@ -77,7 +77,7 @@
 // npm install vuejs-paginate-next       vue要安裝插件
 import Paginate from "vuejs-paginate-next";
 import { ref, onMounted } from 'vue'
-import axiosapi from "@/plugins/axios";
+import axiosapi from "@/plugins/axios-login";
 const current=ref(1);//目前在第幾頁
 const pages=ref(0);  //總共幾頁
 const total=ref(0);  //總共幾筆

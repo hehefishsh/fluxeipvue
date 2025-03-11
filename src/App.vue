@@ -1,7 +1,7 @@
 <template>
-  <RouterView v-if="!isLogin"></RouterView>
-  <nav class="navbar-fixed sidebar-fixed" id="body">
-    <Navbar v-if="isLogin">
+  <RouterView v-if="hideNavbar"></RouterView>
+  <nav class="navbar-fixed sidebar-fixed" id="body" v-if="!hideNavbar" >
+    <Navbar>
       <RouterView></RouterView>
     </Navbar>
   </nav>
@@ -11,14 +11,29 @@
 </template>
 
 <script setup>
-import { RouterView } from "vue-router";
+import { RouterView,useRoute } from "vue-router";
 import Navbar from "@/views/Navbar.vue";
 import { computed } from 'vue';
+import { watchEffect } from "vue";
+
 import useUserStore from '@/stores/user';
 const user=useUserStore();
 
-const isLogin = computed(() => user.empName != null && user.empName !== "");
+// const isLogin = computed(() => user.empName != null && user.empName !== "");
 
+
+
+// sessionStorage 被刪除時，同步清除 Pinia 狀態
+watchEffect(() => {
+  const storedData = sessionStorage.getItem("user");
+  if (!storedData) {
+    user.clear();
+  }
+});
+
+// 以登入路徑決定要不要navbar
+const route = useRoute();
+const hideNavbar = computed(() => route.meta.hideNavbar);
 
 /* 插件們*/
 import "@/plugins/material/css/materialdesignicons.min.css";
