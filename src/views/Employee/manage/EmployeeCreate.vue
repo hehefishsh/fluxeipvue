@@ -39,9 +39,13 @@
             placeholder="請輸入電子郵件"
             required
             class="form-control rounded-"
+            @input="checkmail()"
         />
         <small v-if="employee.email && !isValidEmail" style="color: red;">
             請輸入有效的電子郵件格式。
+        </small>
+        <small v-if=checkemail style="color: red;">
+            此信箱已使用過。
         </small>
         </div>
         <div>
@@ -60,8 +64,10 @@
                 pattern="^[A-Z]{1}[1-2]{1}[0-9]{8}$"
                 required
                 class="form-control rounded-0"
+                @input="checkidentity()"
             />
             <small v-if="employee.identityCard && !isValidIdCard" style="color: red;">格式不正確，請輸入有效的身分證字號。</small>
+            <small v-if=checkidentityCard style="color: red;">此身分證已使用過</small>
         </div>
         <div class="form-group">
             <label for="phone">電話號碼:</label>
@@ -73,8 +79,10 @@
                 placeholder="輸入電話號碼"
                 required
                 class="form-control rounded-0"
+                @input="checkphonenumber()"
             />
             <small v-if="employee.phone && !isValidPhone" style="color: red;">輸入正確電話格式</small>
+            <small v-if=checkphone style="color: red;">此電話已使用過</small>
         </div>
         <button type="button" class="btn btn-secondary btn-pill" @click="submit">提交</button>
 </template>
@@ -100,6 +108,42 @@ const employee=ref({
 
 const departments = ref([]);
 const positions=ref([]);
+
+const checkemail=ref(false);
+async function checkmail(){
+    if(employee.value.email){
+        try {
+        const response = await axiosapi.get(`/check/email/${employee.value.email}`);
+        checkemail.value=response.data;
+        } catch (error) {
+        console.error("檢查失敗:", error);
+        }
+    }
+}
+
+const checkidentityCard=ref(false)
+async function checkidentity(){
+    if(employee.value.identityCard){
+        try {
+        const response = await axiosapi.get(`/check/identityCard/${employee.value.identityCard}`);
+        checkidentityCard.value=response.data;
+        } catch (error) {
+        console.error("檢查失敗:", error);
+        }
+    }
+}
+
+const checkphone=ref(false);
+async function checkphonenumber(){
+    if(employee.value.phone){
+        try {
+        const response = await axiosapi.get(`/check/phone/${employee.value.phone}`);
+        checkphone.value=response.data;
+        } catch (error) {
+        console.error("檢查失敗:", error);
+        }
+    }
+}
 
 const isValidEmail = computed(() => {
         const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -152,7 +196,7 @@ function submit(){
                 title:response.data.message,
                 icon:"success"
             })
-            router.push("manage/search");
+            router.push("/employee/manage/search");
         }else{
             Swal.fire({
                 title:response.data.message,
