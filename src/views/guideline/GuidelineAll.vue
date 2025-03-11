@@ -29,6 +29,9 @@
         </div>
       <div class="bg-white py-4"></div>
     </div>
+    <div class="action-text">
+      <RouterLink class="insert-text" :to="{name:'guideline-update-link'}">新增</RouterLink>
+        </div>
   </div>
 </template>
 
@@ -40,13 +43,38 @@ const allGuideline = ref([])
 
 onMounted(async () => {
   try {
-    const response = await axios.get('http://localhost:8080/api/guideline')
+    const response = await axios.get('http://localhost:8080/api/guidelines')
     allGuideline.value = response.data
   } catch (error) {
     console.error('Error fetching guidelines:', error)
   }
 })
+
+
+
 </script>
 
 <style>
+
+.action-text {
+    position: absolute;
+    bottom: 20px; /* 距離底部 20px */
+    right: 20px; /* 距離右邊 20px */
+    display: flex;
+    justify-content: space-between; /* 讓文字左右排列 */
+    gap: 10px; /* 文字之間的間距 */
+}
+
+/* 編輯文字 */
+.insert-text {
+    color: #007bff; /* 編輯文字藍色 */
+    text-decoration: underline; /* 底線 */
+    cursor: pointer;
+}
+
+
+/* 懸停時顏色變化 */
+.insert-text:hover {
+    color: #0056b3; /* 編輯懸停藍色 */
+}
 </style>
