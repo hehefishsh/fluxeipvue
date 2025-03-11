@@ -1,4 +1,5 @@
 import EmployeeSearch from "@/views/employee/manage/EmployeeSearch.vue";
+
 import EmployeeCreate from "@/views/employee/manage/EmployeeCreate.vue";
 import EmployeeDetail from "@/views/employee/EmployeeDetail.vue";
 import EmployeeDetailUpdate from "@/views/employee/manage/EmployeeDetailUpdate.vue";
