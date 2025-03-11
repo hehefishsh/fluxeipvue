@@ -81,7 +81,7 @@
     
 <script setup lang='ts'>
 import { ref, onMounted,computed  } from 'vue';
-import axiosapi from "@/plugins/axios";
+import axiosapi from "@/plugins/axios-login";
 import Swal from "sweetalert2";
 
 const employee=ref({

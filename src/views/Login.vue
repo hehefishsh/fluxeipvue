@@ -86,7 +86,7 @@
 
 <script setup>
 import { ref } from "vue";
-import axiosapi from "@/plugins/axios";
+import axiosapi from "@/plugins/axios-login";
 import Swal from "sweetalert2";
 import { useRouter } from "vue-router";
 import useUserStore from "@/stores/user";

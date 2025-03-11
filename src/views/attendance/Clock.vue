@@ -61,31 +61,19 @@ const errorMessage = ref("");
 const message = ref("");
 
 // 打卡 API 請求
-const sendClockRequest = (url) => {
-  return new Promise((resolve, reject) => {
-    const token = user.token;
-    if (!token) {
-      errorMessage.value = "未登入，請先登入";
-      reject(new Error("未登入"));
-      return;
-    }
-
-    axiosapi
-      .post(url, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
-        message.value = response.data;
-        errorMessage.value = "";
-        resolve(response.data);
-      })
-      .catch((error) => {
-        errorMessage.value = "打卡失敗，請重試。";
-        message.value = "";
-        reject(error);
-      });
-  });
+const sendClockRequest = async (url) => {
+  try {
+    const response = await axiosapi.post(url, null);
+    message.value = response.data;
+    errorMessage.value = "";
+    return response.data;
+  } catch (error) {
+    errorMessage.value = "打卡失敗，請重試。";
+    message.value = "";
+    throw error;
+  }
 };
+
 
 // 打卡按鈕方法整理
 const clockIn = () => sendClockRequest("/api/clock/in");

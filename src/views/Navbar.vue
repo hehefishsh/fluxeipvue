@@ -583,7 +583,7 @@ import useUserStore from '@/stores/user';
 const user=useUserStore();
 import { useRouter } from 'vue-router';
 const router=useRouter();
-import axiosapi from "@/plugins/axios";
+import axiosapi from "@/plugins/axios-login";
 
 function logOut(){
   axiosapi.defaults.headers.common['Authorization']=``;

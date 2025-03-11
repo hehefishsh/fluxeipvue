@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 
 const useUserStore = defineStore(
   "user",
@@ -9,25 +9,42 @@ const useUserStore = defineStore(
     const empPhoto = ref("");
     const token = ref("");
 
+    const isLoggedIn = computed(() => !!token.value);
+
     function clear() {
-      (empId.value = ""),
-        (empName.value = ""),
-        (empPhoto.value = ""),
-        (token.value = "");
+      empId.value = "";
+      empName.value = "";
+      empPhoto.value = "";
+      token.value = ""; 
+      sessionStorage.removeItem("user");
     }
+
     function set(data) {
-      (empId.value = data.empId),
-        (empName.value = data.empName),
-        (empPhoto.value = data.empPhoto),
-        (token.value = data.token);
+      empId.value = data.empId;
+      empName.value = data.empName;
+      empPhoto.value = data.empPhoto;
+      token.value = data.token;
     }
+
+    function login(data) {
+      set(data);
+    }
+
+    function logout() {
+      clear();
+      location.reload();
+    }
+
     return {
       empId,
       empName,
       empPhoto,
+      token,
+      isLoggedIn,
       set,
       clear,
-      token,
+      login,
+      logout,
     };
   },
   {
@@ -37,5 +54,13 @@ const useUserStore = defineStore(
     },
   }
 );
+
+// 讓 sessionStorage ，和 Pinia 同步
+window.addEventListener("storage", (event) => {
+  if (event.key === "user" && !event.newValue) {
+    const user = useUserStore();
+    user.clear();
+  }
+});
 
 export default useUserStore;
