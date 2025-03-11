@@ -128,7 +128,7 @@
                 <div class="sub-menu">
                   <li :class="{ active: route.path === '/meeting/manage' }">
                     <RouterLink class="sidenav-item-link" to="/meeting/manage">
-                      <span class="nav-text">會議室管理</span>
+                      <span class="nav-text">會議室資訊</span>
                     </RouterLink>
                   </li>
                   <li :class="{ active: route.path === '/meeting/create' }">

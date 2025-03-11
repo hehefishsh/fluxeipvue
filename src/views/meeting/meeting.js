@@ -10,7 +10,7 @@ const meetingRoutes = {
       path: "manage",
       name: "meeting-manage-link",
       component: MeetingManage,
-      meta: { title: '會議室管理' }
+      meta: { title: '會議室資訊' }
     },
     {
       path: "create",

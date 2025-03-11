@@ -2,66 +2,116 @@
     <div class="container">
       <h3>個人資料</h3>
       <div class="row" v-if="employee">
-        <table>
+        <img :src="employee.employeePhoto" class="user-image rounded-circle" alt="User Image" />
+        <table >
+          <tbody>
           <tr>
-            <th>員工ID</th>
+            <td>ID</td>
             <td>{{ employee.employeeId }}</td>
           </tr>
           <tr>
-            <th>姓名</th>
+            <td>姓名</td>
             <td>{{ employee.employeeName }}</td>
           </tr>
           <tr>
-            <th>職位</th>
-            <td>{{ employee.position?.positionName }}</td>
+            <td>部門</td>
+            <td>{{ employee.department }}</td>
           </tr>
           <tr>
-            <th>部門</th>
-            <td>{{ employee.department?.departmentName }}</td>
+            <td>職位</td>
+            <td>{{ employee.position }}</td>
           </tr>
           <tr>
-            <th>入職時間</th>
-            <td>{{ employee.hireDate }}</td>
+            <td>入職日</td>
+            <td>{{ formatDate(employee.hireDate) }}</td>
           </tr>
           <tr>
-            <th>狀態</th>
-            <td>{{ employee.status?.statusName }}</td>
+            <td>性別</td>
+            <td>{{ employee.gender }}</td>
           </tr>
+          <tr>
+            <td>生日</td>
+            <td>{{ formatDate(employee.birthday) }}</td>
+          </tr>
+          <tr>
+            <td>身分證</td>
+            <td>{{ employee.identityCard }}</td>
+          </tr>
+          <tr>
+            <td>信箱</td>
+            <td>{{ employee.email }}</td>
+          </tr>
+          <tr>
+            <td>電話</td>
+            <td>{{ employee.phone }}</td>
+          </tr>
+          <tr>
+            <td>住址</td>
+            <td>{{ employee.address }}</td>
+          </tr>
+          <tr>
+            <td>緊急連絡人</td>
+            <td>{{ employee.emergencyContact }}</td>
+          </tr>
+          <tr>
+            <td>緊急電話</td>
+            <td>{{ employee.energencyPhone }}</td>
+          </tr>
+          
+        </tbody>
         </table>
       </div>
       <div v-else>
         <p>載入中...</p>
       </div>
+      <RouterLink class="btn btn-primary btn-pill" to="/employee/manage/detail/update">
+                      <span class="nav-text">修改個人資料</span>
+            </RouterLink>
     </div>
   </template>
   
   <script setup>
   import { ref, onMounted } from 'vue';
-  import axios from 'axios';
-  
-  const employee = ref(null);
-  
-  onMounted(async () => {
-    try {
-      const response = await axios.get('/api/employee');
-      employee.value = response.data;
-    } catch (error) {
-      console.error('Error fetching employee data:', error);
-    }
-  });
-  </script>
-  
-  <style scoped>
-  table {
-    width: 100%;
-    border-collapse: collapse;
+  import useUserStore from '@/stores/user';
+  import axiosapi from "@/plugins/axios";
+const user=useUserStore();
+const employeeId=user.empId
+
+const employee = ref({});
+
+async function employeeFind(){
+  try {
+    const response = await axiosapi.get(`/employee/detail/${employeeId}`);
+    employee.value = response.data;
+  } catch (error) {
+    console.error('獲取員工資料錯誤:', error);
   }
-  th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-  }
-  th {
-    background-color: #f4f4f4;
-    text-align: left;
-  }
-  </style>
+}
+
+function formatDate(date) {
+  const formattedDate = new Date(date);
+  const year = formattedDate.getFullYear(); // 取得年份
+  const month = (formattedDate.getMonth() + 1).toString().padStart(2, '0'); // 取得月份並補零
+  const day = formattedDate.getDate().toString().padStart(2, '0'); // 取得日期並補零
+  return `${year}/${month}/${day}`; // 返回格式化的日期字符串
+    };
+
+onMounted(function(){
+  employeeFind()
+});
+</script>
+
+<style scoped>
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+th {
+  background-color: #f4f4f4;
+  text-align: left;
+}
+</style>

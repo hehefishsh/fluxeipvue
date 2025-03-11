@@ -1,7 +1,7 @@
 <template>
       <div class="card card-default" id="page-views">
         <div class="card-header">
-          <h2>會議室管理</h2>
+          <h2>會議室資訊</h2>
           <RouterLink class="btn btn-primary btn-pill" to="/meeting/create">
                       <span class="nav-text">新增會議</span>
           </RouterLink>
