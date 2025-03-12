@@ -114,7 +114,7 @@ onMounted(async () => {
     console.log('後端回傳的請假類型:', typeResponse.data) // **檢查 API 回傳的數據**
     leaveTypes.value = typeResponse.data
     // 根據當前使用者，取得可簽核的人員清單
-    const approverResponse = await axios.get(`/api/approvers/${currentEmployeeId.value}`)
+    const approverResponse = await axiosapi.get(`/api/approvers/${currentEmployeeId.value}`)
     approvers.value = approverResponse.data
   } catch (error) {
     console.error('Error fetching leave types:', error)
@@ -123,19 +123,66 @@ onMounted(async () => {
 
 // 計算請假時數
 function updateLeaveHours() {
-  if (leaveRequest.startTime && leaveRequest.endTime) {
-    const start = new Date(leaveRequest.startTime)
-    const end = new Date(leaveRequest.endTime)
-    const diffTime = (end - start) / (1000 * 60 * 60) // 總時數差異
+  if (!leaveRequest.startTime || !leaveRequest.endTime) return;
 
-    // 計算天數
-    leaveRequest.leaveDays = Math.floor(diffTime / 8) // 每天計算 8 小時
+  const start = new Date(leaveRequest.startTime);
+  const end = new Date(leaveRequest.endTime);
 
-    // 計算剩餘的小時數並將其轉換為半小時為單位，無條件進位
-    const remainingHours = diffTime % 8 // 剩餘的時數
-    leaveRequest.leaveHours = (Math.ceil(remainingHours * 2) / 2).toFixed(1) // 無條件進位至最接近的半小時
+  let totalHours = 0;
+  let leaveDays = 0;
+  
+  let current = new Date(start);
+
+  while (current < end) {
+    let workStart = new Date(current);
+    workStart.setHours(8, 0, 0, 0); // 08:00 上班
+    let lunchStart = new Date(current);
+    lunchStart.setHours(12, 0, 0, 0); // 12:00 午休
+    let lunchEnd = new Date(current);
+    lunchEnd.setHours(13, 0, 0, 0); // 13:00 午休結束
+    let workEnd = new Date(current);
+    workEnd.setHours(17, 0, 0, 0); // 17:00 下班
+
+    let nextDay = new Date(current);
+    nextDay.setDate(nextDay.getDate() + 1);
+    nextDay.setHours(8, 0, 0, 0); // 跳到下一個工作日
+
+    let dailyHours = 0;
+
+    if (current < workEnd) {
+      // 上午時段（08:00 - 12:00）
+      if (current < lunchStart) {
+        let morningHours = Math.min((lunchStart - current) / (1000 * 60 * 60), (end - current) / (1000 * 60 * 60));
+        dailyHours += morningHours;
+        current = lunchEnd; // 跳過午休
+      }
+
+      // 下午時段（13:00 - 17:00）
+      if (current >= lunchEnd && current < workEnd) {
+        let afternoonHours = Math.min((workEnd - current) / (1000 * 60 * 60), (end - current) / (1000 * 60 * 60));
+        dailyHours += afternoonHours;
+        current = workEnd;
+      }
+    }
+
+    if (dailyHours > 0) {
+      leaveDays++; // 這一天有計算到工時，算作一天
+    }
+
+    totalHours += dailyHours;
+
+    // 跳到下一個工作日
+    current = nextDay;
   }
+
+  // 確保最終結果
+  let remainingHours = totalHours % 8;
+  leaveRequest.leaveDays = Math.floor(totalHours / 8);
+  leaveRequest.leaveHours = Math.round(remainingHours * 2) / 2; // 確保半小時進位
 }
+
+
+
 
 
 // 處理附件上傳

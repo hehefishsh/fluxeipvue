@@ -13,10 +13,10 @@
       </div>
       <div class="card-body py-0" data-simplebar>
         <!-- 顯示錯誤信息 -->
-        <div v-if="error" class="alert alert-danger" role="alert">
+        <div v-show="error" class="alert alert-danger" role="alert">
           {{ error }}
         </div>
-        <div v-if="atError" class="alert alert-danger" role="alert">
+        <div v-show="atError" class="alert alert-danger" role="alert">
           {{ atError }}
         </div>
         <div v-if="todayAttendance">
@@ -33,7 +33,7 @@
                 <th class="text">正常工時</th>
                 <th class="text">加班工時</th>
                 <th class="text">外勤工時</th>
-                <th class="text">是否違規</th>
+                <th class="text">是否有異常</th>
               </tr>
             </thead>
             <tbody>
@@ -66,8 +66,8 @@
                 v-for="(log, index) in todayAttendance.attendanceLogs"
                 :key="index"
               >
-                <td class="text">{{ log.clockTime }}</td>
-                <td class="text">{{ log.clockType.typeName }}</td>
+                <td class="text">{{ formatDate(log.clockTime) }}</td>
+                <td class="text">{{ log.clockType }}</td>
               </tr>
             </tbody>
           </table>
@@ -87,14 +87,12 @@
             </thead>
             <tbody>
               <tr
-                v-for="(
-                  violation, index
-                ) in todayAttendance.attendanceViolations"
+                v-for="(violation, index) in todayAttendance.attendanceViolations"
                 :key="index"
               >
-                <td class="text">{{ violation.violationType.typeName }}</td>
+                <td class="text">{{ violation.violationType}}</td>
                 <td class="text">{{ violation.violationMinutes }}</td>
-                <td class="text">{{ violation.createdAt }}</td>
+                <td class="text">{{ formatDate(violation.createdAt) }}</td>
               </tr>
             </tbody>
           </table>
@@ -134,14 +132,14 @@
         </form>
         <br />
         <!-- 顯示錯誤信息 -->
-        <div v-if="aError" class="alert alert-danger" role="alert">
+        <div v-show="aError" class="alert alert-danger" role="alert">
           {{ aError }}
         </div>
         <div v-if="attendance">
           <!-- 當天考勤基本資料 -->
           <h4>
             <span class="badge badge-square badge-outline-primary"
-              >今日考勤基本資料</span
+              >指定日期考勤資料</span
             >
           </h4>
           <table class="table table-borderless table-thead-border">
@@ -151,7 +149,7 @@
                 <th class="text">正常工時</th>
                 <th class="text">加班工時</th>
                 <th class="text">外勤工時</th>
-                <th class="text">是否違規</th>
+                <th class="text">是否有異常</th>
               </tr>
             </thead>
             <tbody>
@@ -185,7 +183,7 @@
                 :key="index"
               >
                 <td class="text">{{ formatDate(log.clockTime) }}</td>
-                <td class="text">{{ log.clockType.typeName }}</td>
+                <td class="text">{{ log.clockType }}</td>
               </tr>
             </tbody>
           </table>
@@ -208,7 +206,7 @@
                 v-for="(violation, index) in attendance.attendanceViolations"
                 :key="index"
               >
-                <td class="text">{{ violation.violationType.typeName }}</td>
+                <td class="text">{{ violation.violationType }}</td>
                 <td class="text">{{ violation.violationMinutes }}</td>
                 <td class="text">{{ formatDate(violation.createdAt) }}</td>
               </tr>
@@ -223,7 +221,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import axios from "axios";
+import axiosapi from "@/plugins/axios";
 
 const todayAttendance = ref(null);
 const attendance = ref(null);
@@ -235,22 +233,33 @@ const queryDate = ref("");
 // 當元件掛載時獲取當日考勤資料
 onMounted(async () => {
   try {
-    const response = await axios.get("/api/todayAttendance");
+    const response = await axiosapi.get("/api/attendancelogs/today");
     todayAttendance.value = response.data;
   } catch (err) {
-    error.value = "無法獲取當日考勤記錄";
+    if (err.response && err.response.status === 400) {
+      error.value = err.response.data; 
+    } else {
+      error.value = "無法獲取當日考勤記錄";
+    }
   }
 });
 
 // 查詢指定日期考勤
 const fetchAttendance = async () => {
+  if (!queryDate.value) {
+    aError.value = "請輸入有效的日期";
+    return;
+  }
+
   try {
-    const response = await axios.get(
-      `/api/attendance/log?date=${queryDate.value}`
-    );
+    const response = await axiosapi.get(`/api/attendancelogs/history?date=${queryDate.value}`);
     attendance.value = response.data;
   } catch (err) {
-    aError.value = "無法獲取指定日期考勤記錄";
+    if (err.response && err.response.status === 400) {
+      aError.value = err.response.data; 
+    } else {
+      aError.value = "無法獲取指定日期考勤記錄";
+    }
   }
 };
 
