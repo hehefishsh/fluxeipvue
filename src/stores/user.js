@@ -8,6 +8,7 @@ const useUserStore = defineStore(
     const empName = ref("");
     const empPhoto = ref("");
     const token = ref("");
+    const roleName = ref("")
 
     const isLoggedIn = computed(() => !!token.value);
 
@@ -15,7 +16,8 @@ const useUserStore = defineStore(
       empId.value = "";
       empName.value = "";
       empPhoto.value = "";
-      token.value = ""; 
+      token.value = "";
+      roleName.value = ""
       sessionStorage.removeItem("user");
     }
 
@@ -24,6 +26,7 @@ const useUserStore = defineStore(
       empName.value = data.empName;
       empPhoto.value = data.empPhoto;
       token.value = data.token;
+      roleName.value = data.roleName;
     }
 
     function login(data) {
@@ -36,6 +39,7 @@ const useUserStore = defineStore(
     }
 
     return {
+      roleName,
       empId,
       empName,
       empPhoto,
@@ -50,7 +54,7 @@ const useUserStore = defineStore(
   {
     persist: {
       storage: sessionStorage,
-      paths: ["empId", "empName", "empPhoto", "token"],
+      paths: ["empId", "empName", "empPhoto", "token", "roleName"],
     },
   }
 );
