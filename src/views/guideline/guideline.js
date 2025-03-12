@@ -1,6 +1,7 @@
 import GuidelineAll from "./GuidelineAll.vue";
 import GuidelineDetail from "./GuidelineDetail.vue";
 import GuidelineUpdate from "./GuidelineUpdate.vue";
+import GuidelineUpdateById from "./GuidelineUpdateById.vue";
 
 const guidelineRoutes = {
   path: "/guideline",
@@ -23,6 +24,12 @@ const guidelineRoutes = {
       path: "update",
       name: 'guideline-update-link',
       component: GuidelineUpdate,
+      meta: { title: '智庫編輯' }
+    },
+    {
+      path: "update/:id",
+      name: 'guideline-update-link-by-id',
+      component: GuidelineUpdateById,
       meta: { title: '智庫編輯' }
     }
   ],
