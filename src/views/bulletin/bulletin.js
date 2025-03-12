@@ -6,7 +6,7 @@ const bulletinRoutes = {
   meta: { title: '公佈欄' },
   children: [
     {
-      path: "",
+      path: "bulletin",
       name: "bulletin-link",
       component: Bulletin,
       meta: { title: '公佈欄' }

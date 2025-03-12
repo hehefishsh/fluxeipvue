@@ -115,6 +115,30 @@
               </RouterLink>
             </li>
             <!-- 單目錄的導引欄結束 -->
+             
+            <!-- 有子目錄的導引欄--行事曆 -->
+             <li class="has-sub expand" :class="{ active: /^\/calendar(\/.*)?$/.test(route.path) }">
+              <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#calendar"
+                aria-expanded="false" aria-controls="calendar">
+                <i class=""></i>
+                <span class="nav-text">行事曆</span> <b class="caret"></b>
+              </a>
+              <ul class="collapse" id="calendar" data-parent="#sidebar-menu">
+                <div class="sub-menu">
+                  <li :class="{ active: route.path === '/calendar/department' }">
+                    <RouterLink class="sidenav-item-link" to="/calendar/department">
+                      <span class="nav-text">部門行事曆</span>
+                    </RouterLink>
+                  </li>
+                  <li :class="{ active: route.path === '/calendar/personal' }">
+                    <RouterLink class="sidenav-item-link" to="/calendar/personal">
+                      <span class="nav-text">個人行事曆</span>
+                    </RouterLink>
+                  </li>
+                </div>
+              </ul>
+            </li>
+            <!-- 有子目錄的導引欄結束 -->
 
 
             <!-- 有的子目錄的導引欄--會議管理 -->
