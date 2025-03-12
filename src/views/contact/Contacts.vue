@@ -4,6 +4,13 @@
     <div class="col-4">
         <input type="text" class="form-control" placeholder="搜尋員工..." v-model.trim="search" @input="applyFilter">
     </div>
+    <select class="form-control custom-select" v-model="department" @change="applyFilter">
+          <option value="">所有部門</option>
+          <!-- 使用v-for來動態顯示部門選項 -->
+          <option v-for="dep in departments" :key="dep.departmentId" :value="dep.departmentName">
+            {{ dep.departmentName }}
+          </option>
+        </select>
     </div>
 
 
@@ -45,8 +52,8 @@ const rows = ref(6);
 const emps = ref([]); 
 const filteredEmps = ref([]); 
 const search = ref(""); 
-
-
+const department = ref("");
+const departments = ref([]);
 onMounted(() => {
     callFind();
 });
@@ -80,16 +87,22 @@ async function callFind(page = current.value) {
 
 
 function applyFilter() {
-    if (!search.value) {
-        filteredEmps.value = emps.value;
-    } else {
+    filteredEmps.value = emps.value;
+
+    if (search.value) {
         filteredEmps.value = emps.value.filter(emp =>
         emp.name.toLowerCase().includes(search.value.toLowerCase())
         );
-    } 
+    }
+
+
+    if (department.value) {
+        filteredEmps.value = emps.value.filter(emp =>
+        emp.department.toLowerCase().includes(department.value.toLowerCase())
+        );
+    }
     pages.value = Math.ceil(filteredEmps.value.length / rows.value);
 }
-
 
 function changePage(page) {
     current.value = page;
@@ -102,11 +115,25 @@ const contacts = computed(() => {
     const paginatedData = filteredEmps.value.slice(start, end) || [];
     return paginatedData;
 });
+
+onMounted(async () => {
+    try {
+        const response = await axios.get("http://localhost:8080/department/find");
+        departments.value = response.data || [];  // 假設回應是部門資料
+    } catch (error) {
+    console.error("取得部門資料失敗:", error);
+    }
+});
+
 </script>
     
 <style>
 .pagination {
     display: flex;
     justify-content: center;
+}
+.custom-select {
+    width: 150px;
+    padding: 5px;
 }
 </style>
