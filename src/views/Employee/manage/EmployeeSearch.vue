@@ -1,7 +1,5 @@
 <template>
     <div>
-      <!-- 假設 header 與 leftside 由父層或全域組件處理 -->
-      <!-- 內容區塊 -->
       <div>
         <!-- 頁面標題 -->
         <div class="content-title">
@@ -11,12 +9,26 @@
         <div class="card card-default" id="page-views">
           <div class="card-header">
             <h2>所有員工</h2>
+            部門查詢<select id="departmentId" v-model="department"
+                            required @change="dochangeDep()">
+                            <option value="">全部</option>
+                            <option v-for="department in departments" :key="department.departmentName" :value="department.departmentName">
+                                {{ department.departmentName }}
+                            </option>
+                        </select>
+                        職位查詢<select id="positionId" v-model="position"
+                            required @change="dochange()">
+                            <option value="">全部</option>
+                            <option v-for="position in positions" :key="position.positionName" :value="position.positionName">
+                                {{ position.positionName }}
+                            </option>
+                        </select>
             <RouterLink class="btn btn-primary btn-pill" to="/employee/manage/create">
                       <span class="nav-text">新增員工</span>
             </RouterLink>
           </div>
           <div class="card-body py-0" data-simplebar>
-            <div v-if="employees && employees.length">
+            <!-- <div v-if="employees && employees.length"> -->
               <table class="table table-borderless table-thead-border">
                 <thead>
                   <tr>
@@ -32,39 +44,139 @@
                   <tr v-for="employee in employees" :key="employee.employeeId">
                     <td class="text">{{ employee.employeeId }}</td>
                     <td class="text">{{ employee.employeeName }}</td>
-                    <!-- 注意：原 Thymeleaf 模板中部門與職位順序與表頭略有不同，這邊依原始邏輯保留 -->
                     <td class="text">{{ employee.department.departmentName }}</td>
                     <td class="text">{{ employee.position.positionName }}</td>
-                    <td class="text">{{ employee.hireDate }}</td>
+                    <td class="text">{{ formatDate(employee.hireDate) }}</td>
                     <td class="text">{{ employee.status.statusName }}</td>
                   </tr>
                 </tbody>
               </table>
-            </div>
+            <!-- </div> -->
           </div>
+          <Paginate :first-last-button="true"
+                        first-button-text="&lt;&lt;"
+                        last-button-text="&gt;&gt;"
+                        :prev-text="'Prev'"
+                        :nextText="'Next'"
+                        :click-handler="empFind"
+                        :page-range="3"
+                        :margin-pages="2"
+                        :inital-page="current"
+                        v-model="current"
+                        :pageCount="pages"
+                        >
+            </Paginate>
           <div class="bg-white py-4"></div>
         </div>
       </div>
     </div>
   </template>
   
-  <script setup>
-  import { ref, onMounted } from 'vue'
-  import axios from 'axios'
-  
-  const employees = ref([])
-  
-  onMounted(async () => {
+<script setup>
+
+// npm install vuejs-paginate-next       vue要安裝插件
+import Paginate from "vuejs-paginate-next";
+import { ref, onMounted } from 'vue'
+import axiosapi from "@/plugins/axios-login";
+const current=ref(1);//目前在第幾頁
+const pages=ref(0);  //總共幾頁
+const total=ref(0);  //總共幾筆
+const rows=ref(5);   //一頁要幾筆
+const start=ref(0);  //從第幾筆開始
+const employees=ref({})
+
+const department=ref("");
+const departments = ref([]);
+async function departmentFind(){
     try {
-      const response = await axios.get('/api/employees')
-      employees.value = response.data
+    const response = await axiosapi.get("/department/find");  
+    departments.value = response.data;  
     } catch (error) {
-      console.error('Error fetching employees:', error)
+    console.error("獲取部門資料失敗:", error);
     }
-  })
-  </script>
-  
-  <!-- 保留你的樣式 -->
-  <style>
-  </style>
-  
+}
+
+const position=ref("");
+const positions=ref([]);
+async function positionFind(){
+  if(department){
+    try {
+        const response = await axiosapi.get(`/position/find/${department.value}`);  
+        positions.value = response.data;  
+        // console.log(positions.value)
+        } catch (error) {
+        console.error("獲取職位1資料失敗:", error);
+        }
+  }else{
+    try {
+    const response = await axiosapi.get("/position/find");  
+    positions.value = response.data;  
+    } catch (error) {
+    console.error("獲取部門資料失敗:", error);
+    }
+  }
+
+}
+
+function dochangeDep(){
+  current.value=1
+  position.value=""
+  empFind(current.value)
+  positionFind();
+}
+
+function dochange(){
+  current.value=1
+  empFind(current.value)
+}
+
+async function empFind(page){
+  if(page){
+        current.value=page
+        // start.value=rows.value*(current.value-1)
+    }
+    if(department.value==""){
+      department.value=null;
+    }if(position.value==""){
+      position.value=null;
+    }
+  const data={
+      "current":current.value-1,
+      "rows":rows.value,
+      "department":department.value,
+      "position":position.value
+  };
+  try{
+      const response=await axiosapi.post("/employee/find",data);
+      employees.value=response.data.lists.content;
+      total.value=response.data.count;
+      pages.value=Math.ceil(total.value/rows.value);
+      // lastPageRows.value=total.value % rows.value
+      // console.log(position.value)
+  }catch(error){
+      console.log("error",error);
+      // Swal.fire({
+      //     title:"失敗"+error.message,
+      //     icon:"error"
+      // })
+  }
+};
+
+function formatDate(date) {
+  const formattedDate = new Date(date);
+  const year = formattedDate.getFullYear(); // 取得年份
+  const month = (formattedDate.getMonth() + 1).toString().padStart(2, '0'); // 取得月份並補零
+  const day = formattedDate.getDate().toString().padStart(2, '0'); // 取得日期並補零
+  return `${year}/${month}/${day}`; // 返回格式化的日期字符串
+    };
+
+onMounted(function(){
+  empFind();
+  departmentFind();
+  positionFind();
+})
+</script>
+
+<!-- 保留你的樣式 -->
+<style>
+</style>

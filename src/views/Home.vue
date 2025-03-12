@@ -1,7 +1,7 @@
 <template>
   <!-- <Navbar></Navbar> -->
   <div class="home">
-    <h1>首頁{{ userStore.id }}</h1>
+    <h1>首頁</h1>
     <div class="page-container">
       <Clock></Clock>
 
@@ -13,8 +13,6 @@
 <script setup>
 import Clock from '@/views/attendance/Clock.vue';
 import Navbar from "@/views/Navbar.vue";
-import useUserStore from '@/stores/user';
-const userStore=useUserStore();
 
 </script>
 

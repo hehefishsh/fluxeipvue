@@ -73,6 +73,40 @@
             </li>
             <!-- 有的子目錄的導引欄結束 -->
 
+            <!-- 有的子目錄的導引欄--申請表單 -->
+            <li class="has-sub expand" :class="{ active: /^\/requestform(\/.*)?$/.test(route.path) }">
+              <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#requestform"
+                aria-expanded="false" aria-controls="requestform">
+                <i class="mdi mdi-file-document-outline"></i>
+                <span class="nav-text">申請表單</span> <b class="caret"></b>
+              </a>
+              <ul class="collapse" id="requestform" data-parent="#sidebar-menu">
+                <div class="sub-menu">
+                  <li :class="{ active: route.path === '/requestform/leave' }">
+                    <RouterLink class="sidenav-item-link" to="/requestform/leave">
+                      <span class="nav-text">請假申請</span>
+                    </RouterLink>
+                  </li>
+                  <li :class="{ active: route.path === '/requestform/leave' }">
+                    <RouterLink class="sidenav-item-link" to="/requestform/leave">
+                      <span class="nav-text">加班申請</span>
+                    </RouterLink>
+                  </li>
+                  <li :class="{ active: route.path === '/requestform/leave' }">
+                    <RouterLink class="sidenav-item-link" to="/requestform/leave">
+                      <span class="nav-text">補卡申請</span>
+                    </RouterLink>
+                  </li>
+                  <li :class="{ active: route.path === '/requestform/leave' }">
+                    <RouterLink class="sidenav-item-link" to="/requestform/leave">
+                      <span class="nav-text">費用申請</span>
+                    </RouterLink>
+                  </li>
+                </div>
+              </ul>
+            </li>
+            <!-- 有的子目錄的導引欄結束 -->
+
 
             <!-- 單目錄的導引欄--公佈欄 -->
             <li :class="{ active: route.path === '/bulletin' }">
@@ -94,7 +128,7 @@
                 <div class="sub-menu">
                   <li :class="{ active: route.path === '/meeting/manage' }">
                     <RouterLink class="sidenav-item-link" to="/meeting/manage">
-                      <span class="nav-text">會議室管理</span>
+                      <span class="nav-text">會議室資訊</span>
                     </RouterLink>
                   </li>
                   <li :class="{ active: route.path === '/meeting/create' }">
@@ -405,8 +439,8 @@
               <!-- User Account -->
               <li class="dropdown user-menu">
                 <button class="dropdown-toggle nav-link" data-toggle="dropdown">
-                  <img src="@/images/user/u-xl-1.jpg" class="user-image rounded-circle" alt="User Image" />
-                  <span class="d-none d-lg-inline-block">John Doe</span>
+                  <img :src="user.empPhoto" class="user-image rounded-circle" alt="User Image" />
+                  <span class="d-none d-lg-inline-block">{{ user.empName }}</span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-right">
                   <li>
@@ -434,8 +468,9 @@
                   </li>
 
                   <li class="dropdown-footer">
-                    <a class="dropdown-link-item" href="sign-in.html">
-                      <i class="mdi mdi-logout"></i> Log Out
+                    <a class="dropdown-link-item" >
+                      <button @click="logOut">
+                      <i class="mdi mdi-logout"></i> Log Out</button>
                     </a>
                   </li>
                 </ul>
@@ -578,7 +613,17 @@ import logo from "@/images/dashboard.png"
 import { computed } from 'vue';
 const route = useRoute(); // 取得當前路由資訊
 const pageTitle = computed(() => route.meta.title || '未命名頁面');
+import useUserStore from '@/stores/user';
+const user=useUserStore();
+import { useRouter } from 'vue-router';
+const router=useRouter();
+import axiosapi from "@/plugins/axios-login";
 
+function logOut(){
+  axiosapi.defaults.headers.common['Authorization']=``;
+  user.clear();
+  router.push("/login");
+}
 
 
 
