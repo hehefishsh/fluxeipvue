@@ -9,6 +9,7 @@ import employeeRoutes from "@/views/employee/employee.js";
 import meetingRoutes from "@/views/meeting/meeting";
 import guidelineRoutes from "@/views/guideline/guideline";
 import bulletinRoutes from "@/views/bulletin/bulletin";
+import contactRoutes from "@/views/contact/contact";
 
 const routes = [
   {
@@ -21,7 +22,7 @@ const routes = [
     path: "/login",
     component: Login,
     name: "login-link",
-    meta: { title: "登入",hideNavbar: true },
+    meta: { title: "登入", hideNavbar: true },
   },
   attendanceRoutes,
   requestformRoutes,
@@ -29,6 +30,7 @@ const routes = [
   meetingRoutes,
   guidelineRoutes,
   bulletinRoutes,
+  contactRoutes
 ];
 
 const router = createRouter({
@@ -48,9 +50,9 @@ router.beforeEach((to, from, next) => {
   const isAuthenticated = !!user.token;
 
   if (to.path !== '/login' && !isAuthenticated) {
-      next('/login'); 
+    next('/login');
   } else {
-      next();
+    next();
   }
 });
 
