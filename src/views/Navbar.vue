@@ -73,6 +73,40 @@
             </li>
             <!-- 有的子目錄的導引欄結束 -->
 
+            <!-- 有的子目錄的導引欄--申請表單 -->
+            <li class="has-sub expand" :class="{ active: /^\/requestform(\/.*)?$/.test(route.path) }">
+              <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#requestform"
+                aria-expanded="false" aria-controls="requestform">
+                <i class="mdi mdi-file-document-outline"></i>
+                <span class="nav-text">申請表單</span> <b class="caret"></b>
+              </a>
+              <ul class="collapse" id="requestform" data-parent="#sidebar-menu">
+                <div class="sub-menu">
+                  <li :class="{ active: route.path === '/requestform/leave' }">
+                    <RouterLink class="sidenav-item-link" to="/requestform/leave">
+                      <span class="nav-text">請假申請</span>
+                    </RouterLink>
+                  </li>
+                  <li :class="{ active: route.path === '/requestform/leave' }">
+                    <RouterLink class="sidenav-item-link" to="/requestform/leave">
+                      <span class="nav-text">加班申請</span>
+                    </RouterLink>
+                  </li>
+                  <li :class="{ active: route.path === '/requestform/leave' }">
+                    <RouterLink class="sidenav-item-link" to="/requestform/leave">
+                      <span class="nav-text">補卡申請</span>
+                    </RouterLink>
+                  </li>
+                  <li :class="{ active: route.path === '/requestform/leave' }">
+                    <RouterLink class="sidenav-item-link" to="/requestform/leave">
+                      <span class="nav-text">費用申請</span>
+                    </RouterLink>
+                  </li>
+                </div>
+              </ul>
+            </li>
+            <!-- 有的子目錄的導引欄結束 -->
+
 
             <!-- 單目錄的導引欄--公佈欄 -->
             <li :class="{ active: route.path === '/bulletin' }">
