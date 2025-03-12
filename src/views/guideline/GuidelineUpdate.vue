@@ -88,30 +88,6 @@ function handleFileUpload(event, index) {
   }
 }
 
-// **從後端拉取資料並填充**
-onMounted(async () => {
-  try {
-    const response = await axios.get(`http://localhost:8080/api/guidelines/${guidelineId}`);
-    const data = response.data;
-
-    // 填充資料
-    guideline.value.guideTitle = data.guideTitle;
-    contents.value = data.contents.map((content) => ({
-      contentType: content.contentType,
-      textContent: content.textContent || "",
-    }));
-
-    // 若有圖片，進行預覽處理（假設圖片 URL 已返回）
-    contents.value.forEach((content, index) => {
-      if (content.contentType === 'image') {
-        imagePreviews.value[index] = content.imageContent; // 假設這是圖片的 URL
-      }
-    });
-  } catch (error) {
-    console.error("獲取資料失敗:", error);
-  }
-});
-
 // **表單提交**
 async function submitForm() {
   const formData = new FormData();

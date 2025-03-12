@@ -20,7 +20,7 @@ const guidelineRoutes = {
       meta: { title: '智庫詳細' }
     },
     {
-      path: 'guidelineUupdate',
+      path: "update",
       name: 'guideline-update-link',
       component: GuidelineUpdate,
       meta: { title: '智庫編輯' }
