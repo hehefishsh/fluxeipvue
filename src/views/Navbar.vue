@@ -176,7 +176,7 @@
               <!-- Offcanvas -->
               <li class="custom-dropdown">
                 <a class="offcanvas-toggler active custom-dropdown-toggler" data-offcanvas="contact-off"
-                  href="javascript:">
+                  href="/contacts">
                   <i class="mdi mdi-contacts icon"></i>
                 </a>
               </li>
