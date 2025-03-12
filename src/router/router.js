@@ -9,6 +9,7 @@ import employeeRoutes from "@/views/employee/employee.js";
 import meetingRoutes from "@/views/meeting/meeting";
 import guidelineRoutes from "@/views/guideline/guideline";
 import bulletinRoutes from "@/views/bulletin/bulletin";
+import Forbidden from "@/views/Forbidden.vue";
 
 const routes = [
   {
@@ -21,7 +22,13 @@ const routes = [
     path: "/login",
     component: Login,
     name: "login-link",
-    meta: { title: "登入",hideNavbar: true },
+    meta: { title: "登入", hideNavbar: true },
+  },
+  {
+    path: "/403",
+    component: Forbidden,
+    name: "Forbidden-link",
+    meta: { title: "無權限" },
   },
   attendanceRoutes,
   requestformRoutes,
@@ -48,9 +55,9 @@ router.beforeEach((to, from, next) => {
   const isAuthenticated = !!user.token;
 
   if (to.path !== '/login' && !isAuthenticated) {
-      next('/login'); 
+    next('/login');
   } else {
-      next();
+    next();
   }
 });
 

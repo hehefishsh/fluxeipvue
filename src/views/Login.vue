@@ -124,6 +124,7 @@ async function login() {
         empName: response.data.employeeName,
         empPhoto: response.data.photo,
         token: response.data.token,
+        roleName:response.data.roleName
       };
       userStore.set(emp);
       router.push("/");
