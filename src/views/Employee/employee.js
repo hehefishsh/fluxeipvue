@@ -38,7 +38,7 @@ const routes = [
       }
     }
   },
-  { path: "manage/detail/update", component: EmployeeDetailUpdate, name: "employee-manage-update-link", meta: { title: '員工個人資料修改' } },
+  { path: "detail/update", component: EmployeeDetailUpdate, name: "employee-manage-update-link", meta: { title: '員工個人資料修改' } },
 ]
 
 const employeeRoutes = {
