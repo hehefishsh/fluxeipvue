@@ -5,9 +5,11 @@ import EmployeeDetail from "@/views/employee/EmployeeDetail.vue";
 import EmployeeDetailUpdate from "@/views/employee/manage/EmployeeDetailUpdate.vue";
 
 import useUserStore from '@/stores/user';
+import test from "./test.vue";
 
 const routes = [
   { path: "detail", component: EmployeeDetail, name: "employee-detail-link", meta: { title: '個人資訊' } },
+  { path: "123", component: test, name: "employee-detail-link123", meta: { title: '個人資訊' } },
   {
     path: "manage/search", component: EmployeeSearch, name: "employee-manage-search-link", meta: { title: '員工查詢' }, beforeEnter: (to, from, next) => {
       const userStore = useUserStore();

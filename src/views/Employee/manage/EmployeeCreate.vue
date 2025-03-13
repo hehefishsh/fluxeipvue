@@ -107,7 +107,7 @@ const employee=ref({
 });
 
 const departments = ref([]);
-const positions=ref([]);
+
 
 const checkemail=ref(false);
 async function checkmail(){
@@ -169,6 +169,7 @@ async function departmentFind(){
     }
 }
 
+const positions=ref([]);
 async function positionFind(){
     if (employee.value.departmentName) {
         try {

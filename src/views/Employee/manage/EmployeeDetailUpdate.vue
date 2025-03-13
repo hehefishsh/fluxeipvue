@@ -5,12 +5,12 @@
         <div class="row" v-if="employee">
         <img :src="employee.employeePhoto" alt="User Image" />
         <label for="file">修改照片:</label>
-    <!-- <input type="file" id="file" name="file" accept="image/*" @change="handleFileUpload()"/> -->
+        <input type="file" id="file" name="file" accept="image/*" @change="handleFileUpload"/>
         <table >
             <tbody>
             <tr>
                 <td>ID</td>
-                <td><input type="text" id="employeeId" v-model="employee.employeeId" readonly/>{{ employee.employeeId }}</td>
+                <td><input type="text" id="employeeId" v-model="employee.employeeId" readonly v-if="false"/>{{ employee.employeeId }}</td>
             </tr>
             <tr>
                 <td>姓名</td>
@@ -77,26 +77,50 @@ import { ref, onMounted } from 'vue';
 import useUserStore from '@/stores/user';
 import axiosapi from "@/plugins/axios";
 import Swal from "sweetalert2";
+
+import { useRouter } from "vue-router";
+const router = useRouter();
+
 const user=useUserStore();
 const employeeId=user.empId
 const employee = ref({});
 // const file=ref("");
 
-const data=ref({})
+// const data=ref({})
 
 async function submitForm(){
-    data.value={
-    employeeId:employee.value.employeeId,
-    email:employee.value.email,
-    phone:employee.value.phone,
-    address:employee.value.address,
-    emergencyContact:employee.value.emergencyContact,
-    energencyPhone:employee.value.energencyPhone,
-    // photoFile:""
+    const formData = new FormData();
+    formData.append("employeeId", employee.value.employeeId);
+    formData.append("email", employee.value.email);
+    formData.append("phone", employee.value.phone);
+    formData.append("address", employee.value.address);
+    formData.append("emergencyContact", employee.value.emergencyContact);
+    formData.append("emergencyPhone", employee.value.emergencyPhone);
+
+    const photoFile = document.getElementById('file').files[0];
+    if (photoFile) {
+        formData.append("photoFile", photoFile);
     }
-    console.log(data.value)
-    const response =await axiosapi.post("/employee/detail/update",data.value)
-    console.log(response)
+console.log(formData)
+    const response = await axiosapi.post("/employee/detail/update", formData, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            }
+        });
+        console.log(response.data);
+        if(response.data){
+            Swal.fire({
+                title:"修改成功",
+                icon:"success",
+            })
+            user.updatePhoto(employee.value.employeePhoto)
+            router.push("/employee/detail");
+        }else{
+            Swal.fire({
+                title:"修改失敗",
+                icon:"warning"
+            })
+        }
     // .then(function(response){
     //     if(response.data.success){
     //         Swal.fire({
@@ -137,10 +161,13 @@ function formatDate(date) {
         };
 
 function handleFileUpload(event) {
-    const file = event.target.files[0];  // 獲取選擇的檔案
-    if (file) {
-        data.value.photoFile = file;  // 更新檔案資訊
-    }
+        const file = event.target.files[0];
+        
+        // 確保檔案存在
+        if (file) {
+            // 使用 URL.createObjectURL 來創建一個臨時的圖片 URL
+            employee.value.employeePhoto = URL.createObjectURL(file);
+        }
     }
 
 onMounted(function(){
