@@ -82,7 +82,7 @@ watch(search, () => {
 // 取得所有會議室
 async function callFind() {
   try {
-    const response = await axios.get(`${path}/pages/ajax/rooms`);
+    const response = await axios.get(`${path}/api/rooms`);
     rooms.value = response.data || [];
     applyFilter();
   } catch (error) {
@@ -165,7 +165,7 @@ async function handleSave(roomData) {
 // 新增
 async function callCreateRoom(roomData) {
   try {
-    const response = await axios.post(`${path}/pages/ajax/rooms`, {
+    const response = await axios.post(`${path}/api/rooms`, {
       roomName: roomData.roomName,
       capacity: roomData.capacity,
       location: roomData.location
@@ -187,7 +187,7 @@ async function callUpdateRoom(id, roomData) {
   }
 
   try {
-    const response = await axios.put(`${path}/pages/ajax/rooms/${id}`, {
+    const response = await axios.put(`${path}/api/rooms/${id}`, {
       roomName: roomData.roomName,
       capacity: roomData.capacity,
       location: roomData.location
@@ -215,7 +215,7 @@ async function uploadRoomImage(roomId, file) {
   formData.append("file", file);
 
   try {
-    await axios.post(`${path}/pages/ajax/rooms/${roomId}/upload-image`, formData, {
+    await axios.post(`${path}/api/rooms/${roomId}/upload-image`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
     Swal.fire("成功", "圖片上傳成功！", "success");
@@ -238,7 +238,7 @@ async function callRemoveRoom(id) {
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
-        await axios.delete(`${path}/pages/ajax/rooms/${id}`);
+        await axios.delete(`${path}/api/rooms/${id}`);
         Swal.fire("成功", "刪除成功！", "success");
         callFind();
       } catch (error) {
