@@ -132,7 +132,7 @@ async function departmentFind(){
 const position=ref("");
 const positions=ref([]);
 async function positionFind(){
-  if(department){
+  if(department.value){
     try {
         const response = await axiosapi.get(`/position/find/${department.value}`);  
         positions.value = response.data;  
