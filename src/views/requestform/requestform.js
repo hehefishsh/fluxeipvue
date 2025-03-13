@@ -1,5 +1,5 @@
 import LeaveRequest from "./LeaveRequest.vue";
-import ExpenseRequest from "./expenseRequest.vue";
+import ExpenseRequest from "./ExpenseRequest.vue";
 
 const requestformRoutes = {
   path: "/requestform",
