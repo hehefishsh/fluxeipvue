@@ -113,7 +113,7 @@ async function login() {
     const response = await axiosapi.post("/secure/ajax/login", data);
     if (response.data.success) {
       await Swal.fire({
-        title: response.data.message,
+        title: response.data.employeeName+" "+response.data.message,
         icon: "success",
       });
       axiosapi.defaults.headers.common[

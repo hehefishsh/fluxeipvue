@@ -45,7 +45,7 @@
                     <td class="text">{{ employee.department.departmentName }}</td>
                     <td class="text">{{ employee.position.positionName }}</td>
                     <td class="text">{{ formatDate(employee.hireDate) }}</td>
-                    <td class="text"><button type="button" class="btn btn-primary" @click="openModal(employee.employeeId)">修改</button></td>
+                    <td class="text"><button type="button" class="btn btn-primary" @click="openModal(employee.employeeId,employee.department.departmentName)">修改</button></td>
                   </tr>
                 </tbody>
               </table>
@@ -73,7 +73,9 @@
                     v-model:emp="employee" 
                     v-model:dep="departments"
                     v-model:pos="positions"
+                    v-model:sts="status"
                     @update="callUpdate"
+                    @posfind="positionFind2(employee.department)"
     ></EmployeeUpdate>
 
   </template>
@@ -81,6 +83,7 @@
 <script setup>
 import EmployeeUpdate from "@/components/employeeUpdate.vue";
 // npm install vuejs-paginate-next       vue要安裝插件
+import Swal from "sweetalert2";
 import Paginate from "vuejs-paginate-next";
 import { ref, onMounted } from 'vue'
 import axiosapi from "@/plugins/axios-login";
@@ -97,14 +100,26 @@ async function callUpdate(){
         employeeName:employee.value.employeeName,
         department:employee.value.department,
         position:employee.value.position,
+        status:employee.value.status
     }
-    console.log(emp)
+    if(employee.value.position==""){
+      Swal.fire({
+                title:"請輸入職位",
+                icon:"warning"
+            })
+    }else if(employee.value.employeeName==""){
+      Swal.fire({
+                title:"請輸入姓名",
+                icon:"warning"
+            })
+    }else{
+      console.log(emp)
     const response = await axiosapi.post("/employee/update",emp);
     if(response){
-        console.log("ok")
         empFind()
     }
     modal.value.closeModal();
+    }
 }
 
 async function findEmp(id){
@@ -114,10 +129,13 @@ async function findEmp(id){
     }
 }
 const modal=ref(null);
-function openModal(id){
+function openModal(id,dep){
     findEmp(id)
+    positionFind2(dep)
     modal.value.showModal();
 }
+
+const status=ref(["在職","離職"])
 
 const department=ref("");
 const departments = ref([]);
@@ -149,7 +167,12 @@ async function positionFind(){
     console.error("獲取部門資料失敗:", error);
     }
   }
+}
 
+async function positionFind2(dep){
+        employee.value.position=""
+        const response = await axiosapi.get(`/position/find/${dep}`);  
+        positions.value = response.data; 
 }
 
 function dochangeDep(){

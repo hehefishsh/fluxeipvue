@@ -25,8 +25,8 @@
                             <tr>
                                 <td><label for="departmentId">部門</label></td>
                                 <td>
-                                    <select class="form-control" id="departmentId" v-model="emp.department" required @change="positionFind">
-                                        <option v-for="department in dep" :key="department.departmentName" :value="department.departmentName">
+                                    <select class="form-control" id="departmentId" v-model="emp.department" required @change="emits('posfind')">
+                                        <option v-for="department in dep" :value="department.departmentName">
                                             {{ department.departmentName }}
                                         </option>
                                     </select>
@@ -37,8 +37,18 @@
                                 <td><label for="positionId">職位</label></td>
                                 <td>
                                     <select class="form-control" id="positionId" v-model="emp.position" required>
-                                        <option v-for="position in pos" :key="position.positionName" :value="position.positionName">
+                                        <option v-for="position in pos"  :value="position.positionName">
                                             {{ position.positionName }}
+                                        </option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label for="positionId">狀態</label></td>
+                                <td>
+                                    <select class="form-control" id="positionId" v-model="emp.status" required>
+                                        <option v-for="status in sts" :value="status">
+                                            {{ status }}
                                         </option>
                                     </select>
                                 </td>
@@ -62,8 +72,8 @@ import { Modal } from 'bootstrap';
 
 const EmployeeModalRef = ref(null);
 const EmployeeModal = ref(null);
-const emits = defineEmits(["update:emp", "update"]);
-const props = defineProps(["emp", "dep", "pos"]);
+const emits = defineEmits(["update:emp", "update","posfind"]);
+const props = defineProps(["emp", "dep", "pos","sts"]);
 
 // 更新輸入值
 function doinput(action, event) {
