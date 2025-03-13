@@ -1,4 +1,5 @@
 import LeaveRequest from "./LeaveRequest.vue";
+import ExpenseRequest from "./expenseRequest.vue";
 
 const requestformRoutes = {
   path: "/requestform",
@@ -11,12 +12,13 @@ const requestformRoutes = {
       component: LeaveRequest,
       meta: { title: '請假申請' },
     },
-    // {
-    //   path: "log",
-    //   name: "attendance-log-link",
-    //   component: AttendanceLog,
-    //   meta: { title: '出勤記錄查詢' },
-    // },
+    {
+      path: "expense",
+      name: "requestform-expense-link",
+      component: ExpenseRequest,
+      meta: { title: '費用申請' },
+    },
+
   ],
 };
 
