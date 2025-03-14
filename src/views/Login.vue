@@ -64,7 +64,8 @@
                           >記住我</label
                         >
                       </div>
-                      <a class="text-color" href="#"> 忘記密碼？ </a>
+                      <a class="text-color" href="#" @click="openModal"> 忘記密碼？ </a>
+                      
                     </div>
                     <button
                       class="btn btn-primary btn-pill mb-4"
@@ -82,9 +83,15 @@
       </div>
     </div>
   </div>
+
+  <passwordForget ref="modal" 
+                            v-model:check="check"
+                            @submit="submit">
+                            </passwordForget>
 </template>
 
 <script setup>
+import passwordForget from "@/components/passwordForget.vue";
 import { ref } from "vue";
 import axiosapi from "@/plugins/axios-login";
 import Swal from "sweetalert2";
@@ -92,8 +99,40 @@ import { useRouter } from "vue-router";
 import useUserStore from "@/stores/user";
 const userStore = useUserStore();
 
+const modal=ref(null);
+function openModal(){
+    modal.value.showModal();
+}
+
+const check=ref({})
+async function submit(){
+  const form = new FormData();
+  form.append("id",check.value.id);
+  form.append("name",check.value.name);
+  form.append("email",check.value.email);
+  console.log(form)
+    const response = await axiosapi.post("/forgot/password", form, {});
+        console.log(response.data);
+        if(response.data){
+            Swal.fire({
+                title:"已寄驗證信到信箱",
+                icon:"success",
+            })
+            modal.value.closeModal();
+            // router.push("/employee/detail");
+        }else{
+            Swal.fire({
+                title:"id，姓名，信箱有錯誤",
+                icon:"warning"
+            })
+        }
+}
+
+
+
+
 const username = ref("");
-const password = ref("");
+const password=ref("");
 const rememberMe = ref(false);
 const router = useRouter();
 

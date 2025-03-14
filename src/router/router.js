@@ -12,6 +12,7 @@ import guidelineRoutes from "@/views/guideline/guideline";
 import bulletinRoutes from "@/views/bulletin/bulletin";
 import Forbidden from "@/views/Forbidden.vue";
 import contactRoutes from "@/views/contact/contact";
+import forgetPassword from "@/views/forgetPassword.vue";
 
 const routes = [
   {
@@ -31,6 +32,13 @@ const routes = [
     component: Forbidden,
     name: "Forbidden-link",
     meta: { title: "無權限" },
+  },
+  {
+    path: '/reset-password',
+    name: 'ResetPassword',
+    component: forgetPassword,
+    props: route => ({ token: route.query.token }),
+    meta: { title: "密碼", hideNavbar: true },
   },
   attendanceRoutes,
   requestformRoutes,
@@ -55,13 +63,17 @@ router.afterEach((to) => {
 
 //全域控制，如果沒有登入，就跳轉到登入頁面
 router.beforeEach((to, from, next) => {
-  const user = useUserStore();
-  const isAuthenticated = !!user.token;
-
-  if (to.path !== '/login' && !isAuthenticated) {
-    next('/login');
-  } else {
+  if (to.path == '/reset-password') {
     next();
+  } else {
+    const user = useUserStore();
+    const isAuthenticated = !!user.token;
+
+    if (to.path !== '/login' && !isAuthenticated) {
+      next('/login');
+    } else {
+      next();
+    }
   }
 });
 
