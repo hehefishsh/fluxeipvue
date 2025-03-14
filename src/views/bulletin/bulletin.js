@@ -22,11 +22,11 @@ const bulletinRoutes = {
       path: "edit/:id",
       name: "bulletin-edit",
       component: BulletinForm,
-      props: true,
       meta: { title: "編輯公告" },
     },
   ],
 };
 
 export default bulletinRoutes;
+
 

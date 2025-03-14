@@ -7,7 +7,7 @@ import EmployeeDetailUpdate from "@/views/employee/manage/EmployeeDetailUpdate.v
 const routes = [
   { path: "detail", component: EmployeeDetail, name: "employee-detail-link", meta: { title: '個人資訊' } },
   { path: "manage/search", component: EmployeeSearch, name: "employee-manage-search-link", meta: { title: '員工查詢' } },
-  { path: "manage/create", component: EmployeeCreate, name: "employee-manage-create-link", meta: { title: '員工新增' } },
+  { path: "manage/create", component: EmployeeCreate, name: "employee-manage-create-link", meta: { title: '新增員工' } },
   { path: "manage/detail/update", component: EmployeeDetailUpdate, name: "employee-manage-update-link", meta: { title: '員工個人資料修改' } },
 ]
 
