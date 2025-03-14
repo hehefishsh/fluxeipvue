@@ -1,8 +1,8 @@
 <template>
-  <div class="container">
-    <RouterLink class="btn btn-primary btn-pill" to="/bulletin/create">
-                      <span class="nav-text">新增公告</span>
-            </RouterLink>
+  <RouterLink class="btn btn-primary btn-pill" to="/bulletin/create">
+    <span class="nav-text">新增公告</span>
+          </RouterLink>
+  <div class="card card-default">
     <table>
       <thead>
         <tr>
@@ -118,7 +118,7 @@ table {
 }
 
 th, td {
-  border: 1px solid #000000;
+  
   padding: 8px;
 }
 
