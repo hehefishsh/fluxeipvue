@@ -71,7 +71,6 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
 
 // 接收父組件傳來的請假資料
 const props = defineProps({
