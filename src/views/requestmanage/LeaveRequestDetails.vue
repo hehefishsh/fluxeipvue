@@ -3,44 +3,46 @@
     <div v-if="leaveRequest">
       <h2>請假詳情</h2>
       <table class="table">
+        <tbody>
         <tr>
-          <th>申請Id</th>
+          <td>申請Id</td>
           <td>{{ leaveRequest.leaveRequestId }}</td>
         </tr>
         <tr>
-          <th>申請人</th>
+          <td>申請人</td>
           <td>{{ leaveRequest.employeeName }}</td>
         </tr>
         <tr>
-          <th>請假類型</th>
+          <td>請假類型</td>
           <td>{{ leaveRequest.leaveType }}</td>
         </tr>
         <tr>
-          <th>開始時間</th>
+          <td>開始時間</td>
           <td>{{ formatDate(leaveRequest.startDatetime) }}</td>
         </tr>
         <tr>
-          <th>結束時間</th>
+          <td>結束時間</td>
           <td>{{ formatDate(leaveRequest.endDatetime) }}</td>
         </tr>
         <tr>
-          <th>請假時數</th>
+          <td>請假時數</td>
           <td>{{ leaveRequest.leaveHours }}</td>
         </tr>
         <tr>
-          <th>請假原因</th>
+          <td>請假原因</td>
           <td>{{ leaveRequest.reason }}</td>
         </tr>
         <tr>
-          <th>狀態</th>
+          <td>狀態</td>
           <td>{{ leaveRequest.status }}</td>
         </tr>
         <tr v-if="leaveRequest.attachmentName">
-          <th>附件</th>
+          <td>附件</td>
           <td>
             <button @click="downloadfile(leaveRequest.attachmentName, leaveRequest.attachmentPath)" class="badge badge-primary">下載附件</button>
           </td>
         </tr>
+      </tbody>
       </table>
     </div>
     <div v-else>
