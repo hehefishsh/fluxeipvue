@@ -5,10 +5,15 @@ import Home from "@/views/Home.vue";
 import Login from "@/views/Login.vue";
 import attendanceRoutes from "@/views/attendance/attendance.js";
 import requestformRoutes from "@/views/requestform/requestform";
-import employeeRoutes from "@/views/employee/employee.js";
+import employeeRoutes from "@/views/Employee/employee.js";
 import meetingRoutes from "@/views/meeting/meeting";
 import guidelineRoutes from "@/views/guideline/guideline";
 import bulletinRoutes from "@/views/bulletin/bulletin";
+import BulletinList from "@/views/bulletin/BulletinList.vue";
+import BulletinForm from "@/views/bulletin/BulletinForm.vue";
+
+
+
 
 const routes = [
   {
@@ -21,8 +26,11 @@ const routes = [
     path: "/login",
     component: Login,
     name: "login-link",
-    meta: { title: "登入",hideNavbar: true },
+    meta: { title: "登入", hideNavbar: true },
   },
+  { path: '/', component: BulletinList },
+  { path: '/create', component: BulletinForm },
+  { path: '/edit/:id', component: BulletinForm, props: true },
   attendanceRoutes,
   requestformRoutes,
   employeeRoutes,
@@ -48,9 +56,9 @@ router.beforeEach((to, from, next) => {
   const isAuthenticated = !!user.token;
 
   if (to.path !== '/login' && !isAuthenticated) {
-      next('/login'); 
+    next('/login');
   } else {
-      next();
+    next();
   }
 });
 
