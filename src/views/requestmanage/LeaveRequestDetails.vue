@@ -71,6 +71,7 @@
 </template>
 
 <script setup>
+import axiosapi from '@/plugins/axios';
 
 // 接收父組件傳來的請假資料
 const props = defineProps({
@@ -88,6 +89,7 @@ const formatDate = (dateStr) => {
 function downloadfile(attachmentName, attachmentPath) {
   axiosapi.get(`/api/leave-requests/attachments/${attachmentPath}`, { responseType: 'blob' })
     .then(response => {
+      
       const blob = new Blob([response.data], { type: response.headers['content-type'] });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');

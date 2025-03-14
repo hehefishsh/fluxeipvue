@@ -111,6 +111,7 @@ const formatDate = (dateStr) => {
 
 function downloadfile(attachmentName, attachmentPath) {
   console.log(attachmentName);
+  console.log(attachmentPath);
     axiosapi.get(`/api/leave-requests/attachments/${attachmentPath}`, {
         responseType: 'blob' // 確保返回的是二進制數據
     })
