@@ -87,20 +87,23 @@ async function callFind(page = current.value) {
 
 
 function applyFilter() {
-    filteredEmps.value = emps.value;
+    let filteredData = emps.value;
 
     if (search.value) {
-        filteredEmps.value = emps.value.filter(emp =>
+        filteredData = filteredData.filter(emp =>
         emp.name.toLowerCase().includes(search.value.toLowerCase())
         );
     }
 
 
     if (department.value) {
-        filteredEmps.value = emps.value.filter(emp =>
+        filteredData = filteredData.filter(emp =>
         emp.department.toLowerCase().includes(department.value.toLowerCase())
         );
     }
+
+    filteredEmps.value = filteredData;
+
     pages.value = Math.ceil(filteredEmps.value.length / rows.value);
 }
 

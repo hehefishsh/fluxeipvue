@@ -184,6 +184,35 @@
             </li>
             <!-- 單目錄的導引欄結束 -->
 
+
+            <!-- 有的子目錄的導引欄--排班 -->
+            <li class="has-sub expand" :class="{ active: /^\/schedule(\/.*)?$/.test(route.path) }">
+              <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#schedule"
+                aria-expanded="false" aria-controls="schedule">
+                <i class="mdi mdi-theater"></i>
+                <span class="nav-text">排班</span> <b class="caret"></b>
+              </a>
+              <ul class="collapse" id="schedule" data-parent="#sidebar-menu">
+                <div class="sub-menu">
+                  <li :class="{ active: route.path === '/schedule/shiftType' }">
+                    <RouterLink class="sidenav-item-link" to="/schedule/shiftType">
+                      <span class="nav-text">班別</span>
+                    </RouterLink>
+                  </li>
+                  <li :class="{ active: route.path === '/schedule/create' }">
+                    <RouterLink class="sidenav-item-link" to="/schedule/create">
+                      <span class="nav-text">排班功能</span>
+                    </RouterLink>
+                  </li>
+                  <li :class="{ active: route.path === '/schedule/detail' }">
+                    <RouterLink class="sidenav-item-link" to="/schedule/detail">
+                      <span class="nav-text">排班查詢</span>
+                    </RouterLink>
+                  </li>
+                </div>
+              </ul>
+            </li>
+            <!-- 有的子目錄的導引欄結束 -->
           </ul>
         </div>
       </div>
