@@ -12,6 +12,7 @@ import guidelineRoutes from "@/views/guideline/guideline";
 import bulletinRoutes from "@/views/bulletin/bulletin";
 import Forbidden from "@/views/Forbidden.vue";
 import contactRoutes from "@/views/contact/contact";
+import scheduleRoutes from "@/views/schedule/schedule";
 
 const routes = [
   {
@@ -39,7 +40,8 @@ const routes = [
   meetingRoutes,
   guidelineRoutes,
   bulletinRoutes,
-  contactRoutes
+  contactRoutes,
+  scheduleRoutes
 ];
 
 const router = createRouter({

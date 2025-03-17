@@ -25,7 +25,9 @@
             <span @click="deleteContent(guideline.guideId)" class="delete-text">刪除</span>
         </div>
     </div>
-
+    <div>
+        <RouterLink to="/guideline/all">回智庫首頁</RouterLink>
+    </div>
 </template>
     
 <script setup>
