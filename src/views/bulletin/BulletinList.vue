@@ -1,7 +1,7 @@
 <template>
   <RouterLink class="btn btn-primary btn-pill" to="/bulletin/create">
     <span class="nav-text">新增公告</span>
-          </RouterLink>
+  </RouterLink>
   <div class="card card-default">
     <table>
       <thead>
@@ -16,8 +16,10 @@
       <tbody>
         <tr v-for="bulletin in bulletins" :key="bulletin.id">
           <td>
-            <!-- 點擊標題進入詳細頁 -->
-            <a @click="viewBulletin(bulletin.id)" class="title-link">{{ bulletin.title }}</a>
+            <!-- 點擊標題顯示完整公告內容 -->
+            <a @click="showBulletinDetails(bulletin)" class="title-link">
+              {{ bulletin.title }}
+            </a>
           </td>
           <td>{{ bulletin.creater }}</td>
           <td>
@@ -28,12 +30,11 @@
           <td>{{ bulletin.statusId === 1 ? "草稿" : "已發布" }}</td>
           <td>
             <button class="btn edit-btn" @click="editBulletin(bulletin.id)">
-    ✏️ 編輯
-  </button>
-  <button class="btn delete-btn" @click="deleteBulletin(bulletin.id)">
-    🗑️ 刪除
-  </button>
-
+              ✏️ 編輯
+            </button>
+            <button class="btn delete-btn" @click="deleteBulletin(bulletin.id)">
+              🗑️ 刪除
+            </button>
           </td>
         </tr>
       </tbody>
@@ -61,48 +62,52 @@ export default {
       }
     };
 
-    const viewBulletin = (id) => {
-      router.push(`/bulletin/${id}`);
+    const showBulletinDetails = (bulletin) => {
+      Swal.fire({
+        title: bulletin.title,
+        html: `<p><strong>創建者：</strong>${bulletin.creater}</p>
+               <p><strong>內容：</strong>${bulletin.content}</p>
+               <p><strong>狀態：</strong>${bulletin.statusId === 1 ? "草稿" : "已發布"}</p>`,
+        icon: "info",
+        confirmButtonText: "關閉"
+      });
     };
 
     const editBulletin = (id) => {
       router.push(`/edit/${id}`);
     };
 
-    const goToCreate = () => {
-      router.push('/create');
-    };
-
     const removeBulletin = async (id) => {
-  Swal.fire({
-    title: "確定要刪除嗎？",
-    text: "刪除後將無法恢復！",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "刪除！",
-    cancelButtonText: "取消"
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-      try {
-        await deleteBulletin(id); // 執行刪除請求
-        Swal.fire("刪除成功！", "公告已被刪除。", "success");
-        fetchBulletins(); // 刪除後刷新列表
-      } catch (error) {
-        console.error("刪除公告失敗:", error);
-        Swal.fire("刪除失敗！", "請稍後再試。", "error");
-      }
-    }
-  });
-};
+      Swal.fire({
+        title: "確定要刪除嗎？",
+        text: "刪除後將無法恢復！",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "刪除！",
+        cancelButtonText: "取消"
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            await axiosapi.delete(`/bulletin/${id}`);
+            Swal.fire("刪除成功！", "公告已被刪除。", "success");
+            fetchBulletins();
+          } catch (error) {
+            console.error("刪除公告失敗:", error);
+            Swal.fire("刪除失敗！", "請稍後再試。", "error");
+          }
+        }
+      });
+    };
 
     onMounted(fetchBulletins);
 
-    return { bulletins, viewBulletin, editBulletin, goToCreate, deleteBulletin: removeBulletin };
+    return { bulletins, showBulletinDetails, editBulletin, deleteBulletin: removeBulletin };
   }
 };
 </script>
+
 
 <style scoped>
 .container {
