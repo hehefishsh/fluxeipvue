@@ -25,7 +25,7 @@
             <!-- 單目錄的導引欄結束 -->
 
             <!-- 有的子目錄的導引欄--員工管理 -->
-            <li class="has-sub expand" :class="{ active: /^\/employee\/manage(\/.*)?$/.test(route.path) }">
+            <li class="has-sub expand" :class="{ active: /^\/employee\/manage(\/.*)?$/.test(route.path) }" v-if="user.roleName === '最高管理員' || user.roleName === '人資主管'">
               <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#employee"
                 aria-expanded="false" aria-controls="employee">
                 <i class="mdi mdi-account-box-multiple"></i>
@@ -97,9 +97,43 @@
                       <span class="nav-text">補卡申請</span>
                     </RouterLink>
                   </li>
-                  <li :class="{ active: route.path === '/requestform/leave' }">
+                  <li :class="{ active: route.path === '/requestform/expense' }">
                     <RouterLink class="sidenav-item-link" to="/requestform/leave">
                       <span class="nav-text">費用申請</span>
+                    </RouterLink>
+                  </li>
+                </div>
+              </ul>
+            </li>
+            <!-- 有的子目錄的導引欄結束 -->
+
+            <!-- 有的子目錄的導引欄--申請表單查詢 -->
+            <li class="has-sub expand" :class="{ active: /^\/requestmanage(\/.*)?$/.test(route.path) }">
+              <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#requestmanage"
+                aria-expanded="false" aria-controls="requestmanage">
+                <i class="mdi mdi-file-document-outline"></i>
+                <span class="nav-text">表單查詢</span> <b class="caret"></b>
+              </a>
+              <ul class="collapse" id="requestmanage" data-parent="#sidebar-menu">
+                <div class="sub-menu">
+                  <li :class="{ active: route.path === '/requestmanage/leave' }">
+                    <RouterLink class="sidenav-item-link" to="/requestmanage/leave">
+                      <span class="nav-text">請假查詢</span>
+                    </RouterLink>
+                  </li>
+                  <li :class="{ active: route.path === '/requestmanage/expense' }">
+                    <RouterLink class="sidenav-item-link" to="/requestmanage/expense">
+                      <span class="nav-text">費用查詢</span>
+                    </RouterLink>
+                  </li>
+                  <li :class="{ active: route.path === '/requestmanage/leave' }">
+                    <RouterLink class="sidenav-item-link" to="/requestmanage/leave">
+                      <span class="nav-text">補卡查詢</span>
+                    </RouterLink>
+                  </li>
+                  <li :class="{ active: route.path === '/requestmanage/leave' }">
+                    <RouterLink class="sidenav-item-link" to="/requestmanage/leave">
+                      <span class="nav-text">加班查詢</span>
                     </RouterLink>
                   </li>
                 </div>
@@ -200,7 +234,7 @@
               <!-- Offcanvas -->
               <li class="custom-dropdown">
                 <a class="offcanvas-toggler active custom-dropdown-toggler" data-offcanvas="contact-off"
-                  href="javascript:">
+                  href="/contacts">
                   <i class="mdi mdi-contacts icon"></i>
                 </a>
               </li>

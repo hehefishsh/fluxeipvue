@@ -2,13 +2,11 @@
     <div>
       <div>
         <!-- 頁面標題 -->
-        <div class="content-title">
-          員工管理
-        </div>
+        
         <!-- 內容 -->
         <div class="card card-default" id="page-views">
           <div class="card-header">
-            <h2>所有員工</h2>
+            <!-- <h2>所有員工</h2> -->
             部門查詢<select id="departmentId" v-model="department"
                             required @change="dochangeDep()">
                             <option value="">全部</option>
@@ -37,7 +35,7 @@
                     <th class="text">職位</th>
                     <th class="text">部門</th>
                     <th class="text">入職時間</th>
-                    <th class="text">狀態</th>
+                    <th class="text"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -47,7 +45,7 @@
                     <td class="text">{{ employee.department.departmentName }}</td>
                     <td class="text">{{ employee.position.positionName }}</td>
                     <td class="text">{{ formatDate(employee.hireDate) }}</td>
-                    <td class="text">{{ employee.status.statusName }}</td>
+                    <td class="text"><button type="button" class="btn btn-primary" @click="openModal(employee.employeeId,employee.department.departmentName)">修改</button></td>
                   </tr>
                 </tbody>
               </table>
@@ -70,11 +68,22 @@
         </div>
       </div>
     </div>
+
+    <EmployeeUpdate ref="modal" 
+                    v-model:emp="employee" 
+                    v-model:dep="departments"
+                    v-model:pos="positions"
+                    v-model:sts="status"
+                    @update="callUpdate"
+                    @posfind="positionFind2(employee.department)"
+    ></EmployeeUpdate>
+
   </template>
   
 <script setup>
-
+import EmployeeUpdate from "@/components/employeeUpdate.vue";
 // npm install vuejs-paginate-next       vue要安裝插件
+import Swal from "sweetalert2";
 import Paginate from "vuejs-paginate-next";
 import { ref, onMounted } from 'vue'
 import axiosapi from "@/plugins/axios-login";
@@ -82,8 +91,51 @@ const current=ref(1);//目前在第幾頁
 const pages=ref(0);  //總共幾頁
 const total=ref(0);  //總共幾筆
 const rows=ref(5);   //一頁要幾筆
-const start=ref(0);  //從第幾筆開始
 const employees=ref({})
+const employee=ref({})
+
+async function callUpdate(){
+    const emp={
+        employeeId:employee.value.employeeId,
+        employeeName:employee.value.employeeName,
+        department:employee.value.department,
+        position:employee.value.position,
+        status:employee.value.status
+    }
+    if(employee.value.position==""){
+      Swal.fire({
+                title:"請輸入職位",
+                icon:"warning"
+            })
+    }else if(employee.value.employeeName==""){
+      Swal.fire({
+                title:"請輸入姓名",
+                icon:"warning"
+            })
+    }else{
+      console.log(emp)
+    const response = await axiosapi.post("/employee/update",emp);
+    if(response){
+        empFind()
+    }
+    modal.value.closeModal();
+    }
+}
+
+async function findEmp(id){
+    if(id){
+        const response = await axiosapi.get(`/employee/detail/${id}`);
+        employee.value=response.data
+    }
+}
+const modal=ref(null);
+function openModal(id,dep){
+    findEmp(id)
+    positionFind2(dep)
+    modal.value.showModal();
+}
+
+const status=ref(["在職","離職"])
 
 const department=ref("");
 const departments = ref([]);
@@ -99,7 +151,7 @@ async function departmentFind(){
 const position=ref("");
 const positions=ref([]);
 async function positionFind(){
-  if(department){
+  if(department.value){
     try {
         const response = await axiosapi.get(`/position/find/${department.value}`);  
         positions.value = response.data;  
@@ -115,7 +167,12 @@ async function positionFind(){
     console.error("獲取部門資料失敗:", error);
     }
   }
+}
 
+async function positionFind2(dep){
+        employee.value.position=""
+        const response = await axiosapi.get(`/position/find/${dep}`);  
+        positions.value = response.data; 
 }
 
 function dochangeDep(){

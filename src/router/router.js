@@ -5,6 +5,7 @@ import Home from "@/views/Home.vue";
 import Login from "@/views/Login.vue";
 import attendanceRoutes from "@/views/attendance/attendance.js";
 import requestformRoutes from "@/views/requestform/requestform";
+<<<<<<< HEAD
 import employeeRoutes from "@/views/Employee/employee.js";
 import meetingRoutes from "@/views/meeting/meeting";
 import guidelineRoutes from "@/views/guideline/guideline";
@@ -14,6 +15,15 @@ import BulletinForm from "@/views/bulletin/BulletinForm.vue";
 
 
 
+=======
+import requestmanageRoutes from "@/views/requestmanage/requestmanage";
+import employeeRoutes from "@/views/employee/employee.js";
+import meetingRoutes from "@/views/meeting/meeting";
+import guidelineRoutes from "@/views/guideline/guideline";
+import bulletinRoutes from "@/views/bulletin/bulletin";
+import Forbidden from "@/views/Forbidden.vue";
+import contactRoutes from "@/views/contact/contact";
+>>>>>>> origin/show
 
 const routes = [
   {
@@ -27,16 +37,27 @@ const routes = [
     component: Login,
     name: "login-link",
     meta: { title: "登入", hideNavbar: true },
+<<<<<<< HEAD
+=======
+  },
+  {
+    path: "/403",
+    component: Forbidden,
+    name: "Forbidden-link",
+    meta: { title: "無權限" },
+>>>>>>> origin/show
   },
   { path: '/', component: BulletinList },
   { path: '/create', component: BulletinForm },
   { path: '/edit/:id', component: BulletinForm, props: true },
   attendanceRoutes,
   requestformRoutes,
+  requestmanageRoutes,
   employeeRoutes,
   meetingRoutes,
   guidelineRoutes,
   bulletinRoutes,
+  contactRoutes
 ];
 
 const router = createRouter({

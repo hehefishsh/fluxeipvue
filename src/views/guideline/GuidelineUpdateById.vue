@@ -58,7 +58,28 @@ const router = useRouter();
 // 使用 useRoute 獲取當前路由
 const route = useRoute();
 
-const guidelineId = route.params.guidelineId; // 從路由參數中獲取 guidelineId
+const guidelineId = route.params.id; // 從路由參數中獲取 guidelineId
+
+onMounted(async () => {
+  if (!guidelineId) return;
+
+  try {
+    const response = await axios.get(`http://localhost:8080/api/guidelines/${guidelineId}`);
+    const data = response.data;
+
+    guideline.value = { guideTitle: data.guideline.guideTitle };
+    contents.value = data.contents.map((content) => ({
+      contentType: content.contentType,
+      textContent: content.textContent || "",
+      imageContent: content.imageContent || "", // 如果是圖片，這裡是圖片 URL
+    }));
+
+    // 如果有圖片，載入預覽
+    imagePreviews.value = contents.value.map((content) => content.imageContent || null);
+  } catch (error) {
+    console.error("載入指南資料失敗:", error);
+  }
+});
 
 // **新增欄位**
 function addField() {
@@ -113,7 +134,7 @@ async function submitForm() {
 
   // **發送請求**
   try {
-    const response = await axios.post("http://localhost:8080/api/guidelines", formData, {
+    const response = await axios.put(`http://localhost:8080/api/guidelines/${guidelineId}`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
     console.log("提交成功:", response.data);
