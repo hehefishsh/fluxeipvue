@@ -16,6 +16,10 @@ const useUserStore = defineStore(
       empPhoto.value = data;
     }
 
+    function updateName(data) {
+      empName.value = data;
+    }
+
     function clear() {
       empId.value = "";
       empName.value = "";
@@ -50,6 +54,7 @@ const useUserStore = defineStore(
       token,
       isLoggedIn,
       updatePhoto,
+      updateName,
       set,
       clear,
       login,

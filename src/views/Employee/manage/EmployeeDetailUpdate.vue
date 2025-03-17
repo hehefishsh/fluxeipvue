@@ -130,13 +130,6 @@ async function passwordsubmit(){
                 icon:"warning"
             })
         }
-    // } catch (error) {
-    //     console.error('錯誤發生', error);
-    //     Swal.fire({
-    //     title: '修改密碼失敗',
-    //     icon: 'error',
-    //     });
-    // }
 }
 
 const user=useUserStore();

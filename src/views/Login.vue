@@ -6,7 +6,7 @@
     >
       <div class="d-flex flex-column justify-content-between">
         <div class="row justify-content-center">
-          <div class="col-lg-6 col-md-10">
+          <div class="col-lg-8 col-md-10">
             <div class="card card-default mb-0">
               <div class="card-header pb-0">
                 <div

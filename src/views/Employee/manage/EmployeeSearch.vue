@@ -87,12 +87,14 @@ import Swal from "sweetalert2";
 import Paginate from "vuejs-paginate-next";
 import { ref, onMounted } from 'vue'
 import axiosapi from "@/plugins/axios-login";
+import useUserStore from '@/stores/user';
 const current=ref(1);//目前在第幾頁
 const pages=ref(0);  //總共幾頁
 const total=ref(0);  //總共幾筆
 const rows=ref(5);   //一頁要幾筆
 const employees=ref({})
 const employee=ref({})
+const user=useUserStore();
 
 async function callUpdate(){
     const emp={
@@ -113,10 +115,10 @@ async function callUpdate(){
                 icon:"warning"
             })
     }else{
-      console.log(emp)
     const response = await axiosapi.post("/employee/update",emp);
     if(response){
         empFind()
+        user.updateName(employee.value.employeeName)
     }
     modal.value.closeModal();
     }
