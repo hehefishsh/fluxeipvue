@@ -35,7 +35,7 @@
   </template>
   
   <script setup>
- import { ref, defineProps, defineEmits, watch } from "vue";
+ import { ref, watch } from "vue";
 
 const props = defineProps(["isOpen", "isEdit", "room"]);
 const emits = defineEmits(["close", "save"]);

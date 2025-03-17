@@ -49,7 +49,10 @@
                 </td>
                 <td class="text">{{ leave.status }}</td>
                 <td class="text">
-                  <RouterLink :to="`/requestmanage/leave-request-details/${leave.leaveRequestId}`" >查看詳情</RouterLink>
+                  <!-- <RouterLink :to="`/requestmanage/leave-request-details/${leave.leaveRequestId}`" >查看詳情</RouterLink> -->
+                  <button class="badge badge-info" @click="showModal(leave)" data-toggle="modal" data-target="#leaveRequestModal">
+                    查看詳情
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -58,6 +61,8 @@
         <div class="bg-white py-4"></div>
       </div>
     </div>
+        <!-- 請假詳情 Modal -->
+        <LeaveRequestDetails :leaveRequest="selectedLeaveRequest" />
   </div>
 </template>
 
@@ -65,12 +70,19 @@
 import { ref, onMounted } from 'vue';
 import axiosapi from '@/plugins/axios.js';
 import useUserStore from '@/stores/user';
+import LeaveRequestDetails from './LeaveRequestDetails.vue';
 const user=useUserStore();
-
 // 用來儲存請假資料
 const leaveRequestData = ref([]);
 const error = ref('');
 
+const selectedLeaveRequest = ref(null);
+
+
+// 選擇請假單，傳遞給 Modal
+const showModal = (leave) => {
+  selectedLeaveRequest.value = leave;
+};
 // 查詢請假資料
 onMounted(async () => {
   try {
@@ -99,6 +111,7 @@ const formatDate = (dateStr) => {
 
 function downloadfile(attachmentName, attachmentPath) {
   console.log(attachmentName);
+  console.log(attachmentPath);
     axiosapi.get(`/api/leave-requests/attachments/${attachmentPath}`, {
         responseType: 'blob' // 確保返回的是二進制數據
     })
