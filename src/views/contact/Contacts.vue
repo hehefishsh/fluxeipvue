@@ -46,6 +46,9 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 import ContactCard from '@/components/ContactCard.vue';
 
+
+const path = import.meta.env.VITE_API_URL;
+
 const current = ref(1); 
 const pages = ref(0); 
 const rows = ref(6); 
@@ -67,7 +70,7 @@ watch(search, () => {
 
 async function callFind(page = current.value) {
     try {
-        const response = await axios.get('http://localhost:8080/api/contacts', {
+        const response = await axios.get(`${path}/api/contacts`, {
         params: {
             page: page,
             limit: rows.value,
@@ -121,7 +124,7 @@ const contacts = computed(() => {
 
 onMounted(async () => {
     try {
-        const response = await axios.get("http://localhost:8080/department/find");
+        const response = await axios.get(`${path}/department/find`);
         departments.value = response.data || [];  // 假設回應是部門資料
     } catch (error) {
     console.error("取得部門資料失敗:", error);

@@ -92,7 +92,7 @@ function checkpas(){
 async function passwordsubmit(){
     const form = new FormData();
         form.append("token",token);
-        form.append("newPassword",password.value.name);
+        form.append("newPassword",password.value);
     console.log(form)
     const response = await axiosapi.post("/reset/password", form, {});
         console.log(response.data);

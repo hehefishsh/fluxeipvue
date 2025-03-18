@@ -49,6 +49,9 @@ import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router"; // 引入 useRoute
 import axios from "axios";
 import { useRouter } from 'vue-router';
+
+const path = import.meta.env.VITE_API_URL;
+
 // **狀態管理**
 const guideline = ref({ guideTitle: "" });
 const contents = ref([{ contentType: "text", textContent: "" }]);
@@ -113,7 +116,7 @@ async function submitForm() {
 
   // **發送請求**
   try {
-    const response = await axios.post("http://localhost:8080/api/guidelines", formData, {
+    const response = await axios.post(`${path}/api/guidelines`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
     console.log("提交成功:", response.data);
