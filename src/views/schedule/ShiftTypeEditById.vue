@@ -127,7 +127,7 @@ const goBack = () => {
 };
 </script>
            
-<style>
+<style scoped>
            .container {
          max-width: 500px;
          margin-top: 50px;
@@ -142,4 +142,5 @@ const goBack = () => {
        .btn {
          border-radius: 5px;
        }
-       </style>
+       
+</style>
