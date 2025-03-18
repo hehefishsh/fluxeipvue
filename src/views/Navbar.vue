@@ -48,6 +48,30 @@
             </li>
             <!-- 有的子目錄的導引欄結束 -->
 
+            <!-- 有的子目錄的導引欄--工作事項 -->
+            <li class="has-sub expand" :class="{ active: /^\/work(\/.*)?$/.test(route.path) }">
+              <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#work"
+                aria-expanded="false" aria-controls="work">
+                <i class="mdi mdi-account-box-multiple"></i>
+                <span class="nav-text">工作事項</span> <b class="caret"></b>
+              </a>
+              <ul class="collapse" id="work" data-parent="#sidebar-menu">
+                <div class="sub-menu">
+                  <li>
+                    <RouterLink class="sidenav-item-link" to="/work/progress">
+                      <span class="nav-text">工作事項</span>
+                    </RouterLink>
+                  </li>
+                  <!-- <li :class="{ active: route.path === '/employee/manage/create' }">
+                    <RouterLink class="sidenav-item-link" to="/employee/manage/create">
+                      <span class="nav-text">新增員工</span>
+                    </RouterLink>
+                  </li> -->
+                </div>
+              </ul>
+            </li>
+            <!-- 有的子目錄的導引欄結束 -->
+
 
             <!-- 有的子目錄的導引欄--出勤與打卡 -->
             <li class="has-sub expand" :class="{ active: /^\/attendance(\/.*)?$/.test(route.path) }">
