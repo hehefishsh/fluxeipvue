@@ -118,7 +118,7 @@ async function deleteShiftType(id){
 }
 </script>
     
-<style>
+<style scoped>
     .insertBtn{
         position: absolute;
     bottom: 20px; /* 距離底部 20px */

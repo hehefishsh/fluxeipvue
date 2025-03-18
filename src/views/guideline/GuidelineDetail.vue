@@ -15,7 +15,7 @@
 
                 <!-- 如果是圖片 -->
                 <p v-if="content.contentType === 'image'">
-                <img :src="content.imageContent" alt="圖片">
+                <img :src="content.imageContent" alt="圖片" style="width: 100%; height: auto;">
                 </p>
             </div>
         <div class="bg-white py-4"></div>

@@ -102,7 +102,7 @@ const goBack = () => {
 };
 </script>
     
-<style>
+<style scoped>
     .container {
   max-width: 500px;
   margin-top: 50px;
