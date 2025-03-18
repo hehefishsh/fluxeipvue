@@ -31,7 +31,7 @@ watchEffect(() => {
   }
 });
 
-// 以登入路徑決定要不要navbar
+// 以登入路徑決定要不要顯示navbar
 const route = useRoute();
 const hideNavbar = computed(() => route.meta.hideNavbar);
 

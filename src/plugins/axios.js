@@ -9,7 +9,7 @@ const instance = axios.create({
 
 instance.interceptors.request.use(
     (config) => {
-        const user = useUserStore(); 
+        const user = useUserStore();
         const token = user.token;
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
@@ -17,7 +17,7 @@ instance.interceptors.request.use(
             window.location.href = "/login";
             return Promise.reject(new Error('未登入'));
         }
-        
+
         return config;
     },
     (error) => {

@@ -5,14 +5,17 @@ import Home from "@/views/Home.vue";
 import Login from "@/views/Login.vue";
 import attendanceRoutes from "@/views/attendance/attendance.js";
 import requestformRoutes from "@/views/requestform/requestform";
-import employeeRoutes from "@/views/Employee/employee.js";
+import requestmanageRoutes from "@/views/requestmanage/requestmanage";
+import employeeRoutes from "@/views/employee/employee.js";
 import meetingRoutes from "@/views/meeting/meeting";
 import guidelineRoutes from "@/views/guideline/guideline";
+import Forbidden from "@/views/Forbidden.vue";
+import contactRoutes from "@/views/contact/contact";
+import forgetPassword from "@/views/forgetPassword.vue";
+import scheduleRoutes from "@/views/schedule/schedule";
 import bulletinRoutes from "@/views/bulletin/bulletin";
 import BulletinList from "@/views/bulletin/BulletinList.vue";
 import BulletinForm from "@/views/bulletin/BulletinForm.vue";
-
-
 
 
 const routes = [
@@ -28,15 +31,31 @@ const routes = [
     name: "login-link",
     meta: { title: "登入", hideNavbar: true },
   },
+  {
+    path: "/403",
+    component: Forbidden,
+    name: "Forbidden-link",
+    meta: { title: "無權限" },
+  },
+  {
+    path: '/reset-password',
+    name: 'ResetPassword',
+    component: forgetPassword,
+    props: route => ({ token: route.query.token }),
+    meta: { title: "密碼", hideNavbar: true },
+  },
   { path: '/', component: BulletinList },
   { path: '/create', component: BulletinForm },
   { path: '/edit/:id', component: BulletinForm, props: true },
   attendanceRoutes,
   requestformRoutes,
+  requestmanageRoutes,
   employeeRoutes,
   meetingRoutes,
   guidelineRoutes,
   bulletinRoutes,
+  contactRoutes,
+  scheduleRoutes
 ];
 
 const router = createRouter({
@@ -52,13 +71,17 @@ router.afterEach((to) => {
 
 //全域控制，如果沒有登入，就跳轉到登入頁面
 router.beforeEach((to, from, next) => {
-  const user = useUserStore();
-  const isAuthenticated = !!user.token;
-
-  if (to.path !== '/login' && !isAuthenticated) {
-    next('/login');
-  } else {
+  if (to.path == '/reset-password') {
     next();
+  } else {
+    const user = useUserStore();
+    const isAuthenticated = !!user.token;
+
+    if (to.path !== '/login' && !isAuthenticated) {
+      next('/login');
+    } else {
+      next();
+    }
   }
 });
 

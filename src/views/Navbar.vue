@@ -25,7 +25,7 @@
             <!-- 單目錄的導引欄結束 -->
 
             <!-- 有的子目錄的導引欄--員工管理 -->
-            <li class="has-sub expand" :class="{ active: /^\/employee\/manage(\/.*)?$/.test(route.path) }">
+            <li class="has-sub expand" :class="{ active: /^\/employee\/manage(\/.*)?$/.test(route.path) }" v-if="user.roleName === '最高管理員' || user.roleName === '人資主管'">
               <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#employee"
                 aria-expanded="false" aria-controls="employee">
                 <i class="mdi mdi-account-box-multiple"></i>
@@ -97,9 +97,43 @@
                       <span class="nav-text">補卡申請</span>
                     </RouterLink>
                   </li>
-                  <li :class="{ active: route.path === '/requestform/leave' }">
+                  <li :class="{ active: route.path === '/requestform/expense' }">
                     <RouterLink class="sidenav-item-link" to="/requestform/leave">
                       <span class="nav-text">費用申請</span>
+                    </RouterLink>
+                  </li>
+                </div>
+              </ul>
+            </li>
+            <!-- 有的子目錄的導引欄結束 -->
+
+            <!-- 有的子目錄的導引欄--申請表單查詢 -->
+            <li class="has-sub expand" :class="{ active: /^\/requestmanage(\/.*)?$/.test(route.path) }">
+              <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#requestmanage"
+                aria-expanded="false" aria-controls="requestmanage">
+                <i class="mdi mdi-file-document-outline"></i>
+                <span class="nav-text">表單查詢</span> <b class="caret"></b>
+              </a>
+              <ul class="collapse" id="requestmanage" data-parent="#sidebar-menu">
+                <div class="sub-menu">
+                  <li :class="{ active: route.path === '/requestmanage/leave' }">
+                    <RouterLink class="sidenav-item-link" to="/requestmanage/leave">
+                      <span class="nav-text">請假查詢</span>
+                    </RouterLink>
+                  </li>
+                  <li :class="{ active: route.path === '/requestmanage/expense' }">
+                    <RouterLink class="sidenav-item-link" to="/requestmanage/expense">
+                      <span class="nav-text">費用查詢</span>
+                    </RouterLink>
+                  </li>
+                  <li :class="{ active: route.path === '/requestmanage/leave' }">
+                    <RouterLink class="sidenav-item-link" to="/requestmanage/leave">
+                      <span class="nav-text">補卡查詢</span>
+                    </RouterLink>
+                  </li>
+                  <li :class="{ active: route.path === '/requestmanage/leave' }">
+                    <RouterLink class="sidenav-item-link" to="/requestmanage/leave">
+                      <span class="nav-text">加班查詢</span>
                     </RouterLink>
                   </li>
                 </div>
@@ -155,11 +189,15 @@
                       <span class="nav-text">會議室資訊</span>
                     </RouterLink>
                   </li>
-                  <li :class="{ active: route.path === '/meeting/create' }">
+                  <li class="has-sub expand" 
+                    :class="{ active: /^\/meeting(\/.*)?$/.test(route.path) }" 
+                    v-if="['最高管理員', '次等管理員', '行政主管', '人資主管', '業務主管', '技術主管', '員工'].includes(user.roleName)">
                     <RouterLink class="sidenav-item-link" to="/meeting/create">
-                      <span class="nav-text">預約會議室</span>
+                      <span class="nav-text">預約列表</span>
                     </RouterLink>
-                  </li>
+            </li>
+
+
                 </div>
               </ul>
             </li>
@@ -174,6 +212,35 @@
             </li>
             <!-- 單目錄的導引欄結束 -->
 
+
+            <!-- 有的子目錄的導引欄--排班 -->
+            <li class="has-sub expand" :class="{ active: /^\/schedule(\/.*)?$/.test(route.path) }">
+              <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#schedule"
+                aria-expanded="false" aria-controls="schedule">
+                <i class="mdi mdi-theater"></i>
+                <span class="nav-text">排班</span> <b class="caret"></b>
+              </a>
+              <ul class="collapse" id="schedule" data-parent="#sidebar-menu">
+                <div class="sub-menu">
+                  <li :class="{ active: route.path === '/schedule/shiftType' }">
+                    <RouterLink class="sidenav-item-link" to="/schedule/shiftType">
+                      <span class="nav-text">班別</span>
+                    </RouterLink>
+                  </li>
+                  <li :class="{ active: route.path === '/schedule/create' }">
+                    <RouterLink class="sidenav-item-link" to="/schedule/create">
+                      <span class="nav-text">排班功能</span>
+                    </RouterLink>
+                  </li>
+                  <li :class="{ active: route.path === '/schedule/detail' }">
+                    <RouterLink class="sidenav-item-link" to="/schedule/detail">
+                      <span class="nav-text">排班查詢</span>
+                    </RouterLink>
+                  </li>
+                </div>
+              </ul>
+            </li>
+            <!-- 有的子目錄的導引欄結束 -->
           </ul>
         </div>
       </div>
@@ -200,7 +267,7 @@
               <!-- Offcanvas -->
               <li class="custom-dropdown">
                 <a class="offcanvas-toggler active custom-dropdown-toggler" data-offcanvas="contact-off"
-                  href="javascript:">
+                  href="/contacts">
                   <i class="mdi mdi-contacts icon"></i>
                 </a>
               </li>

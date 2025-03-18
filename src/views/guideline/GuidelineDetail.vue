@@ -15,17 +15,19 @@
 
                 <!-- 如果是圖片 -->
                 <p v-if="content.contentType === 'image'">
-                <img :src="content.imageContent" alt="圖片">
+                <img :src="content.imageContent" alt="圖片" style="width: 100%; height: auto;">
                 </p>
             </div>
         <div class="bg-white py-4"></div>
         </div>
         <div class="action-text">
-            <RouterLink class="edit-text" :to="{name:'guideline-update-link'}">編輯</RouterLink>
+            <RouterLink :to="`/guideline/update/${guideId}`" class="edit-text">編輯</RouterLink>
             <span @click="deleteContent(guideline.guideId)" class="delete-text">刪除</span>
         </div>
     </div>
-
+    <div>
+        <RouterLink to="/guideline/all">回智庫首頁</RouterLink>
+    </div>
 </template>
     
 <script setup>
@@ -39,9 +41,9 @@ const router = useRouter();
 const route = useRoute()
 const guideline = ref({})
 const contents = ref([])
-
+const guideId = route.params.id
 onMounted(async () => {
-    const guideId = route.params.id  // 從路由中取得動態參數 id
+     // 從路由中取得動態參數 id
     console.log(guideId)
     try {
     // 發送 GET 請求到後端 API

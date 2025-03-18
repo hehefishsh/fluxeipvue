@@ -6,7 +6,7 @@
     >
       <div class="d-flex flex-column justify-content-between">
         <div class="row justify-content-center">
-          <div class="col-lg-6 col-md-10">
+          <div class="col-lg-8 col-md-10">
             <div class="card card-default mb-0">
               <div class="card-header pb-0">
                 <div
@@ -64,7 +64,8 @@
                           >記住我</label
                         >
                       </div>
-                      <a class="text-color" href="#"> 忘記密碼？ </a>
+                      <a class="text-color" href="#" @click="openModal"> 忘記密碼？ </a>
+                      
                     </div>
                     <button
                       class="btn btn-primary btn-pill mb-4"
@@ -82,9 +83,15 @@
       </div>
     </div>
   </div>
+
+  <passwordForget ref="modal" 
+                            v-model:check="check"
+                            @submit="submit">
+                            </passwordForget>
 </template>
 
 <script setup>
+import passwordForget from "@/components/passwordForget.vue";
 import { ref } from "vue";
 import axiosapi from "@/plugins/axios-login";
 import Swal from "sweetalert2";
@@ -92,8 +99,40 @@ import { useRouter } from "vue-router";
 import useUserStore from "@/stores/user";
 const userStore = useUserStore();
 
+const modal=ref(null);
+function openModal(){
+    modal.value.showModal();
+}
+
+const check=ref({})
+async function submit(){
+  const form = new FormData();
+  form.append("id",check.value.id);
+  form.append("name",check.value.name);
+  form.append("email",check.value.email);
+  console.log(form)
+    const response = await axiosapi.post("/forgot/password", form, {});
+        console.log(response.data);
+        if(response.data){
+            Swal.fire({
+                title:"已寄驗證信到信箱",
+                icon:"success",
+            })
+            modal.value.closeModal();
+            // router.push("/employee/detail");
+        }else{
+            Swal.fire({
+                title:"id，姓名，信箱有錯誤",
+                icon:"warning"
+            })
+        }
+}
+
+
+
+
 const username = ref("");
-const password = ref("");
+const password=ref("");
 const rememberMe = ref(false);
 const router = useRouter();
 
@@ -113,7 +152,7 @@ async function login() {
     const response = await axiosapi.post("/secure/ajax/login", data);
     if (response.data.success) {
       await Swal.fire({
-        title: response.data.message,
+        title: response.data.employeeName+" "+response.data.message,
         icon: "success",
       });
       axiosapi.defaults.headers.common[
@@ -124,6 +163,7 @@ async function login() {
         empName: response.data.employeeName,
         empPhoto: response.data.photo,
         token: response.data.token,
+        roleName:response.data.roleName
       };
       userStore.set(emp);
       router.push("/");

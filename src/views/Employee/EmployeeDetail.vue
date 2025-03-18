@@ -2,7 +2,7 @@
     <div class="container">
       <h3>個人資料</h3>
       <div class="row" v-if="employee">
-        <img :src="employee.employeePhoto" class="user-image rounded-circle" alt="User Image" />
+        <img :src="employee.employeePhoto" alt="User Image" />
         <table >
           <tbody>
           <tr>
@@ -64,7 +64,7 @@
       <div v-else>
         <p>載入中...</p>
       </div>
-      <RouterLink class="btn btn-primary btn-pill" to="/employee/manage/detail/update">
+      <RouterLink class="btn btn-primary btn-pill" to="/employee/detail/update">
                       <span class="nav-text">修改個人資料</span>
             </RouterLink>
     </div>

@@ -189,6 +189,7 @@ async function positionFind(){
 }
 
 function submit(){
+    console.log(employee.value)
     axiosapi.post("/employee/create",employee.value)
     .then(function(response){
         if(response.data.success){
