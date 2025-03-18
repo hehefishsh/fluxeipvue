@@ -49,6 +49,9 @@ import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router"; // 引入 useRoute
 import axios from "axios";
 import { useRouter } from 'vue-router';
+
+const path = import.meta.env.VITE_API_URL;
+
 // **狀態管理**
 const guideline = ref({ guideTitle: "" });
 const contents = ref([{ contentType: "text", textContent: "" }]);
@@ -64,7 +67,7 @@ onMounted(async () => {
   if (!guidelineId) return;
 
   try {
-    const response = await axios.get(`http://localhost:8080/api/guidelines/${guidelineId}`);
+    const response = await axios.get(`${path}/api/guidelines/${guidelineId}`);
     const data = response.data;
 
     guideline.value = { guideTitle: data.guideline.guideTitle };
@@ -134,7 +137,7 @@ async function submitForm() {
 
   // **發送請求**
   try {
-    const response = await axios.put(`http://localhost:8080/api/guidelines/${guidelineId}`, formData, {
+    const response = await axios.put(`${path}/api/guidelines/${guidelineId}`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
     console.log("提交成功:", response.data);

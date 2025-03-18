@@ -38,12 +38,14 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+const path = import.meta.env.VITE_API_URL;
+
 
 const allGuideline = ref([])
 
 onMounted(async () => {
   try {
-    const response = await axios.get('http://localhost:8080/api/guidelines')
+    const response = await axios.get(`${path}/api/guidelines`)
     allGuideline.value = response.data
   } catch (error) {
     console.error('Error fetching guidelines:', error)
