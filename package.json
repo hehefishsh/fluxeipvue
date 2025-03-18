@@ -9,6 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fullcalendar/core": "^6.1.15",
+    "@fullcalendar/daygrid": "^6.1.15",
+    "@fullcalendar/interaction": "^6.1.15",
+    "@fullcalendar/timegrid": "^6.1.15",
+    "@fullcalendar/vue3": "^6.1.15",
     "axios": "^1.8.1",
     "bootstrap": "^4.1.0",
     "datatables": "^1.10.18",
@@ -25,7 +30,8 @@
     "sweetalert2": "^11.17.2",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0",
-    "vuejs-paginate-next": "^1.0.2"
+    "vuejs-paginate-next": "^1.0.2",
+    "vuetify": "^3.7.16"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.1",
