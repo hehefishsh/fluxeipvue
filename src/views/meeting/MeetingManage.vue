@@ -4,15 +4,20 @@
       <div class="col-4">
         <input type="text" class="form-control" placeholder="搜尋會議室..." v-model.lazy.trim="search" @input="applyFilter">
       </div>
-      <div class="col text-end">
-        <button  class="btn btn-outline-primary btn-pill" @click="openAddModal">新增會議室</button>
+      <div class="col d-flex justify-content-end">
+        <button v-if="isAdmin" class="btn btn-outline-primary btn-pill" @click="openAddModal">新增會議室</button>
       </div>
     </div>
 
     <!-- 會議室卡片 -->
     <div class="row">
       <div class="col-lg-4 col-md-6 mb-4" v-for="item in paginatedRooms" :key="item.id">
-        <RoomCard :item="item" @open-update="openEditModal" @delete="callRemoveRoom"></RoomCard>
+        <RoomCard :item="item"
+  :roleName="roleName"
+  @open-update="openEditModal"
+  @delete="callRemoveRoom"
+  @openReserve="openReserve"
+  @openIdle="openIdle"></RoomCard>
       </div>
     </div>
 
@@ -25,6 +30,14 @@
         @close="closeModal"
         @save="handleSave"
     />
+
+    <ReserveModal 
+  v-model:isOpen="isReserveModalOpen"
+  :room="selectedRoom"
+  :employee="userStore"
+  @reserve="handleReserve"
+/>
+  
 
     <!-- 分頁按鈕 -->
     <div class="row justify-content-center mt-4">
@@ -52,10 +65,21 @@ import { ref, onMounted, computed, watch } from 'vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import Paginate from 'vuejs-paginate-next';
+import useUserStore from '@/stores/user';
 import RoomCard from '@/components/RoomCard.vue';
 import RoomModal from '@/components/RoomModal.vue';
+import ReserveModal from '@/components/ReserveModal.vue';
 
 const path = import.meta.env.VITE_API_URL;
+
+
+const userStore = useUserStore();
+const roleName = ref(userStore.roleName);
+const isAdmin = computed(() => {
+  return roleName.value === "最高管理員" || roleName.value === "次等管理員";
+});
+
+
 
 const current = ref(1);
 const pages = ref(0);
@@ -67,6 +91,17 @@ const search = ref("");
 const isModalOpen = ref(false);
 const isEditMode = ref(false);
 const selectedRoom = ref(null);
+
+const openIdle = () => {
+  console.log("開啟空閒會議室狀態功能");
+};
+
+const isReserveModalOpen = ref(false);
+
+
+
+
+
 
 
 onMounted(() => {
@@ -121,6 +156,21 @@ function openEditModal(room) {
   selectedRoom.value = { ...room };
   isModalOpen.value = true;
 }
+
+//預約方法
+
+
+function openReserve(room) {
+  if (!room || !room.roomName) {
+    console.error("❌ 錯誤：會議室資料為空或無效", room);
+    Swal.fire("錯誤", "會議室資料載入失敗", "error");
+    return;
+  }
+  selectedRoom.value = { ...room };
+  isReserveModalOpen.value = true;
+}
+
+
 
 
 // 切換分頁
@@ -249,6 +299,20 @@ async function callRemoveRoom(id) {
   });
 }
 
+
+async function handleReserve(meeting) {
+  try {
+    await axios.post(`${path}/api/meetings`, meeting);
+    Swal.fire("成功", "會議室預約成功！", "success");
+    isReserveModalOpen.value = false;
+    callFind(); // 重新載入會議室列表
+  } catch (error) {
+    console.error("預約失敗:", error);
+    Swal.fire("錯誤", `預約失敗：${error.response?.data?.message || error.message}`, "error");
+  }
+}
+
+
 // 計算分頁
 const paginatedRooms = computed(() => {
   const start = (current.value - 1) * rows.value;
@@ -257,11 +321,7 @@ const paginatedRooms = computed(() => {
 });
 
 
-
-
 </script>
-
-
 
 
 <style scoped>

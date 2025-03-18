@@ -9,25 +9,57 @@
     <div class="card-text text-danger">容納人數: {{ item.capacity }}</div>
     <div class="card-text">地點: {{ item.location }}</div>
 
+      <div class="d-flex justify-content-between mt-3" v-if="isEmployee">
+        <button class="btn btn-danger px-4 ms-auto"  @click="emits('openReserve', item)">
+          預約
+        </button>
+        <button class="btn btn-primary px-4" @click="emits('openIdle', item.id)">
+          顯示
+        </button>
+      </div>
+
     <!-- 調整按鈕對齊方式 -->
-    <div class="d-flex justify-content-between mt-3">
+    <div class="d-flex justify-content-between mt-3" v-if="isAdmin">
       <button class="btn btn-danger px-4 ms-auto" @click="emits('delete', item.id)">刪除</button> 
       <button class="btn btn-primary px-4" @click="emits('openUpdate', item)">修改</button>
     
     </div>
+    
   </div>
 </div>
 
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import {  ref, computed } from 'vue';
 
 const defaultImage = ref('https://dummyimage.com/300x200/ccc/000&text=No+Image');
 
-const props = defineProps(["item"]);
-const emits = defineEmits(["openUpdate", "delete"]);
+const props = defineProps({
+  item: Object,
+  roleName: String, 
+});
+const emits = defineEmits(["openUpdate", "delete","openReserve", "openIdle"]);
+
+// 管理員
+const isAdmin = computed(checkIsAdminComputed);
+
+
+function checkIsAdminComputed() {
+  return props.roleName === "最高管理員" || props.roleName === "次等管理員";
+}
+
+// 員工
+const isEmployee = computed(checkIsEmployee);
+
+function checkIsEmployee() {
+    return props.roleName === "員工";
+}
+
+
 </script>
+
+
 
 <style scoped>
 .room-img {
