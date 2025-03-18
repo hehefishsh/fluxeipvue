@@ -11,8 +11,9 @@
 
     <!-- 調整按鈕對齊方式 -->
     <div class="d-flex justify-content-between mt-3">
-      <button class="btn btn-primary px-4" @click="emits('openUpdate', item)">修改</button>
       <button class="btn btn-danger px-4 ms-auto" @click="emits('delete', item.id)">刪除</button> 
+      <button class="btn btn-primary px-4" @click="emits('openUpdate', item)">修改</button>
+    
     </div>
   </div>
 </div>

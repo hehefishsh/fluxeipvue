@@ -165,11 +165,15 @@
                       <span class="nav-text">會議室資訊</span>
                     </RouterLink>
                   </li>
-                  <li :class="{ active: route.path === '/meeting/create' }">
+                  <li class="has-sub expand" 
+                    :class="{ active: /^\/meeting(\/.*)?$/.test(route.path) }" 
+                    v-if="['最高管理員', '次等管理員', '行政主管', '人資主管', '業務主管', '技術主管', '員工'].includes(user.roleName)">
                     <RouterLink class="sidenav-item-link" to="/meeting/create">
-                      <span class="nav-text">預約會議室</span>
+                      <span class="nav-text">預約列表</span>
                     </RouterLink>
-                  </li>
+            </li>
+
+
                 </div>
               </ul>
             </li>
