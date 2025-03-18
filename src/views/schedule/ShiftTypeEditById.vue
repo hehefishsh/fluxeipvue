@@ -49,6 +49,9 @@ import axios from "axios";
 import { ref,onMounted } from "vue";
 import { useRouter,useRoute } from "vue-router";
 import Swal from "sweetalert2";
+
+const path = import.meta.env.VITE_API_URL;
+
        
 const router = useRouter(); // 用來跳轉頁面
 const route = useRoute();
@@ -63,7 +66,7 @@ const departments = ref([]);
 
 onMounted(async () => {
         try {
-                const response = await axios.get("http://localhost:8080/department/find");
+                const response = await axios.get(`${path}/department/find`);
                departments.value = response.data || [];  // 假設回應是部門資料
         } catch (error) {
         console.error("取得部門資料失敗:", error);
@@ -74,7 +77,7 @@ onMounted(async () => {
   const shiftTypeId = route.params.id;
   try {
     // 根據 id 載入班別資料
-    const response = await axios.get(`http://localhost:8080/api/shiftType/${shiftTypeId}`);
+    const response = await axios.get(`${path}/api/shiftType/${shiftTypeId}`);
     const shiftType = response.data;
     shiftName.value = shiftType.shiftName;
     shiftCategory.value = shiftType.shiftCategory;
@@ -83,7 +86,7 @@ onMounted(async () => {
     departmentName.value = shiftType.departmentName;
 
     // 載入部門列表
-    const deptResponse = await axios.get("http://localhost:8080/department/find");
+    const deptResponse = await axios.get(`${path}/department/find`);
     departments.value = deptResponse.data || [];
   } catch (error) {
     console.error("班別資料加載失敗:", error);
@@ -103,7 +106,7 @@ const updateShiftType = async () => {
         departmentName: departmentName.value,
         };
        
-        await axios.put(`http://localhost:8080/api/shiftType/${shiftTypeId}`, shiftData);
+        await axios.put(`${path}/api/shiftType/${shiftTypeId}`, shiftData);
         Swal.fire({
                 title: "更新成功！",
                 text: "班別已成功更新！",
