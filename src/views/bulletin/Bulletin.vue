@@ -4,7 +4,7 @@
           <h2>公佈欄</h2>
         </div>
         <div class="card-body py-0" data-simplebar>
-          <!-- 卡片內容 -->
+          
         </div>
         <div class="bg-white py-4"></div>
       </div>

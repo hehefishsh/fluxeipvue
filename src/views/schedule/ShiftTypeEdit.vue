@@ -58,11 +58,12 @@ const startTime=ref("")
 const finishTime=ref("")
 const departmentName = ref("");
 const departments = ref([]);
+const path = import.meta.env.VITE_API_URL;
 
 
 onMounted(async () => {
     try {
-        const response = await axios.get("http://localhost:8080/department/find");
+        const response = await axios.get(`${path}/department/find`);
         departments.value = response.data || [];  // 假設回應是部門資料
     } catch (error) {
     console.error("取得部門資料失敗:", error);
@@ -78,7 +79,7 @@ const saveShiftType = async () => {
       departmentName: departmentName.value,
     };
 
-    await axios.post("http://localhost:8080/api/shiftType", shiftData);
+    await axios.post(`${path}/api/shiftType`, shiftData);
     Swal.fire({
       title: "新增成功！",
       text: "班別已成功新增！",

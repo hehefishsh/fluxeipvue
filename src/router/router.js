@@ -9,11 +9,14 @@ import requestmanageRoutes from "@/views/requestmanage/requestmanage";
 import employeeRoutes from "@/views/employee/employee.js";
 import meetingRoutes from "@/views/meeting/meeting";
 import guidelineRoutes from "@/views/guideline/guideline";
-import bulletinRoutes from "@/views/bulletin/bulletin";
 import Forbidden from "@/views/Forbidden.vue";
 import contactRoutes from "@/views/contact/contact";
 import forgetPassword from "@/views/forgetPassword.vue";
 import scheduleRoutes from "@/views/schedule/schedule";
+import bulletinRoutes from "@/views/bulletin/bulletin";
+import BulletinList from "@/views/bulletin/BulletinList.vue";
+import BulletinForm from "@/views/bulletin/BulletinForm.vue";
+import workpro from "@/views/work/work";
 
 const routes = [
   {
@@ -41,6 +44,9 @@ const routes = [
     props: route => ({ token: route.query.token }),
     meta: { title: "密碼", hideNavbar: true },
   },
+  { path: '/', component: BulletinList },
+  { path: '/create', component: BulletinForm },
+  { path: '/edit/:id', component: BulletinForm, props: true },
   attendanceRoutes,
   requestformRoutes,
   requestmanageRoutes,
@@ -49,7 +55,8 @@ const routes = [
   guidelineRoutes,
   bulletinRoutes,
   contactRoutes,
-  scheduleRoutes
+  scheduleRoutes,
+  workpro
 ];
 
 const router = createRouter({

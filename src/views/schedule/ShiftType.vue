@@ -49,6 +49,8 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import { useRouter } from 'vue-router'
+const path = import.meta.env.VITE_API_URL;
+
 
 const router = useRouter();
 
@@ -56,28 +58,13 @@ const allShiftType = ref([])
 
 onMounted(async () => {
   try {
-    const response = await axios.get('http://localhost:8080/api/shiftType')
+    const response = await axios.get(`${path}/api/shiftType`)
     allShiftType.value = response.data
   } catch (error) {
     console.error('Error fetching ShiftType:', error)
   }
 })
 
-
-
-// 刪除班別
-// const deleteShiftType = async (shiftTypeId) => {
-//   if (confirm("確定要刪除這個班別嗎？")) {
-//     try {
-//       await axios.delete(`http://localhost:8080/api/shiftType/${shiftTypeId}`);
-//       allShiftType.value = allShiftType.value.filter(st => st.shiftTypeId !== shiftTypeId);
-//       alert("刪除成功");
-//     } catch (error) {
-//       console.error("刪除失敗:", error);
-//       alert("刪除失敗，請稍後再試");
-//     }
-//   }
-// };
 
 async function deleteShiftType(id){
     if(id){
@@ -88,7 +75,7 @@ async function deleteShiftType(id){
         });
         if(result.isConfirmed){
             try{
-                const response=await axios.delete(`http://localhost:8080/api/shiftType/${id}`);
+                const response=await axios.delete(`${path}/api/shiftType/${id}`);
                 console.log(response)
                 if(response.data.success){
                     await Swal.fire({

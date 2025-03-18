@@ -37,6 +37,9 @@ import { useRoute } from 'vue-router'
 import axios from 'axios'
 import { useRouter } from 'vue-router';
 
+const path = import.meta.env.VITE_API_URL;
+
+
 const router = useRouter();
 const route = useRoute()
 const guideline = ref({})
@@ -47,7 +50,7 @@ onMounted(async () => {
     console.log(guideId)
     try {
     // 發送 GET 請求到後端 API
-        const response = await axios.get(`http://localhost:8080/api/guidelines/${guideId}`)
+        const response = await axios.get(`${path}/api/guidelines/${guideId}`)
         console.log(response); 
         guideline.value = response.data.guideline  // 儲存返回的指南資料
         contents.value = response.data.contents  // 儲存相關的內容列表
