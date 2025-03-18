@@ -1,5 +1,6 @@
 import BulletinList from "@/views/bulletin/BulletinList.vue";
 import BulletinForm from "@/views/bulletin/BulletinForm.vue";
+import BulletinDetail from "./BulletinDetail.vue";
 
 const bulletinRoutes = {
   path: "/bulletin",
@@ -24,6 +25,13 @@ const bulletinRoutes = {
       component: BulletinForm,
       meta: { title: "編輯公告" },
     },
+    {
+      path: '/bulletin/:id',
+      name: 'BulletinDetail',
+      component: BulletinDetail,  // 載入你的詳細頁面組件
+      meta: { title: "詳細內容" }
+    },
+
   ],
 };
 
