@@ -198,12 +198,12 @@
               </a>
               <ul class="collapse" id="schedule" data-parent="#sidebar-menu">
                 <div class="sub-menu">
-                  <li :class="{ active: route.path === '/schedule/shiftType' }">
+                  <li :class="{ active: route.path === '/schedule/shiftType' }" v-if="[...scheduleRoles].includes(user.roleName)">
                     <RouterLink class="sidenav-item-link" to="/schedule/shiftType">
                       <span class="nav-text">班別</span>
                     </RouterLink>
                   </li>
-                  <li :class="{ active: route.path === '/schedule/create' }">
+                  <li :class="{ active: route.path === '/schedule/create' }" v-if="[...scheduleRoles].includes(user.roleName)">
                     <RouterLink class="sidenav-item-link" to="/schedule/create">
                       <span class="nav-text">排班功能</span>
                     </RouterLink>
@@ -691,6 +691,8 @@ function logOut(){
   user.clear();
   router.push("/login");
 }
+
+const scheduleRoles = ["最高管理員", "次等管理員","行政主管", "人資主管", "業務主管", "技術主管"]; // 可以排班的角色
 
 
 

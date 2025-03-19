@@ -3,7 +3,7 @@
     <h2>員工班表管理</h2>
 
     <!-- 部門選擇 -->
-    <div class="mb-3">
+    <div class="mb-3" v-if="[...adminRoles].includes(userStore.roleName)">
       <label class="form-label">選擇部門：</label>
       <select v-model="selectedDepartment" @change="fetchEmployees">
         <option value="">請選擇部門</option>
@@ -29,7 +29,7 @@
 </template>
     
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch  } from "vue";
 import axios from "axios";
 import Swal from "sweetalert2";
 import FullCalendar from "@fullcalendar/vue3";
@@ -37,7 +37,11 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 
 const path = import.meta.env.VITE_API_URL;
+import useUserStore from "@/stores/user";
+const userStore=useUserStore()
 
+const adminRoles = ["最高管理員", "次等管理員"]; // 管理員角色
+const departmentRoles = ["行政主管", "人資主管", "業務主管", "技術主管"]; // 部門主管
 
 const departments = ref([]); // 部門列表
 const employees = ref([]); // 員工列表
@@ -45,6 +49,7 @@ const selectedDepartment = ref(""); // 已選擇的部門
 const selectedEmployee = ref(""); // 已選擇的員工
 const schedules = ref([]); // 該員工的班表
 const shiftTypes = ref([]); // 班別資料
+const contacts=ref([])
 
 const calendarOptions = ref({
   plugins: [dayGridPlugin, interactionPlugin],
@@ -76,7 +81,26 @@ onMounted(async () => {
   } catch (error) {
     console.error("取得班別資料失敗:", error);
   }
+
+  
+  try {
+    const res = await axios.get(`${path}/api/contacts`);
+    contacts.value = res.data; // 取得班別資料    
+  } catch (error) {
+    console.error("取得員工資料失敗:", error);
+  }
 });
+
+//主管只能看到自己部門員工
+if([...departmentRoles].includes(userStore.roleName)){
+  watch(contacts, (newContacts) => {
+const contact = newContacts.find((emp) => emp.empId === userStore.empId);
+const department = departments.value.find(dep => dep.departmentName === contact.department);
+selectedDepartment.value=department.departmentId;
+
+fetchEmployees();
+});
+}
 
 // 取得該部門下的員工
 const fetchEmployees = async () => {
@@ -91,6 +115,7 @@ const fetchEmployees = async () => {
     console.error("取得員工資料失敗:", error);
   }
 };
+
 
 // 取得該員工的班表
 const fetchSchedule = async () => {
