@@ -52,7 +52,7 @@
             <li class="has-sub expand" :class="{ active: /^\/work(\/.*)?$/.test(route.path) }">
               <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#work"
                 aria-expanded="false" aria-controls="work">
-                <i class="mdi mdi-account-box-multiple"></i>
+                <i class="mdi mdi-briefcase"></i>
                 <span class="nav-text">工作事項</span> <b class="caret"></b>
               </a>
               <ul class="collapse" id="work" data-parent="#sidebar-menu">

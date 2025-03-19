@@ -1,4 +1,5 @@
 import workProgress from "@/views/work/workProgress.vue";
+import workDetail from "./workDetail.vue";
 
 const workpro = {
     path: "/work",
@@ -9,8 +10,13 @@ const workpro = {
             path: "progress",
             name: "workprogress-link",
             component: workProgress,
-            meta: { title: "所有工作" },
-            // 移除了 beforeEnter，表示所有人都可以訪問
+            meta: { title: "所有工作" }
+        },
+        {
+            path: "progress/detail/:id",
+            name: "workprogressdetail-link",
+            component: workDetail,
+            meta: { title: "工作分配" }
         }
     ],
 };
