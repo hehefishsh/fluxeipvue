@@ -27,7 +27,8 @@
 
             <el-table-column prop="employeeName" label="姓名" width="120"></el-table-column>
             <el-table-column prop="roomName" label="會議室" width="160"></el-table-column>
-            <el-table-column prop="title" label="主題" min-width="200"></el-table-column>
+            <el-table-column prop="title" label="主題" min-width="160"></el-table-column>
+            <el-table-column prop="notes" label="內容" min-width="200"></el-table-column>
 
             <el-table-column prop="startTime" label="開始時間" width="180" sortable>
                     <template #default="{ row }">
