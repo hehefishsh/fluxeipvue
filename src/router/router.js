@@ -14,6 +14,7 @@ import Forbidden from "@/views/Forbidden.vue";
 import contactRoutes from "@/views/contact/contact";
 import forgetPassword from "@/views/forgetPassword.vue";
 import scheduleRoutes from "@/views/schedule/schedule";
+import salaryRoutes from "@/views/salary/salary";
 
 const routes = [
   {
@@ -49,7 +50,8 @@ const routes = [
   guidelineRoutes,
   bulletinRoutes,
   contactRoutes,
-  scheduleRoutes
+  scheduleRoutes,
+  salaryRoutes
 ];
 
 const router = createRouter({

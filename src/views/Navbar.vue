@@ -193,7 +193,7 @@
             <li class="has-sub expand" :class="{ active: /^\/schedule(\/.*)?$/.test(route.path) }">
               <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#schedule"
                 aria-expanded="false" aria-controls="schedule">
-                <i class="mdi mdi-theater"></i>
+                <i class="mdi mdi-calendar"></i>
                 <span class="nav-text">排班</span> <b class="caret"></b>
               </a>
               <ul class="collapse" id="schedule" data-parent="#sidebar-menu">
@@ -213,6 +213,26 @@
                       <span class="nav-text">排班查詢</span>
                     </RouterLink>
                   </li>
+                </div>
+              </ul>
+            </li>
+            <!-- 有的子目錄的導引欄結束 -->
+
+            <!-- 有的子目錄的導引欄--排班 -->
+            <li class="has-sub expand" :class="{ active: /^\/salary(\/.*)?$/.test(route.path) }">
+              <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#salary"
+                aria-expanded="false" aria-controls="salary">
+                <i class="mdi mdi-currency-usd"></i>
+                <span class="nav-text">薪資相關</span> <b class="caret"></b>
+              </a>
+              <ul class="collapse" id="salary" data-parent="#sidebar-menu">
+                <div class="sub-menu">
+                  <li :class="{ active: route.path === '/salary/all' }" v-if="['最高管理員', '次等管理員', '人資主管'].includes(user.roleName)">
+                    <RouterLink class="sidenav-item-link" to="/salary/all">
+                      <span class="nav-text">薪資設定</span>
+                    </RouterLink>
+                  </li>
+                  
                 </div>
               </ul>
             </li>
