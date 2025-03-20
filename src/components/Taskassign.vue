@@ -23,8 +23,38 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td>負責員工 :</td>
-                                <td><input type="text" name="assign" :value="emp" @input="doinput('emp',$event)"></td>
+                                <td><label for="empId">負責員工 :</label></td>
+                                <td><select class="form-control" id="empId" v-model="task.employee" required>
+                                        <option v-for="emplo in empselect"  :value="emplo.employeeName">
+                                            {{ emplo.employeeName }}
+                                        </option>
+                                    </select></td>
+                            </tr>
+                            <tr>
+                                <td>開始日期 :</td>
+                                <td><input type="date" id="createDate" v-model="task.createDate" class="custom-select my-1 mr-sm-2 w-auto"
+                                    required /></td>
+                            </tr>
+                            <tr>
+                                <td>預計完成日期 :</td>
+                                <td><input type="date" id="expectedFinishDate" v-model="task.expectedFinishDate" class="custom-select my-1 mr-sm-2 w-auto"
+                                    required /></td>
+                            </tr>
+                            <tr>
+                                <td>完成日期 :</td>
+                                <td v-if="task.finishDate!=null"><input type="date" id="finishDate" v-model="task.finishDate" class="custom-select my-1 mr-sm-2 w-auto"
+                                    /></td>
+                                    <td v-if="task.finishDate==null"><input type="date" id="finishDate" v-model="task.finishDate" class="custom-select my-1 mr-sm-2 w-auto"
+                                        value=''/></td>
+                                <td><button @click="emits('deleteDate')">清除完成日</button></td>
+                            </tr>
+                            <tr>
+                                <td><label for="review">審核狀態 :</label></td>
+                                <td><select class="form-control" id="review" v-model="task.status" required @change="emits('reviewDate')">
+                                        <option v-for="rev in review"  :value="rev">
+                                            {{ rev }}
+                                        </option>
+                                    </select></td>
                             </tr>
                         </tbody>
                     </table>
@@ -45,9 +75,9 @@ import { Modal } from 'bootstrap';
 
 const TaskassignModalRef = ref(null);
 const TaskassignModal = ref(null);
-const emits = defineEmits(["update:task", "update"]);
-const props = defineProps(["task","emp"]);
-
+const emits = defineEmits(["update:task", "update","deleteDate","reviewDate"]);
+const props = defineProps(["task","empselect","review"]);
+const formattedDate = ref('');
 // 更新輸入值
 function doinput(action, event) {
     emits("update:task", {
@@ -76,6 +106,8 @@ defineExpose({
     showModal,
     closeModal
 })
+
+
 </script>
 
 <style>
