@@ -33,7 +33,6 @@ const works=ref({});
 async function allwork(){
     const response=await axiosapi.get("/workProgress/all");
     works.value=response.data
-    console.log(works.value)
 }
 
 onMounted(function(){

@@ -61,7 +61,7 @@ const review=ref(["未完成","已完成","待審核"])
 
 const task=ref({})
 async function callUpdate(){
-    if(task.value.status=="已完成"&&task.value.finishDate==null){
+    if(task.value.status=="已完成"&&task.value.finishDate==(null||'')){
         Swal.fire({
                 title:"審核完成，請輸入完成日期",
                 icon:"warning"

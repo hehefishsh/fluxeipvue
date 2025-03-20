@@ -6,7 +6,7 @@
     >
       <div class="d-flex flex-column justify-content-between">
         <div class="row justify-content-center">
-          <div class="col-lg-8 col-md-10">
+          <div class="col-lg-6 col-md-10">
             <div class="card card-default mb-0">
               <div class="card-header pb-0">
                 <div
@@ -60,9 +60,6 @@
                           class="custom-control-input"
                           id="customCheck2"
                         />
-                        <label class="custom-control-label" for="customCheck2"
-                          >記住我</label
-                        >
                       </div>
                       <a class="text-color" href="#" @click="openModal"> 忘記密碼？ </a>
                       
