@@ -39,15 +39,15 @@ const routes = [
     meta: { title: "無權限" },
   },
   {
-    path: '/reset-password',
-    name: 'ResetPassword',
+    path: "/reset-password",
+    name: "ResetPassword",
     component: forgetPassword,
-    props: route => ({ token: route.query.token }),
+    props: (route) => ({ token: route.query.token }),
     meta: { title: "密碼", hideNavbar: true },
   },
-  { path: '/', component: BulletinList },
-  { path: '/create', component: BulletinForm },
-  { path: '/edit/:id', component: BulletinForm, props: true },
+  { path: "/", component: BulletinList },
+  { path: "/create", component: BulletinForm },
+  { path: "/edit/:id", component: BulletinForm, props: true },
   attendanceRoutes,
   requestformRoutes,
   requestmanageRoutes,
@@ -58,7 +58,7 @@ const routes = [
   bulletinRoutes,
   contactRoutes,
   scheduleRoutes,
-  workpro
+  workpro,
 ];
 
 const router = createRouter({
@@ -71,17 +71,16 @@ router.afterEach((to) => {
   document.title = to.meta.title || "預設標題";
 });
 
-
 //全域控制，如果沒有登入，就跳轉到登入頁面
 router.beforeEach((to, from, next) => {
-  if (to.path == '/reset-password') {
+  if (to.path == "/reset-password") {
     next();
   } else {
     const user = useUserStore();
     const isAuthenticated = !!user.token;
 
-    if (to.path !== '/login' && !isAuthenticated) {
-      next('/login');
+    if (to.path !== "/login" && !isAuthenticated) {
+      next("/login");
     } else {
       next();
     }
