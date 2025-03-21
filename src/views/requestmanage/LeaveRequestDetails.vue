@@ -59,15 +59,18 @@
             </table>
 
             <!-- 顯示審核步驟 -->
-            <h5 class="mt-3">審核流程</h5>
-            <table class="table">
+            <div>
+              <h5 class="badge badge-secondary">審核流程</h5>
+            </div>
+
+            <table class="table table-borderless">
               <thead>
                 <tr>
-                  <th>步驟</th>
+                  <th style="width: 12%;">步驟</th>
                   <th>審核人</th>
                   <th>狀態</th>
-                  <th>審核意見</th>
-                  <th>時間</th>
+                  <th>意見</th>
+                  <th style="width: 40%;">更新時間</th>
                 </tr>
               </thead>
               <tbody>
