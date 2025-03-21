@@ -6,12 +6,12 @@
         <div class="modal-header">
           <h5 class="modal-title">請假詳情</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">×</span>
+            <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
           <div v-if="leaveRequest">
-            <table class="table table-borderless ">
+            <table class="table table-borderless">
               <tbody>
                 <tr>
                   <td>申請Id</td>
@@ -48,12 +48,35 @@
                 <tr v-if="leaveRequest.attachmentName">
                   <td>附件</td>
                   <td>
-                    <button v-if="leaveRequest.attachmentName" @click="downloadfile(leaveRequest.attachmentName, leaveRequest.attachmentPath)" class="badge badge-primary">
+                    <button @click="downloadFile(leaveRequest.attachmentName, leaveRequest.attachmentPath)"
+                      class="badge badge-primary">
                       下載附件
                     </button>
-                    <span v-else>無</span>
-                  {{ leaveRequest.attachmentName }}
+                    {{ leaveRequest.attachmentName }}
                   </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- 顯示審核步驟 -->
+            <h5 class="mt-3">審核流程</h5>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>步驟</th>
+                  <th>審核人</th>
+                  <th>狀態</th>
+                  <th>審核意見</th>
+                  <th>時間</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="step in approvalSteps" :key="step.stepId">
+                  <td>{{ step.currentStep }}</td>
+                  <td>{{ step.approverName }}</td>
+                  <td>{{ step.status }}</td>
+                  <td>{{ step.comment || '無' }}</td>
+                  <td>{{ formatDate(step.updatedAt) }}</td>
                 </tr>
               </tbody>
             </table>
@@ -63,7 +86,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-danger btn-pill" data-dismiss="modal">關閉</button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">關閉</button>
         </div>
       </div>
     </div>
@@ -71,25 +94,34 @@
 </template>
 
 <script setup>
+import { ref, watch } from 'vue';
 import axiosapi from '@/plugins/axios';
 
-// 接收父組件傳來的請假資料
 const props = defineProps({
   leaveRequest: Object
 });
 
-// 簡單日期格式化函式
+const approvalSteps = ref([]);
+
 const formatDate = (dateStr) => {
   if (!dateStr) return "";
   const date = new Date(dateStr);
   return date.toLocaleString("zh-TW", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
 };
 
-// 下載附件的函數
-function downloadfile(attachmentName, attachmentPath) {
+const fetchApprovalSteps = async () => {
+  if (!props.leaveRequest) return;
+  try {
+    const response = await axiosapi.get(`/api/approval/steps/${props.leaveRequest.leaveRequestId}`);
+    approvalSteps.value = response.data;
+  } catch (error) {
+    console.error("獲取審核步驟失敗", error);
+  }
+};
+
+const downloadFile = (attachmentName, attachmentPath) => {
   axiosapi.get(`/api/leave-requests/attachments/${attachmentPath}`, { responseType: 'blob' })
     .then(response => {
-      
       const blob = new Blob([response.data], { type: response.headers['content-type'] });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -103,22 +135,24 @@ function downloadfile(attachmentName, attachmentPath) {
     .catch(error => {
       console.error("下載失敗", error);
     });
-}
+};
+
+watch(() => props.leaveRequest, (newVal) => {
+  if (newVal) fetchApprovalSteps();
+});
 </script>
+
 <style scoped>
-設定表格固定布局
 .table {
   table-layout: fixed;
   width: 100%;
 }
 
-/* 防止文字溢出並顯示省略號 */
-.table td, .table th {
+.table td,
+.table th {
   word-wrap: break-word;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 200px; /* 可以根據需要設置合適的寬度 */
+  max-width: 200px;
 }
-
-
 </style>
