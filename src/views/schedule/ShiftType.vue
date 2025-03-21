@@ -1,6 +1,5 @@
 <template>
-        <h3>班別</h3>
-        <div class="card card-default" id="page-views">
+    <div class="card card-default" id="page-views">
       <div class="card-header">
         <h2>班別一覽</h2>
       </div>
@@ -48,11 +47,9 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import Swal from 'sweetalert2'
-import { useRouter } from 'vue-router'
 const path = import.meta.env.VITE_API_URL;
 
 
-const router = useRouter();
 
 const allShiftType = ref([])
 

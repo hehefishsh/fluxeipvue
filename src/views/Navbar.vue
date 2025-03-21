@@ -275,17 +275,17 @@
             <li class="has-sub expand" :class="{ active: /^\/schedule(\/.*)?$/.test(route.path) }">
               <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#schedule"
                 aria-expanded="false" aria-controls="schedule">
-                <i class="mdi mdi-theater"></i>
+                <i class="mdi mdi-calendar"></i>
                 <span class="nav-text">排班</span> <b class="caret"></b>
               </a>
               <ul class="collapse" id="schedule" data-parent="#sidebar-menu">
                 <div class="sub-menu">
-                  <li :class="{ active: route.path === '/schedule/shiftType' }">
+                  <li :class="{ active: route.path === '/schedule/shiftType' }" v-if="[...scheduleRoles].includes(user.roleName)">
                     <RouterLink class="sidenav-item-link" to="/schedule/shiftType">
                       <span class="nav-text">班別</span>
                     </RouterLink>
                   </li>
-                  <li :class="{ active: route.path === '/schedule/create' }">
+                  <li :class="{ active: route.path === '/schedule/create' }" v-if="[...scheduleRoles].includes(user.roleName)">
                     <RouterLink class="sidenav-item-link" to="/schedule/create">
                       <span class="nav-text">排班功能</span>
                     </RouterLink>
@@ -295,6 +295,26 @@
                       <span class="nav-text">排班查詢</span>
                     </RouterLink>
                   </li>
+                </div>
+              </ul>
+            </li>
+            <!-- 有的子目錄的導引欄結束 -->
+
+            <!-- 有的子目錄的導引欄--排班 -->
+            <li class="has-sub expand" :class="{ active: /^\/salary(\/.*)?$/.test(route.path) }">
+              <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#salary"
+                aria-expanded="false" aria-controls="salary">
+                <i class="mdi mdi-currency-usd"></i>
+                <span class="nav-text">薪資相關</span> <b class="caret"></b>
+              </a>
+              <ul class="collapse" id="salary" data-parent="#sidebar-menu">
+                <div class="sub-menu">
+                  <li :class="{ active: route.path === '/salary/all' }" v-if="['最高管理員', '次等管理員', '人資主管'].includes(user.roleName)">
+                    <RouterLink class="sidenav-item-link" to="/salary/all">
+                      <span class="nav-text">薪資設定</span>
+                    </RouterLink>
+                  </li>
+                  
                 </div>
               </ul>
             </li>
@@ -773,6 +793,8 @@ function logOut(){
   user.clear();
   router.push("/login");
 }
+
+const scheduleRoles = ["最高管理員", "次等管理員","行政主管", "人資主管", "業務主管", "技術主管"]; // 可以排班的角色
 
 
 
