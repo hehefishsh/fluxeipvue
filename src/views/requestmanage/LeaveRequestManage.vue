@@ -11,104 +11,160 @@
         <div v-show="error" class="alert alert-danger" role="alert">
           {{ error }}
         </div>
-          <!-- 分類標籤 -->
-          <div class="d-flex justify-content-between">
-          <ul class="nav nav-custom-pills mb-3" id="leave-tabs" role="tablist">
-          <li class="nav-item">
-            <a class="nav-link" :class="{ active: activeTab === 'all' }" @click="activeTab = 'all'" href="#">全部</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" :class="{ active: activeTab === 'pending' }" @click="activeTab = 'pending'" href="#">待審核</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" :class="{ active: activeTab === 'reviewing' }" @click="activeTab = 'reviewing'" href="#">審核中</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" :class="{ active: activeTab === 'approved' }" @click="activeTab = 'approved'" href="#">已核決</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" :class="{ active: activeTab === 'rejected' }" @click="activeTab = 'rejected'" href="#">未核准</a>
-          </li>
-        </ul>
-        <!-- 返回首頁按鈕，靠右對齊 -->
-         <div> <RouterLink class="btn btn-outline-primary btn-pill ms-auto" to="/">返回首頁</RouterLink></div>
- 
-</div>
+        <!-- 分類標籤 -->
+        <div class="d-flex justify-content-between">
+          <ul
+            class="nav nav-pills mb-3 justify-content-between"
+            id="pills-tab12"
+            role="tablist"
+          >
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                :class="{ active: activeTab === 'all' }"
+                @click="activeTab = 'all'"
+                id="pills-home-tab"
+                data-toggle="pill"
+                href="#pills-home-custom-pill"
+                role="tab"
+                aria-controls="pills-home"
+                aria-selected="true"
+                >全部</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                :class="{ active: activeTab === 'pending' }"
+                @click="activeTab = 'pending'"
+                href="#"
+                >待審核</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                :class="{ active: activeTab === 'reviewing' }"
+                @click="activeTab = 'reviewing'"
+                href="#"
+                >審核中</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                :class="{ active: activeTab === 'approved' }"
+                @click="activeTab = 'approved'"
+                href="#"
+                >已核決</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                :class="{ active: activeTab === 'rejected' }"
+                @click="activeTab = 'rejected'"
+                href="#"
+                >未核准</a
+              >
+            </li>
+          </ul>
+          <!-- 返回首頁按鈕，靠右對齊 -->
+          <div>
+            <RouterLink class="btn btn-outline-primary btn-pill ms-auto" to="/"
+              >返回首頁</RouterLink
+            >
+          </div>
+        </div>
 
         <!-- 篩選顯示對應的請假資料 -->
         <div class="tab-content mt-3">
           <div v-if="filteredLeaveRequests.length">
-        <!-- <div v-if="leaveRequestData"> -->
-          <!-- 顯示請假資料 -->
-          <!-- <h4>
+            <!-- <div v-if="leaveRequestData"> -->
+            <!-- 顯示請假資料 -->
+            <!-- <h4>
             <span class="badge badge-square badge-outline-primary">請假資料</span>
           </h4> -->
-          <table class="table table-borderless table-thead-border">
-            <thead>
-              <tr>
-                <th class="text">申請Id</th>
-                <th class="text">申請人</th>
-                <th class="text">請假類型</th>
-                <th class="text">開始時間</th>
-                <th class="text">結束時間</th>
-                <th class="text">請假時數</th>
-                <th class="text">請假原因</th>
-                <th class="text">附件</th>
-                <th class="text">狀態</th>
-                <th class="text">其他</th>
-
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(leave, index) in leaveRequestData" :key="index">
-                <td class="text">{{ leave.leaveRequestId }}</td>
-                <td class="text">{{ leave.employeeName }}</td>
-                <td class="text">{{ leave.leaveType}}</td>
-                <td class="text">{{ formatDate(leave.startDatetime) }}</td>
-                <td class="text">{{ formatDate(leave.endDatetime) }}</td>
-                <td class="text">{{ leave.leaveHours }}</td>
-                <td class="text">{{ leave.reason }}</td>
-                <td class="text">
-                  <button v-if="leave.attachmentName" @click="downloadfile(leave.attachmentName,leave.attachmentPath)" class="badge badge-primary">下載附件</button>
-                  <span v-else>無</span>
-                  {{ leave.attachmentName }}
-                </td>
-                <td class="text">{{ leave.status }}</td>
-                <td class="text">
-                  <!-- <RouterLink :to="`/requestmanage/leave-request-details/${leave.leaveRequestId}`" >查看詳情</RouterLink> -->
-                  <button class="badge badge-info" @click="showModal(leave)" data-toggle="modal" data-target="#leaveRequestModal">
-                    查看詳情
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+            <table class="table table-borderless table-thead-border">
+              <thead>
+                <tr>
+                  <th class="text">申請Id</th>
+                  <th class="text">申請人</th>
+                  <th class="text">請假類型</th>
+                  <th class="text">開始時間</th>
+                  <th class="text">結束時間</th>
+                  <th class="text">請假時數</th>
+                  <th class="text">請假原因</th>
+                  <th class="text">附件</th>
+                  <th class="text">狀態</th>
+                  <th class="text">其他</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="(leave, index) in filteredLeaveRequests"
+                  :key="index"
+                >
+                  <td class="text">{{ leave.leaveRequestId }}</td>
+                  <td class="text">{{ leave.employeeName }}</td>
+                  <td class="text">{{ leave.leaveType }}</td>
+                  <td class="text">{{ formatDate(leave.startDatetime) }}</td>
+                  <td class="text">{{ formatDate(leave.endDatetime) }}</td>
+                  <td class="text">{{ leave.leaveHours }}</td>
+                  <td class="text">{{ leave.reason }}</td>
+                  <td class="text">
+                    <button
+                      v-if="leave.attachmentName"
+                      @click="
+                        downloadfile(leave.attachmentName, leave.attachmentPath)
+                      "
+                      class="badge badge-primary"
+                    >
+                      下載附件
+                    </button>
+                    <span v-else>無</span>
+                    {{ leave.attachmentName }}
+                  </td>
+                  <td class="text">{{ leave.status }}</td>
+                  <td class="text">
+                    <!-- <RouterLink :to="`/requestmanage/leave-request-details/${leave.leaveRequestId}`" >查看詳情</RouterLink> -->
+                    <button
+                      class="badge badge-info"
+                      @click="showModal(leave)"
+                      data-toggle="modal"
+                      data-target="#leaveRequestModal"
+                    >
+                      查看詳情
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
           <div v-else>
             <p class="text-center text-muted">無相關請假資料</p>
           </div>
         </div>
-        
+
         <div class="bg-white py-4"></div>
       </div>
     </div>
-        <!-- 請假詳情 Modal -->
-        <LeaveRequestDetails :leaveRequest="selectedLeaveRequest" />
+    <!-- 請假詳情 Modal -->
+    <LeaveRequestDetails :leaveRequest="selectedLeaveRequest" />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed} from 'vue';
-import axiosapi from '@/plugins/axios.js';
-import useUserStore from '@/stores/user';
-import LeaveRequestDetails from './LeaveRequestDetails.vue';
-const user=useUserStore();
+import { ref, onMounted, computed } from "vue";
+import axiosapi from "@/plugins/axios.js";
+import useUserStore from "@/stores/user";
+import LeaveRequestDetails from "./LeaveRequestDetails.vue";
+const user = useUserStore();
 // 用來儲存請假資料
 const leaveRequestData = ref([]);
-const error = ref('');
-const activeTab = ref('all'); // 預設顯示 "全部"
+const error = ref("");
+const activeTab = ref("all"); // 預設顯示 "全部"
 const selectedLeaveRequest = ref(null);
-
 
 // 選擇請假單，傳遞給 Modal
 const showModal = (leave) => {
@@ -117,7 +173,9 @@ const showModal = (leave) => {
 // 查詢請假資料
 onMounted(async () => {
   try {
-    const response = await axiosapi.get(`/api/leave-requests/employee/${user.empId}`);
+    const response = await axiosapi.get(
+      `/api/leave-requests/employee/${user.empId}`
+    );
     leaveRequestData.value = response.data;
   } catch (err) {
     error.value = "無法獲取請假資料";
@@ -126,17 +184,17 @@ onMounted(async () => {
 
 // 根據標籤篩選請假資料
 const filteredLeaveRequests = computed(() => {
-  if (activeTab.value === 'all') return leaveRequestData.value;
+  if (activeTab.value === "all") return leaveRequestData.value;
   return leaveRequestData.value.filter((leave) => {
     switch (activeTab.value) {
-      case 'pending':
-        return leave.status === '待審核';
-      case 'reviewing':
-        return leave.status === '審核中';
-      case 'approved':
-        return leave.status === '已核決';
-      case 'rejected':
-        return leave.status === '未核准';
+      case "pending":
+        return leave.status === "待審核";
+      case "reviewing":
+        return leave.status === "審核中";
+      case "approved":
+        return leave.status === "已核決";
+      case "rejected":
+        return leave.status === "未核准";
       default:
         return true;
     }
@@ -161,52 +219,50 @@ const formatDate = (dateStr) => {
 function downloadfile(attachmentName, attachmentPath) {
   console.log(attachmentName);
   console.log(attachmentPath);
-    axiosapi.get(`/api/leave-requests/attachments/${attachmentPath}`, {
-        responseType: 'blob' // 確保返回的是二進制數據
+  axiosapi
+    .get(`/api/leave-requests/attachments/${attachmentPath}`, {
+      responseType: "blob", // 確保返回的是二進制數據
     })
-    .then(response => {
-        // 創建 Blob 對象
-        const blob = new Blob([response.data], { type: response.headers['content-type'] }); 
+    .then((response) => {
+      // 創建 Blob 對象
+      const blob = new Blob([response.data], {
+        type: response.headers["content-type"],
+      });
 
-        // 創建下載連結
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = decodeURIComponent(attachmentName);
+      // 創建下載連結
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = decodeURIComponent(attachmentName);
 
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a); 
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
 
-        window.URL.revokeObjectURL(url);
+      window.URL.revokeObjectURL(url);
     })
-    .catch(error => {
-        console.error("下載失敗", error);
-        Swal.fire({
-            title: "下載失敗: " + error.message,
-            icon: "error"
-        });
+    .catch((error) => {
+      console.error("下載失敗", error);
+      Swal.fire({
+        title: "下載失敗: " + error.message,
+        icon: "error",
+      });
     });
 }
-
-
-
 </script>
 
 <style scoped>
-設定表格固定布局
-.table {
+設定表格固定布局 .table {
   table-layout: fixed;
   width: 100%;
 }
 
 /* 防止文字溢出並顯示省略號 */
-.table td, .table th {
+.table td,
+.table th {
   word-wrap: break-word;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 200px; /* 可以根據需要設置合適的寬度 */
 }
-
-
 </style>
