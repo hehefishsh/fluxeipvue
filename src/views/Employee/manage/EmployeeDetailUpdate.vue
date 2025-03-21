@@ -1,79 +1,81 @@
 <template>
-    <div class="container">
-        <h3>個人資料修改</h3>
-        <form @submit.prevent="submitForm" enctype="multipart/form-data">
-            <div class="row" v-if="employee">
-                <img :src="employee.employeePhoto" alt="User Image" />
-                <label for="file">修改照片:</label>
-                <input type="file" id="file" name="file" accept="image/*" @change="handleFileUpload"/>
-            <table >
-                <tbody>
-                <tr>
-                    <td>ID</td>
-                    <td><input type="text" id="employeeId" v-model="employee.employeeId" readonly v-if="false"/>{{ employee.employeeId }}</td>
-                </tr>
-                <tr>
-                    <td>姓名</td>
-                    <td>{{ employee.employeeName }}</td>
-                </tr>
-                <tr>
-                    <td>部門</td>
-                    <td>{{ employee.department }}</td>
-                </tr>
-                <tr>
-                    <td>職位</td>
-                    <td>{{ employee.position }}</td>
-                </tr>
-                <tr>
-                    <td>入職日</td>
-                    <td>{{ formatDate(employee.hireDate) }}</td>
-                </tr>
-                <tr>
-                    <td>性別</td>
-                    <td>{{ employee.gender }}</td>
-                </tr>
-                <tr>
-                    <td>生日</td>
-                    <td>{{ formatDate(employee.birthday) }}</td>
-                </tr>
-                <tr>
-                    <td>身分證</td>
-                    <td>{{ employee.identityCard }}</td>
-                </tr>
-                <tr>
-                    <td>信箱</td>
-                    <td><input type="text" v-model="employee.email" id="email" required></td>
-                </tr>
-                <tr>
-                    <td>電話</td>
-                    <td><input type="text" v-model="employee.phone" id="phone" required></td>
-                </tr>
-                <tr>
-                    <td>住址</td>
-                    <td><input type="text" v-model="employee.address" id="address" required></td>
-                </tr>
-                <tr>
-                    <td>緊急連絡人</td>
-                    <td><input type="text" v-model="employee.emergencyContact" id="emergencyContact" required></td>
-                </tr>
-                <tr>
-                    <td>緊急電話</td>
-                    <td><input type="text" v-model="employee.energencyPhone" id="energencyPhone" required></td>
-                </tr>
-            
-                </tbody>
-            </table>
+    <div class="card card-default">
+        <div class="container">
+            <div class="card-header">
+            <h3>個人資料修改</h3>
         </div>
-        <div v-else>
-            <p>載入中...</p>
-        </div>
-        <button type="submit" class="btn btn-secondary btn-pill">修改</button>
-        <button type="button" class="btn btn-info btn-pill" @click="openModal">
-            修改密碼
-        </button>
-        </form>
+        <div class="card-body">
+            <form @submit.prevent="submitForm" enctype="multipart/form-data">
+                <div>
+                    <img :src="employee.employeePhoto" alt="User Image" />
+                    <label for="file">修改照片:</label>
+                    <input type="file" id="file" name="file" accept="image/*" @change="handleFileUpload"/>
+                <table >
+                    <tbody>
+                    <tr>
+                        <td>ID</td>
+                        <td><input type="text" id="employeeId" v-model="employee.employeeId" readonly v-if="false"/>{{ employee.employeeId }}</td>
+                    </tr>
+                    <tr>
+                        <td>姓名</td>
+                        <td>{{ employee.employeeName }}</td>
+                    </tr>
+                    <tr>
+                        <td>部門</td>
+                        <td>{{ employee.department }}</td>
+                    </tr>
+                    <tr>
+                        <td>職位</td>
+                        <td>{{ employee.position }}</td>
+                    </tr>
+                    <tr>
+                        <td>入職日</td>
+                        <td>{{ formatDate(employee.hireDate) }}</td>
+                    </tr>
+                    <tr>
+                        <td>性別</td>
+                        <td>{{ employee.gender }}</td>
+                    </tr>
+                    <tr>
+                        <td>生日</td>
+                        <td>{{ formatDate(employee.birthday) }}</td>
+                    </tr>
+                    <tr>
+                        <td>身分證</td>
+                        <td>{{ employee.identityCard }}</td>
+                    </tr>
+                    <tr>
+                        <td>信箱</td>
+                        <td><input type="text" v-model="employee.email" id="email" required></td>
+                    </tr>
+                    <tr>
+                        <td>電話</td>
+                        <td><input type="text" v-model="employee.phone" id="phone" required></td>
+                    </tr>
+                    <tr>
+                        <td>住址</td>
+                        <td><input type="text" v-model="employee.address" id="address" required></td>
+                    </tr>
+                    <tr>
+                        <td>緊急連絡人</td>
+                        <td><input type="text" v-model="employee.emergencyContact" id="emergencyContact" required></td>
+                    </tr>
+                    <tr>
+                        <td>緊急電話</td>
+                        <td><input type="text" v-model="employee.energencyPhone" id="energencyPhone" required></td>
+                    </tr>
+                
+                    </tbody>
+                </table>
             </div>
-
+            <button type="submit" class="btn btn-secondary btn-pill">修改</button>
+            <button type="button" class="btn btn-info btn-pill" @click="openModal">
+                修改密碼
+            </button>
+            </form>
+        </div>
+    </div>
+</div>
             <passwordUpdate ref="modal" 
                             v-model:pas="password" 
                             v-model:newPasswordError="newPasswordError"
@@ -109,12 +111,15 @@ function check(){
     }
 }
 async function passwordsubmit(){
-    console.log(password.value)
-    // try{
+    if(password.value.new!=password.value.check){
+        Swal.fire({
+                title:"新密碼與確認密碼不同",
+                icon:"warning"
+            })
+    }else{
     const form = new FormData();
     form.append("newPassword",password.value.new);
     form.append("oldPassword",password.value.old);
-    // console.log(password.value.new)
     const response = await axiosapi.post("/password/update", form, {});
         console.log(response.data);
         if(response.data){
@@ -130,6 +135,7 @@ async function passwordsubmit(){
                 icon:"warning"
             })
         }
+    }
 }
 
 const user=useUserStore();

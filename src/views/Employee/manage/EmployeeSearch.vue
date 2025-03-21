@@ -117,6 +117,10 @@ async function callUpdate(){
     }else{
     const response = await axiosapi.post("/employee/update",emp);
     if(response){
+      Swal.fire({
+                title:"修改成功",
+                icon:"success"
+            })
         empFind()
         user.updateName(employee.value.employeeName)
     }

@@ -1,4 +1,22 @@
 <template>
+    <ul class="nav nav-tabs mb-3" id="pills-tab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#nav-tabs-home" role="tab"
+      aria-controls="nav-tabs" aria-selected="true">Home</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="nav-profile-tab" data-toggle="pill" href="#nav-profile" role="tab"
+      aria-controls="nav-profile" aria-selected="false">Profile</a>
+  </li>
+</ul>
+<div class="tab-content mt-5" id="nav-tabContent">
+  <div class="tab-pane fade show active" id="nav-tabs-home" role="tabpanel" aria-labelledby="nav-home-tab">
+    ...1234654987
+  </div>
+  <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+    ...
+  </div>
+</div>
     <div class="accordion accordion-shadow" id="accordionShadow">
         <div class="card"  v-for="work in works" :key="work.workprogressId">
             <div class="card-header" :id="'headingShadow'+work.workprogressId">
