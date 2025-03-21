@@ -52,6 +52,7 @@ export default {
     const bulletins = ref([]);
     const router = useRouter();
 
+    // 獲取公告列表
     const fetchBulletins = async () => {
       try {
         const response = await axiosapi.get("/bulletin");
@@ -61,19 +62,24 @@ export default {
       }
     };
 
+    // 查看公告
     const viewBulletin = (id) => {
       router.push(`/bulletin/${id}`);
     };
 
+    // 編輯公告
     const editBulletin = (id) => {
       router.push(`/edit/${id}`);
     };
 
+    // 新增公告
     const goToCreate = () => {
       router.push('/create');
     };
 
-    const removeBulletin = async (id) => {
+    // 刪除公告的實際請求
+    const deleteBulletin = async (id) => {
+  // 顯示刪除確認提示
   Swal.fire({
     title: "確定要刪除嗎？",
     text: "刪除後將無法恢復！",
@@ -81,14 +87,15 @@ export default {
     showCancelButton: true,
     confirmButtonColor: "#d33",
     cancelButtonColor: "#3085d6",
-    confirmButtonText: "刪除！",
+    confirmButtonText: "刪除",
     cancelButtonText: "取消"
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
-        await deleteBulletin(id); // 執行刪除請求
+        // 刪除公告的 API 請求
+        await axiosapi.delete(`/bulletin/delete/${id}`);
         Swal.fire("刪除成功！", "公告已被刪除。", "success");
-        fetchBulletins(); // 刪除後刷新列表
+        fetchBulletins(); // 刪除後刷新公告列表
       } catch (error) {
         console.error("刪除公告失敗:", error);
         Swal.fire("刪除失敗！", "請稍後再試。", "error");
@@ -97,12 +104,15 @@ export default {
   });
 };
 
+    
+
     onMounted(fetchBulletins);
 
-    return { bulletins, viewBulletin, editBulletin, goToCreate, deleteBulletin: removeBulletin };
+    return { bulletins, viewBulletin, editBulletin, goToCreate, deleteBulletin }; // 返回 removeBulletin 並重命名為 deleteBulletin
   }
 };
 </script>
+
 
 <style scoped>
 .container {
