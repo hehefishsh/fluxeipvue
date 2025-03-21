@@ -6,6 +6,7 @@ import Login from "@/views/Login.vue";
 import attendanceRoutes from "@/views/attendance/attendance.js";
 import requestformRoutes from "@/views/requestform/requestform";
 import requestmanageRoutes from "@/views/requestmanage/requestmanage";
+import requestapprovalRoutes from "@/views/requestapproval/requestapproval";
 import employeeRoutes from "@/views/employee/employee.js";
 import meetingRoutes from "@/views/meeting/meeting";
 import guidelineRoutes from "@/views/guideline/guideline";
@@ -50,6 +51,7 @@ const routes = [
   attendanceRoutes,
   requestformRoutes,
   requestmanageRoutes,
+  requestapprovalRoutes,
   employeeRoutes,
   meetingRoutes,
   guidelineRoutes,

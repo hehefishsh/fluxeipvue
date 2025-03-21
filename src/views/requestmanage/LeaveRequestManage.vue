@@ -3,20 +3,46 @@
     <!-- 查詢請假資料 -->
     <div class="card card-default" id="leave-request-query">
       <div class="card-header">
-        <h2>請假資料查詢</h2>
-        <RouterLink class="btn btn-outline-primary btn-pill" to="/">返回首頁</RouterLink>
+        <!-- <h2>請假資料查詢</h2>
+        <RouterLink class="btn btn-outline-primary btn-pill" to="/">返回首頁</RouterLink> -->
       </div>
       <div class="card-body py-0" data-simplebar>
         <!-- 顯示錯誤信息 -->
         <div v-show="error" class="alert alert-danger" role="alert">
           {{ error }}
         </div>
+          <!-- 分類標籤 -->
+          <div class="d-flex justify-content-between">
+          <ul class="nav nav-custom-pills mb-3" id="leave-tabs" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link" :class="{ active: activeTab === 'all' }" @click="activeTab = 'all'" href="#">全部</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" :class="{ active: activeTab === 'pending' }" @click="activeTab = 'pending'" href="#">待審核</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" :class="{ active: activeTab === 'reviewing' }" @click="activeTab = 'reviewing'" href="#">審核中</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" :class="{ active: activeTab === 'approved' }" @click="activeTab = 'approved'" href="#">已核決</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" :class="{ active: activeTab === 'rejected' }" @click="activeTab = 'rejected'" href="#">未核准</a>
+          </li>
+        </ul>
+        <!-- 返回首頁按鈕，靠右對齊 -->
+         <div> <RouterLink class="btn btn-outline-primary btn-pill ms-auto" to="/">返回首頁</RouterLink></div>
+ 
+</div>
 
-        <div v-if="leaveRequestData">
+        <!-- 篩選顯示對應的請假資料 -->
+        <div class="tab-content mt-3">
+          <div v-if="filteredLeaveRequests.length">
+        <!-- <div v-if="leaveRequestData"> -->
           <!-- 顯示請假資料 -->
-          <h4>
+          <!-- <h4>
             <span class="badge badge-square badge-outline-primary">請假資料</span>
-          </h4>
+          </h4> -->
           <table class="table table-borderless table-thead-border">
             <thead>
               <tr>
@@ -57,7 +83,12 @@
               </tr>
             </tbody>
           </table>
+          </div>
+          <div v-else>
+            <p class="text-center text-muted">無相關請假資料</p>
+          </div>
         </div>
+        
         <div class="bg-white py-4"></div>
       </div>
     </div>
@@ -67,7 +98,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed} from 'vue';
 import axiosapi from '@/plugins/axios.js';
 import useUserStore from '@/stores/user';
 import LeaveRequestDetails from './LeaveRequestDetails.vue';
@@ -75,7 +106,7 @@ const user=useUserStore();
 // 用來儲存請假資料
 const leaveRequestData = ref([]);
 const error = ref('');
-
+const activeTab = ref('all'); // 預設顯示 "全部"
 const selectedLeaveRequest = ref(null);
 
 
@@ -93,6 +124,24 @@ onMounted(async () => {
   }
 });
 
+// 根據標籤篩選請假資料
+const filteredLeaveRequests = computed(() => {
+  if (activeTab.value === 'all') return leaveRequestData.value;
+  return leaveRequestData.value.filter((leave) => {
+    switch (activeTab.value) {
+      case 'pending':
+        return leave.status === '待審核';
+      case 'reviewing':
+        return leave.status === '審核中';
+      case 'approved':
+        return leave.status === '已核決';
+      case 'rejected':
+        return leave.status === '未核准';
+      default:
+        return true;
+    }
+  });
+});
 // 簡單日期格式化函式，依需求調整格式
 const formatDate = (dateStr) => {
   if (!dateStr) return "";

@@ -165,6 +165,40 @@
             </li>
             <!-- 有的子目錄的導引欄結束 -->
 
+              <!-- 有的子目錄的導引欄--申請表單查詢 -->
+            <li class="has-sub expand" :class="{ active: /^\/requestapproval(\/.*)?$/.test(route.path) }">
+              <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#requestapproval"
+                aria-expanded="false" aria-controls="requestapproval">
+                <i class="mdi mdi-swap-horizontal-variant"></i>
+                <span class="nav-text">簽核</span> <b class="caret"></b>
+              </a>
+              <ul class="collapse" id="requestapproval" data-parent="#sidebar-menu">
+                <div class="sub-menu">
+                  <li :class="{ active: route.path === '/requestapproval/leave' }">
+                    <RouterLink class="sidenav-item-link" to="/requestapproval/leave">
+                      <span class="nav-text">請假簽核</span>
+                    </RouterLink>
+                  </li>
+                  <li :class="{ active: route.path === '/requestapproval/expense' }">
+                    <RouterLink class="sidenav-item-link" to="/requestapproval/expense">
+                      <span class="nav-text">費用簽核</span>
+                    </RouterLink>
+                  </li>
+                  <li :class="{ active: route.path === '/requestapproval/leave' }">
+                    <RouterLink class="sidenav-item-link" to="/requestapproval/leave">
+                      <span class="nav-text">補卡查詢</span>
+                    </RouterLink>
+                  </li>
+                  <li :class="{ active: route.path === '/requestapproval/leave' }">
+                    <RouterLink class="sidenav-item-link" to="/requestapproval/leave">
+                      <span class="nav-text">加班查詢</span>
+                    </RouterLink>
+                  </li>
+                </div>
+              </ul>
+            </li>
+            <!-- 有的子目錄的導引欄結束 -->
+
 
             <!-- 單目錄的導引欄--公佈欄 -->
             <li :class="{ active: route.path === '/bulletin' }">
