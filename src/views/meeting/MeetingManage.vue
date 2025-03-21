@@ -13,7 +13,7 @@
     <div class="row">
       <div class="col-lg-4 col-md-6 mb-4" v-for="item in paginatedRooms" :key="item.id">
         <RoomCard :item="item" :roleName="roleName" @open-update="openEditModal" @delete="callRemoveRoom"
-        @openReserve="openReserve" ></RoomCard>
+        @openReserve="openReserve"  @openIdle="openScheduleModal(item.id)"></RoomCard>
       </div>
     </div>
 
@@ -25,6 +25,14 @@
     <ReserveModal v-model:isOpen="isReserveModalOpen" :room="selectedRoom" :employee="userStore" 
     @reserve="handleReserve">
     </ReserveModal>
+
+
+    <!-- 會議室時段顯示 Modal -->
+    <RoomSchedule 
+      :isOpen="isScheduleModalOpen" 
+      :roomId="selectedRoomId" 
+      @close="isScheduleModalOpen = false" 
+    />
   
 
     <!-- 分頁按鈕 -->
@@ -47,6 +55,7 @@ import useUserStore from '@/stores/user';
 import RoomCard from '@/components/RoomCard.vue';
 import RoomModal from '@/components/RoomModal.vue';
 import ReserveModal from '@/components/ReserveModal.vue';
+import RoomSchedule from '@/components/RoomSchedule.vue';
 
 const path = import.meta.env.VITE_API_URL;
 
@@ -72,6 +81,9 @@ const isEditMode = ref(false);
 const isReserveModalOpen = ref(false);
 const selectedRoom = ref(null);
 
+// 控制 `RoomSchedule.vue` 的變數
+const isScheduleModalOpen = ref(false);
+const selectedRoomId = ref(null);
 
 const meetings = ref([]); 
 
@@ -79,6 +91,21 @@ const meetings = ref([]);
 onMounted(() => {
   callFind();
 });
+
+
+
+
+
+// 開啟「會議室時段顯示」
+function openScheduleModal(roomId) {
+  selectedRoomId.value = roomId;
+  isScheduleModalOpen.value = true;
+}
+
+
+
+
+
 
 // 監聽搜尋欄位變化
 watch(search, () => {
@@ -181,10 +208,7 @@ async function callRemoveRoom(id) {
 
 // 會議室圖片上傳
 async function uploadRoomImage(roomId, file) {
-  if (!file) {
-    Swal.fire("錯誤", "請選擇一張圖片", "error");
-    return;
-  }
+  if (!file) return false; // **回傳 false，代表沒有上傳圖片**
 
   let formData = new FormData();
   formData.append("file", file);
@@ -193,13 +217,14 @@ async function uploadRoomImage(roomId, file) {
     await axios.post(`${path}/api/rooms/${roomId}/upload-image`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
-    Swal.fire("成功", "圖片上傳成功！", "success");
-    callFind();
+    console.log("圖片上傳成功"); 
+    return true; // **回傳 true，代表上傳成功**
   } catch (error) {
     console.error("圖片上傳失敗:", error);
-    Swal.fire("錯誤", "圖片上傳失敗：" + error.message, "error");
+    return false; // **回傳 false，代表上傳失敗**
   }
 }
+
 
 
 function closeModal() {
@@ -212,7 +237,7 @@ function closeModal() {
 
 
 // 新增會議室 Modal
-function openAddModal() {
+function openAddModal() {meetings.notes,
   isEditMode.value = false;
   selectedRoom.value = { roomName: "", capacity: 1, location: "" };
   isModalOpen.value = true;
@@ -251,13 +276,21 @@ async function handleSave(roomData) {
         return;
       }
       newRoom = await callUpdateRoom(roomData.id, roomData);
+      Swal.fire("成功", "修改成功！", "success");
     } else {
       newRoom = await callCreateRoom(roomData);
+      Swal.fire("成功", "新增成功！", "success");
     }
 
-    if (roomData.image && newRoom?.id) {
-      await uploadRoomImage(newRoom.id, roomData.image);
+    if (!newRoom?.id) return;
+
+    // **等待圖片上傳完成後再重新載入會議室列表**
+    if (roomData.image) {
+      await uploadRoomImage(newRoom.id, roomData.image); // **這次加上 await**
     }
+
+    // **重新查詢所有會議室，確保畫面更新**
+    await callFind(); 
 
     isModalOpen.value = false;
   } catch (error) {
@@ -266,24 +299,17 @@ async function handleSave(roomData) {
   }
 }
 
+
 // 預約會議室
 
 async function handleReserve(meeting) {
   try {
-    console.log("收到預約資料：", meeting);  // ✅ 確保 `meeting` 資料正確
-
-    if (!meeting.employeeId) {
-      Swal.fire("錯誤", "無法獲取申請人資訊，請重新登入", "error");
-      return;
-    }
-
-
-  
     const formattedStartTime = `${meeting.date}T${meeting.startTime}:00`;
     const formattedEndTime = `${meeting.date}T${meeting.endTime}:00`;
 
     const requestData = {
       title: meeting.title,
+      notes: meeting.notes,
       startTime: formattedStartTime,
       endTime: formattedEndTime,
       roomId: meeting.roomId,
@@ -292,32 +318,22 @@ async function handleReserve(meeting) {
       employeeName: meeting.employeeName,
     };
 
-    console.log("發送的預約資料：", requestData);
-
     const response = await axios.post(`${path}/api/meetings`, requestData);
 
-
-    if (response.data.message.includes("衝突") || response.data.message.includes("不合法")) {
+    if (response.data.message && (response.data.message.includes("衝突") || response.data.message.includes("不合法"))) {
       Swal.fire("錯誤", response.data.message, "error");
       return;
     }
 
-    // **確保 `meetings.value` 被正確更新**
     meetings.value.push(response.data);
-
     Swal.fire("成功", "會議室預約成功！", "success");
     isReserveModalOpen.value = false;
-  } catch (error) {
-    console.error("預約失敗:", error);
 
-    if (error.response && error.response.status === 400) {
-      Swal.fire("錯誤", error.response.data.message, "error");
-    } else {
-      Swal.fire("錯誤", "預約失敗：" + error.message, "error");
-    }
+  } catch (error) {
+    Swal.fire("錯誤", "預約失敗，請稍後再試", "error");
   }
-  
 }
+
 
 
 // 切換分頁
