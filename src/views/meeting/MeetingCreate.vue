@@ -1,25 +1,40 @@
 <template>
   <div>
-    <MeetingForm :meetings="meetings"></MeetingForm>
+    <MeetingForm
+  :meetings="paginatedMeetings"
+  :employeeId="userStore.empId"
+  @refresh="refreshMeetings"
+/>
+
+
+    <Pagination
+      v-model="currentPage"
+      :total-items="allMeetings.length"
+      :items-per-page="itemsPerPage"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import Swal from "sweetalert2";
+import Pagination from "@/components/Pagination.vue";
+import { ref, computed, onMounted } from "vue";
 import axios from "axios";
 import useUserStore from "@/stores/user";
-import MeetingForm from "@/components/MeetingForm.vue"; 
+import MeetingForm from "@/components/MeetingForm.vue";
 
-const path = import.meta.env.VITE_API_URL;
 const userStore = useUserStore();
-const meetings = ref([]); 
+const path = import.meta.env.VITE_API_URL;
 
-onMounted(() => {
-  callFind();
+const allMeetings = ref([]);
+const currentPage = ref(1);
+const itemsPerPage = 10;
+
+const paginatedMeetings = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return allMeetings.value.slice(start, end);
 });
 
-// 🔹 取得會議資料
 async function callFind() {
   try {
     const userRole = userStore.roleName;
@@ -32,15 +47,22 @@ async function callFind() {
       response = await axios.get(`${path}/api/meetings/user/${userId}`);
     }
 
-    meetings.value = response.data || [];
+    allMeetings.value = response.data || [];
   } catch (error) {
-    console.error("查詢失敗:", error);
-    Swal.fire("錯誤", "讀取會議資料失敗：" + error.message, "error");
+    console.error("讀取失敗", error);
   }
 }
 
+// 提供給子元件刷新用
+function refreshMeetings() {
+  callFind();
+}
 
+onMounted(callFind);
 </script>
+
+
+
 
 <style scoped>
 
