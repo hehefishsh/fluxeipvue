@@ -32,7 +32,7 @@
             </div>
         </div>
     </div>
-    <button class="fixed-button" @click="openModal(null)">分配工作</button>
+    <button class="fixed-button" @click="openModal(null)">新增交辦事項</button>
     <Taskassign ref="modal" 
                     v-model:task="task" 
                     v-model:empselect="empselect"

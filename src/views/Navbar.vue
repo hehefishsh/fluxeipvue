@@ -62,11 +62,11 @@
                       <span class="nav-text">工作事項</span>
                     </RouterLink>
                   </li>
-                  <!-- <li :class="{ active: route.path === '/employee/manage/create' }">
-                    <RouterLink class="sidenav-item-link" to="/employee/manage/create">
-                      <span class="nav-text">新增員工</span>
+                  <li>
+                    <RouterLink class="sidenav-item-link" to="/work/progress/create">
+                      <span class="nav-text">新增工作</span>
                     </RouterLink>
-                  </li> -->
+                  </li>
                 </div>
               </ul>
             </li>
