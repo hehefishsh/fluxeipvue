@@ -25,7 +25,8 @@
             <!-- 單目錄的導引欄結束 -->
 
             <!-- 有的子目錄的導引欄--員工管理 -->
-            <li class="has-sub expand" :class="{ active: /^\/employee\/manage(\/.*)?$/.test(route.path) }" v-if="user.roleName === '最高管理員' || user.roleName === '人資主管'">
+            <li class="has-sub expand" :class="{ active: /^\/employee\/manage(\/.*)?$/.test(route.path) }"
+              v-if="user.roleName === '最高管理員' || user.roleName === '人資主管'">
               <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#employee"
                 aria-expanded="false" aria-controls="employee">
                 <i class="mdi mdi-account-box-multiple"></i>
@@ -165,10 +166,10 @@
             </li>
             <!-- 有的子目錄的導引欄結束 -->
 
-              <!-- 有的子目錄的導引欄--申請表單查詢 -->
+            <!-- 有的子目錄的導引欄--申請表單查詢 -->
             <li class="has-sub expand" :class="{ active: /^\/requestapproval(\/.*)?$/.test(route.path) }">
-              <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#requestapproval"
-                aria-expanded="false" aria-controls="requestapproval">
+              <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse"
+                data-target="#requestapproval" aria-expanded="false" aria-controls="requestapproval">
                 <i class="mdi mdi-swap-horizontal-variant"></i>
                 <span class="nav-text">簽核</span> <b class="caret"></b>
               </a>
@@ -199,6 +200,35 @@
             </li>
             <!-- 有的子目錄的導引欄結束 -->
 
+            <!-- 有的子目錄的導引欄--申請表單查詢 -->
+            <li class="has-sub expand" :class="{ active: /^\/approvalflow(\/.*)?$/.test(route.path) }"
+              v-if="['最高管理員', '次等管理員', '人資主管'].includes(user.roleName)">
+              <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#approvalflow"
+                aria-expanded="false" aria-controls="approvalflow">
+                <i class="mdi mdi-swap-horizontal-variant"></i>
+                <span class="nav-text">簽核流程</span> <b class="caret"></b>
+              </a>
+              <ul class="collapse" id="approvalflow" data-parent="#sidebar-menu">
+                <div class="sub-menu">
+                  <li :class="{ active: route.path === '/approvalflow/create' }">
+                    <RouterLink class="sidenav-item-link" to="/approvalflow/create">
+                      <span class="nav-text">自訂簽核流程</span>
+                    </RouterLink>
+                  </li>
+                  <li :class="{ active: route.path === '/approvalflow/manage' }">
+                    <RouterLink class="sidenav-item-link" to="/approvalflow/manage">
+                      <span class="nav-text">管理簽核流程</span>
+                    </RouterLink>
+                  </li>
+                  <li :class="{ active: route.path === '/approvalflow/assign' }">
+                    <RouterLink class="sidenav-item-link" to="/approvalflow/assign">
+                      <span class="nav-text">指派簽核流程</span>
+                    </RouterLink>
+                  </li>
+                </div>
+              </ul>
+            </li>
+            <!-- 有的子目錄的導引欄結束 -->
 
             <!-- 單目錄的導引欄--公佈欄 -->
             <li :class="{ active: route.path === '/bulletin' }">
@@ -207,9 +237,9 @@
               </RouterLink>
             </li>
             <!-- 單目錄的導引欄結束 -->
-             
+
             <!-- 有子目錄的導引欄--行事曆 -->
-             <li class="has-sub expand" :class="{ active: /^\/calendar(\/.*)?$/.test(route.path) }">
+            <li class="has-sub expand" :class="{ active: /^\/calendar(\/.*)?$/.test(route.path) }">
               <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#calendar"
                 aria-expanded="false" aria-controls="calendar">
                 <i class=""></i>
@@ -247,13 +277,12 @@
                       <span class="nav-text">會議室資訊</span>
                     </RouterLink>
                   </li>
-                  <li class="has-sub expand" 
-                    :class="{ active: /^\/meeting(\/.*)?$/.test(route.path) }" 
+                  <li class="has-sub expand" :class="{ active: /^\/meeting(\/.*)?$/.test(route.path) }"
                     v-if="['最高管理員', '次等管理員', '行政主管', '人資主管', '業務主管', '技術主管', '員工'].includes(user.roleName)">
                     <RouterLink class="sidenav-item-link" to="/meeting/create">
                       <span class="nav-text">預約列表</span>
                     </RouterLink>
-            </li>
+                  </li>
 
 
                 </div>
@@ -280,12 +309,14 @@
               </a>
               <ul class="collapse" id="schedule" data-parent="#sidebar-menu">
                 <div class="sub-menu">
-                  <li :class="{ active: route.path === '/schedule/shiftType' }" v-if="[...scheduleRoles].includes(user.roleName)">
+                  <li :class="{ active: route.path === '/schedule/shiftType' }"
+                    v-if="[...scheduleRoles].includes(user.roleName)">
                     <RouterLink class="sidenav-item-link" to="/schedule/shiftType">
                       <span class="nav-text">班別</span>
                     </RouterLink>
                   </li>
-                  <li :class="{ active: route.path === '/schedule/create' }" v-if="[...scheduleRoles].includes(user.roleName)">
+                  <li :class="{ active: route.path === '/schedule/create' }"
+                    v-if="[...scheduleRoles].includes(user.roleName)">
                     <RouterLink class="sidenav-item-link" to="/schedule/create">
                       <span class="nav-text">排班功能</span>
                     </RouterLink>
@@ -309,12 +340,13 @@
               </a>
               <ul class="collapse" id="salary" data-parent="#sidebar-menu">
                 <div class="sub-menu">
-                  <li :class="{ active: route.path === '/salary/all' }" v-if="['最高管理員', '次等管理員', '人資主管'].includes(user.roleName)">
+                  <li :class="{ active: route.path === '/salary/all' }"
+                    v-if="['最高管理員', '次等管理員', '人資主管'].includes(user.roleName)">
                     <RouterLink class="sidenav-item-link" to="/salary/all">
                       <span class="nav-text">薪資設定</span>
                     </RouterLink>
                   </li>
-                  
+
                 </div>
               </ul>
             </li>
@@ -637,9 +669,9 @@
                   </li>
 
                   <li class="dropdown-footer">
-                    <a class="dropdown-link-item" >
+                    <a class="dropdown-link-item">
                       <button @click="logOut">
-                      <i class="mdi mdi-logout"></i> Log Out</button>
+                        <i class="mdi mdi-logout"></i> Log Out</button>
                     </a>
                   </li>
                 </ul>
@@ -783,18 +815,18 @@ import { computed } from 'vue';
 const route = useRoute(); // 取得當前路由資訊
 const pageTitle = computed(() => route.meta.title || '未命名頁面');
 import useUserStore from '@/stores/user';
-const user=useUserStore();
+const user = useUserStore();
 import { useRouter } from 'vue-router';
-const router=useRouter();
+const router = useRouter();
 import axiosapi from "@/plugins/axios-login";
 
-function logOut(){
-  axiosapi.defaults.headers.common['Authorization']=``;
+function logOut() {
+  axiosapi.defaults.headers.common['Authorization'] = ``;
   user.clear();
   router.push("/login");
 }
 
-const scheduleRoles = ["最高管理員", "次等管理員","行政主管", "人資主管", "業務主管", "技術主管"]; // 可以排班的角色
+const scheduleRoles = ["最高管理員", "次等管理員", "行政主管", "人資主管", "業務主管", "技術主管"]; // 可以排班的角色
 
 
 
