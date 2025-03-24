@@ -19,6 +19,8 @@ import BulletinList from "@/views/bulletin/BulletinList.vue";
 import BulletinForm from "@/views/bulletin/BulletinForm.vue";
 import workpro from "@/views/work/work";
 import salaryRoutes from "@/views/salary/salary";
+import PersonalCalendar from "@/views/calendar/PersonalCalendar.vue";
+import calendarRoutes from "@/views/calendar/calendar";
 
 const routes = [
   {
@@ -60,7 +62,8 @@ const routes = [
   contactRoutes,
   scheduleRoutes,
   workpro,
-  salaryRoutes
+  salaryRoutes,
+  calendarRoutes
 ];
 
 const router = createRouter({
