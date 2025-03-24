@@ -1,91 +1,154 @@
 <template>
     <div class="card card-default form-container">
-        <form @submit.prevent="submitForm">
 
             <h3 class="form-title">工作內容</h3>
-            工作名稱<input v-model="work.name" placeholder="輸入名稱" class="input-field" />
-            創立日期<input type="date" v-model="work.createDate" class="custom-select my-1 mr-sm-2 w-auto" required />
+            工作名稱<input v-model="work.workName" placeholder="輸入名稱" class="input-field" required  />
+            開始日期<input type="date" v-model="work.createDate" class="custom-select my-1 mr-sm-2 w-auto" required />
             預計完成日期<input type="date" v-model="work.expectedFinishDate" class="custom-select my-1 mr-sm-2 w-auto" required />
 
             <h3 class="form-title">分配工作</h3>
             <div v-for="(content, index) in contents" :key="index" class="content-group">
                 <div class="content-wrapper">
-                <!-- 文字 or 連結輸入框 -->
-                交辦事項名稱<input v-if="content.contentType === 'text'" 
-             v-model="content.textContent" 
-             :placeholder="'輸入交辦事項名稱 '" class="input-field"/>
-             交辦事項內容<input v-if="content.contentType === 'text'" 
-             v-model="content.text2Content" 
-             :placeholder="'輸入交辦事項內容 '" class="input-field"/>
+                項目名稱<input
+                  v-model="content.taskName" 
+                  :placeholder="'輸入名稱 '" class="input-field" required />
 
-      <!-- 日期欄位 -->
-      <input v-if="content.contentType === 'date'" 
-             type="date" 
-             v-model="content.dateContent" />
-
-      <!-- 選擇器欄位 -->
-      <select v-if="content.contentType === 'select'" 
-              v-model="content.selectedValue">
-        <option v-for="(option, idx) in content.options" :key="idx" :value="option">
-          {{ option }}</option></select>
+                工作內容<input
+                    v-model="content.taskContent" 
+                    :placeholder="'輸入內容 '" class="input-field" required />
+                            
+                負責員工<select v-model="content.employee" required >
+                            <option v-for="emplo in empselect"  :value="emplo.employeeName">
+                              {{ emplo.employeeName }}
+                            </option>
+                        </select>
+                
+                開始日期<input type="date"  v-model="content.createDate" required  />
+                預計完成日期<input type="date"  v-model="content.expectedFinishDate"  required />
                 </div>
 
                 <!-- 刪除按鈕 -->
                 <button type="button" @click="removeField(index)" class="delete-button">X</button>
-        </div>
-        <!-- 新增內容按鈕 -->
-        <button type="button" @click="addField" class="add-button">新增交辦事項</button>
-  
-        <!-- 送出按鈕 -->
-        <button type="submit" class="submit-button">提交</button>
-      </form>
+            </div>
+                <!-- 新增內容按鈕 -->
+                <button type="button" @click="addField" class="add-button">新增交辦事項</button>
+          
+                <!-- 送出按鈕 -->
+                <div style="text-align: right;">
+                  <button @click="submit" class="btn btn-secondary btn-pill">提交</button>
+                </div>
     </div>
-  </template>
-  
-  <script setup>
+</template>
+
+<script setup>
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router"; // 引入 useRoute
-import axios from "axios";
+import axiosapi from "@/plugins/axios-login";
 import { useRouter } from 'vue-router';
-
-const work=ref({})
+import useUserStore from '@/stores/user';
+import Swal from "sweetalert2";
+const user=useUserStore();
+const employeeId=user.empId
+const work=ref({createDate: getTodayDate(),expectedFinishDate:""})
 
 const router = useRouter();
 // 使用 useRoute 獲取當前路由
 const route = useRoute();
 
+const empselect=ref([])
 // **狀態管理**
-const contents = ref([{ contentType: "text", textContent: "" },{ contentType: "date", dateContent: "" },{
-        contentType: "select",
-        options: ["選項1", "選項2", "選項3"],
-        selectedValue: ""
-      }]);
+const contents = ref([
+      {
+        taskName:"",
+        taskContent: "",
+        createDate: getTodayDate(), 
+        expectedFinishDate:"",
+        finishDate:"",
+        employee:"" ,
+        reveiew: employeeId,  
+        status:"未完成"
+      }
+    ]);
 
+async function submit() {
+  if(new Date(work.value.createDate) > new Date(work.value.expectedFinishDate)){
+    Swal.fire({
+                title:"工作的開始日期比預計完成日期晚",
+                icon:"warning"
+            })
+            return;
+  }
+  for (let task of contents.value) {
+      console.log(new Date(task.createDate) > new Date(task.expectedFinishDate));  // 列印每個 taskassign 的員工名稱
+      if(new Date(task.createDate) > new Date(task.expectedFinishDate)){
+        Swal.fire({
+                title:"分配工作的開始日期比預計完成日期晚",
+                icon:"warning"
+            })
+            return;
+          }
+    };
+    const workRequest = {
+      supervisorId: employeeId,
+      workName: work.value.workName,
+      createDate: work.value.createDate,
+      expectedFinishdate: work.value.expectedFinishDate,
+      taskassigns: contents.value,  // 這是一個對象或數組，會被自動轉換成 JSON 字符串
+    };
+    const response = await axiosapi.post("/workProgress/create", workRequest);
+    if(response.data){
+              Swal.fire({
+                  title:"新增成功",
+                  icon:"success"
+              })
+              router.push("/work/progress");
+          }else{
+              Swal.fire({
+                  title:"新增失敗",
+                  icon:"warning"
+              })
+          }
+}
 
 // **新增欄位**
 function addField() {
-  contents.value.push({ contentType: "text", textContent: "" });
-  contents.value.push({ contentType: "date", dateContent: "" });
       contents.value.push({
-        contentType: "select",
-        options: ["選項1", "選項2", "選項3"],
-        selectedValue: ""
+        taskName:"",
+        taskContent: "",
+        createDate: getTodayDate(), 
+        expectedFinishDate:"",
+        finishDate:"",
+        employee:"" ,
+        reveiew: employeeId,  
+        status:"未完成"
       });
-}
+    }
 
 // **刪除欄位**
 function removeField(index) {
-  contents.value.splice(index, 1);
-  imageFiles.value.splice(index, 1);
-  imagePreviews.value.splice(index, 1);
+  contents.value.splice(index, 1); // 根據 index 刪除對應的欄位
 }
 
-// **表單提交**
-async function submitForm() {
-  const formData = new FormData();
+async function findEmp(){
+  const dep=await axiosapi.get(`/employee/find/department/emp/${employeeId}`);
+  empselect.value=dep.data
 }
-  </script>
-  
+
+onMounted(function(){
+    findEmp()
+})
+
+function getTodayDate() {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0'); // 月份從0開始，需加1
+      const day = String(today.getDate()).padStart(2, '0'); // 使日期為兩位數
+
+      return `${year}-${month}-${day}`;
+}
+
+</script>
+
 <style scoped>
   /* 表單容器 */
   .form-container {
