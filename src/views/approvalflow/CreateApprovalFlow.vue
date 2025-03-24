@@ -170,7 +170,7 @@ async function submitForm() {
     } else {
       Swal.fire({
         title: "錯誤!",
-        text: "提交請假申請時發生未知錯誤",
+        text: "提交簽核流程時發生未知錯誤",
         icon: "error",
         confirmButtonText: "重新提交",
       });

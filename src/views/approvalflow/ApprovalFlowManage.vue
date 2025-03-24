@@ -34,8 +34,11 @@
                 <td class="text">{{ flow.employeePosition }}</td>
                 <td class="text">{{ flow.approverPosition }}</td>
                 <td class="text">
-                  <button v-if="flow.stepOrder === 1" class="badge badge-square badge-danger"
-                    @click="deleteFlow(flow.flowId)">
+                  <button
+                    v-if="flow.stepOrder === 1"
+                    class="badge badge-square badge-danger"
+                    @click="deleteFlow(flow.flowId)"
+                  >
                     刪除
                   </button>
                 </td>
@@ -80,26 +83,28 @@ const deleteFlow = async (flowId) => {
     confirmButtonColor: "#d33",
     cancelButtonColor: "#3085d6",
     confirmButtonText: "是，刪除！",
-    cancelButtonText: "取消"
+    cancelButtonText: "取消",
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
         await axiosapi.delete(`/api/approval/delete/approval-flows/${flowId}`);
-        approvalFlows.value = approvalFlows.value.filter(flow => flow.flowId !== flowId);
+        approvalFlows.value = approvalFlows.value.filter(
+          (flow) => flow.flowId !== flowId
+        );
 
         Swal.fire({
           title: "刪除成功！",
           text: "該簽核流程已被刪除。",
           icon: "success",
           timer: 3000,
-          showConfirmButton: false
-        }).then(() => loadApprovalFlows())
+          showConfirmButton: false,
+        }).then(() => loadApprovalFlows());
       } catch (err) {
         Swal.fire({
           title: "刪除失敗！",
           text: "請稍後再試。",
           icon: "error",
-          confirmButtonText: "確定"
+          confirmButtonText: "確定",
         });
       }
     }
