@@ -1,59 +1,57 @@
 <template>
-    <div>
-      <el-tabs v-model="selectedStatus">
-        <el-tab-pane label="所有預約" name="all"></el-tab-pane>
-        <el-tab-pane label="審核中" name="審核中"></el-tab-pane>
-        <el-tab-pane label="已審核" name="已審核"></el-tab-pane>
-        <el-tab-pane label="未核准" name="未核准"></el-tab-pane>
-      </el-tabs>
-  
-      <el-table
-        :data="filterMeetings"
-        border
-        style="width: 100%"
-        stripe
-        :default-sort="{ prop: 'createdAt', order: 'ascending' }"
-        empty-text="無此資料"
-      >
-        <el-table-column prop="createdAt" label="申請時間" width="180" sortable>
-          <template #default="{ row }">{{ formatDate(row.createdAt) }}</template>
-        </el-table-column>
-  
-        <el-table-column prop="employeeName" label="姓名" width="120" />
-        <el-table-column prop="roomName" label="會議室" width="160" />
-        <el-table-column prop="title" label="主題" min-width="160" />
-         <!-- <el-table-column prop="notes" label="內容" min-width="200" />-->
-  
-        <el-table-column prop="startTime" label="開始時間" width="180" sortable>
-          <template #default="{ row }">{{ formatDate(row.startTime) }}</template>
-        </el-table-column>
-  
-        <el-table-column prop="endTime" label="結束時間" width="180" sortable>
-          <template #default="{ row }">{{ formatDate(row.endTime) }}</template>
-        </el-table-column>
-  
-        <el-table-column prop="statusName" label="狀態" width="120">
-          <template #default="{ row }">
-            <el-tag :type="statusTagType(row.statusName)">
-              {{ row.statusName }}
-            </el-tag>
-          </template>
-        </el-table-column>
+  <div>
+    <el-tabs v-model="selectedStatus" @tab-click="resetTab">
+      <el-tab-pane label="所有預約" name="all"></el-tab-pane>
+      <el-tab-pane label="審核中" name="審核中"></el-tab-pane>
+      <el-tab-pane label="已審核" name="已審核"></el-tab-pane>
+      <el-tab-pane label="未核准" name="未核准"></el-tab-pane>
+    </el-tabs>
 
-        <!-- 在審核中才顯示審核操作欄位 -->
-        <el-table-column v-if="showApprovalColumn" label="審核操作" width="200">
-          <template #default="{ row }">
-            <el-button type="success" size="small" class="me-2" @click="approve(row.id)">通過</el-button>
-        <el-button type="danger" size="small" @click="reject(row.id)">拒絕</el-button>
-          </template>
-        </el-table-column>
+    <el-table
+      :data="filterMeetings"
+      border
+      style="width: 100%"
+      stripe
+      :default-sort="{ prop: 'createdAt', order: 'ascending' }"
+      empty-text="無此資料"
+    >
+      <el-table-column prop="createdAt" label="申請時間" width="180" sortable>
+        <template #default="{ row }">{{ formatDate(row.createdAt) }}</template>
+      </el-table-column>
 
-      </el-table>
-    </div>
-  </template>
-  
-  <script setup>
-import { ref, computed, defineProps } from "vue";
+      <el-table-column prop="employeeName" label="姓名" width="120" />
+      <el-table-column prop="roomName" label="會議室" width="160" />
+      <el-table-column prop="title" label="主題" min-width="160" />
+
+      <el-table-column prop="startTime" label="開始時間" width="180" sortable>
+        <template #default="{ row }">{{ formatDate(row.startTime) }}</template>
+      </el-table-column>
+
+      <el-table-column prop="endTime" label="結束時間" width="180" sortable>
+        <template #default="{ row }">{{ formatDate(row.endTime) }}</template>
+      </el-table-column>
+
+      <el-table-column prop="statusName" label="狀態" width="120">
+        <template #default="{ row }">
+          <el-tag :type="statusTagType(row.statusName)">
+            {{ row.statusName }}
+          </el-tag>
+        </template>
+      </el-table-column>
+
+      <!-- 在審核中才顯示審核操作欄位 -->
+      <el-table-column v-if="showApprovalColumn" label="審核操作" width="200">
+        <template #default="{ row }">
+          <el-button type="success" size="small" class="me-2" @click="approve(row.id)">通過</el-button>
+          <el-button type="danger" size="small" @click="reject(row.id)">拒絕</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed, defineProps, defineEmits } from "vue";
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -63,8 +61,10 @@ const props = defineProps({
     required: true,
     default: () => [],
   },
-  employeeId: Number, 
+  employeeId: Number,
 });
+
+const emit = defineEmits(["refresh"]);
 
 const selectedStatus = ref("all");
 
@@ -72,7 +72,7 @@ const selectedStatus = ref("all");
 const filterMeetings = computed(() => {
   if (!props.meetings) return [];
   if (selectedStatus.value === "all") return props.meetings;
-  return props.meetings.filter(m => m.statusName === selectedStatus.value);
+  return props.meetings.filter((m) => m.statusName === selectedStatus.value);
 });
 
 // 顯示「審核操作」欄的條件
@@ -99,7 +99,7 @@ function statusTagType(status) {
   }
 }
 
-//  審核請求
+// 審核請求
 async function approve(meetingId) {
   try {
     await axios.put(`${import.meta.env.VITE_API_URL}/api/meetings/${meetingId}/approve`, null, {
@@ -115,6 +115,7 @@ async function approve(meetingId) {
   }
 }
 
+// 拒絕請求
 async function reject(meetingId) {
   try {
     await axios.put(`${import.meta.env.VITE_API_URL}/api/meetings/${meetingId}/approve`, null, {
@@ -129,12 +130,15 @@ async function reject(meetingId) {
     Swal.fire("錯誤", "拒絕失敗：" + error.message, "error");
   }
 }
+
+// 切換 tab 時自動重設（如有其他互動邏輯未來可加）
+function resetTab() {
+  // 若未來切換 tab 需要額外處理可以加在這
+}
 </script>
 
-  
-  <style scoped>
-  .el-table {
-    margin-top: 10px;
-  }
-  </style>
-  
+<style scoped>
+.el-table {
+  margin-top: 10px;
+}
+</style>
