@@ -3,41 +3,40 @@
     <MeetingForm
       :meetings="paginatedMeetings"
       :employeeId="userStore.empId"
-      :currentPage="currentPage"
-      :totalPages="totalPages"
       :selectedStatus="selectedStatus"
+      :current="currentPageForStatus"
+      :pages="pagesForStatus"
       @refresh="refreshMeetings"
-      @change-page="handlePageChange"
       @change-status="handleStatusChange"
       @change-sort="handleSortChange"
+      @change-page="handlePageChange"
     />
   </div>
 </template>
 
-
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
-import axios from "axios";
-import useUserStore from "@/stores/user";
-import MeetingForm from "@/components/MeetingForm.vue";
+import { ref, computed, onMounted } from 'vue';
+import axios from 'axios';
+import useUserStore from '@/stores/user';
+import MeetingForm from '@/components/MeetingForm.vue';
 
 const userStore = useUserStore();
 const path = import.meta.env.VITE_API_URL;
 
 const allMeetings = ref([]);
-const selectedStatus = ref("all");
-const currentPage = ref(1);
+const selectedStatus = ref('all');
+const sortInfo = ref({ prop: 'createdAt', order: 'ascending' });
 const itemsPerPage = 10;
 
-const sortInfo = ref({
-  prop: "createdAt",
-  order: "ascending",
-});
+// 分頁狀態（每個狀態各自記錄目前頁碼 & 總頁數）
+const current = ref({ all: 1, 審核中: 1, 已審核: 1, 未核准: 1 });
+const pages = ref({ all: 0, 審核中: 0, 已審核: 0, 未核准: 0 });
+
+// ✅ 用 computed 包裝 current / pages，確保 reactive
+const currentPageForStatus = computed(() => current.value[selectedStatus.value]);
+const pagesForStatus = computed(() => pages.value[selectedStatus.value]);
 
 onMounted(callFind);
-
-
-
 
 async function callFind() {
   try {
@@ -47,6 +46,7 @@ async function callFind() {
       ? await axios.get(`${path}/api/meetings`)
       : await axios.get(`${path}/api/meetings/user/${userId}`);
     allMeetings.value = res.data || [];
+    calculatePages();
   } catch (error) {
     console.error("讀取失敗", error);
   }
@@ -56,18 +56,33 @@ function refreshMeetings() {
   callFind();
 }
 
+function handleStatusChange(newStatus) {
+  selectedStatus.value = newStatus;
+  current.value[newStatus] = 1; // 切換狀態時回到第一頁
+}
+
+function handleSortChange({ prop, order }) {
+  sortInfo.value = { prop, order };
+}
+
+function handlePageChange(page) {
+  current.value[selectedStatus.value] = page;
+}
+
+// 篩選 + 排序
 const filteredAndSorted = computed(() => {
-  let filtered = selectedStatus.value === "all"
+  const status = selectedStatus.value;
+  let filtered = status === 'all'
     ? allMeetings.value
-    : allMeetings.value.filter(m => m.statusName === selectedStatus.value);
+    : allMeetings.value.filter(m => m.statusName === status);
 
   const { prop, order } = sortInfo.value;
-  if (prop && order && order !== null) {
+  if (prop && order) {
     filtered = [...filtered].sort((a, b) => {
       const valA = a[prop];
       const valB = b[prop];
       if (valA == null || valB == null) return 0;
-      return order === "ascending"
+      return order === 'ascending'
         ? valA > valB ? 1 : -1
         : valA < valB ? 1 : -1;
     });
@@ -76,36 +91,30 @@ const filteredAndSorted = computed(() => {
   return filtered;
 });
 
+// 分頁資料
 const paginatedMeetings = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage;
-  return filteredAndSorted.value.slice(start, start + itemsPerPage);
+  const currentStatus = selectedStatus.value;
+  const currentPage = current.value[currentStatus];
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  return filteredAndSorted.value.slice(startIndex, endIndex);
 });
 
-const totalPages = computed(() => {
-  return Math.ceil(filteredAndSorted.value.length / itemsPerPage);
-});
+// 計算各狀態的總頁數
+function calculatePages() {
+  const statusOptions = ['all', '審核中', '已審核', '未核准'];
 
-function handlePageChange(newPage) {
-  if (newPage > totalPages.value || newPage < 1) return;
-  currentPage.value = newPage;
+  statusOptions.forEach(status => {
+    const meetingsForStatus =
+      status === 'all'
+        ? allMeetings.value
+        : allMeetings.value.filter(m => m.statusName === status);
+    const totalPages = Math.ceil(meetingsForStatus.length / itemsPerPage);
+    pages.value[status] = totalPages;
+  });
 }
-
-function handleStatusChange(newStatus) {
-  selectedStatus.value = newStatus;
-  currentPage.value = 1; // 切換狀態時重設為第 1 頁
-}
-
-function handleSortChange({ prop, order }) {
-  sortInfo.value = { prop, order };
-}
-
-
-watch([selectedStatus, currentPage, filteredAndSorted], () => {
-  console.log("狀態:", selectedStatus.value);
-  console.log("頁碼:", currentPage.value);
-  console.log("資料總數:", filteredAndSorted.value.length);
-  console.log("目前顯示:", paginatedMeetings.value.map(m => m.title));
-});
 </script>
 
-
+<style scoped>
+/* 這裡可以補上自訂樣式 */
+</style>
