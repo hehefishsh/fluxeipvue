@@ -1,19 +1,21 @@
 <template>
   <div>
-    <el-tabs v-model="selectedStatus" @tab-click="resetTab">
-      <el-tab-pane label="所有預約" name="all"></el-tab-pane>
-      <el-tab-pane label="審核中" name="審核中"></el-tab-pane>
-      <el-tab-pane label="已審核" name="已審核"></el-tab-pane>
-      <el-tab-pane label="未核准" name="未核准"></el-tab-pane>
+    <el-tabs v-model="localStatus" @tab-click="onStatusChange">
+      <el-tab-pane label="所有預約" name="all" />
+      <el-tab-pane label="審核中" name="審核中" />
+      <el-tab-pane label="已審核" name="已審核" />
+      <el-tab-pane label="未核准" name="未核准" />
     </el-tabs>
 
     <el-table
-      :data="filterMeetings"
+      :key="tableKey"
+      :data="meetings"
       border
-      style="width: 100%"
       stripe
-      :default-sort="{ prop: 'createdAt', order: 'ascending' }"
+      style="width: 100%"
       empty-text="無此資料"
+      :default-sort="{ prop: 'createdAt', order: 'ascending' }"
+      @sort-change="onSortChange"
     >
       <el-table-column prop="createdAt" label="申請時間" width="180" sortable>
         <template #default="{ row }">{{ formatDate(row.createdAt) }}</template>
@@ -39,7 +41,6 @@
         </template>
       </el-table-column>
 
-      <!-- 在審核中才顯示審核操作欄位 -->
       <el-table-column v-if="showApprovalColumn" label="審核操作" width="200">
         <template #default="{ row }">
           <el-button type="success" size="small" class="me-2" @click="approve(row.id)">通過</el-button>
@@ -47,45 +48,79 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <div class="d-flex justify-content-center mt-3" v-if="totalPages > 1">
+      <Paginate
+        :page-count="totalPages"
+        :click-handler="changePage"
+        :prev-text="'<'"
+        :next-text="'>'"
+        :container-class="'pagination'"
+        :page-range="3"
+        :margin-pages="1"
+        :force-page="currentPage - 1"
+        
+      />
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, defineProps, defineEmits } from "vue";
-import axios from "axios";
+import { ref, watch, computed } from "vue";
+import { defineProps, defineEmits } from "vue";
 import Swal from "sweetalert2";
+import axios from "axios";
+import Paginate from "vuejs-paginate-next";
 
 const props = defineProps({
-  meetings: {
-    type: Array,
-    required: true,
-    default: () => [],
-  },
+  meetings: Array,
   employeeId: Number,
+  currentPage: Number,
+  totalPages: Number,
+  selectedStatus: String,
 });
 
-const emit = defineEmits(["refresh"]);
+const emit = defineEmits(["refresh", "change-page", "change-status", "change-sort"]);
 
-const selectedStatus = ref("all");
+const localStatus = ref(props.selectedStatus);
 
-// 篩選資料
-const filterMeetings = computed(() => {
-  if (!props.meetings) return [];
-  if (selectedStatus.value === "all") return props.meetings;
-  return props.meetings.filter((m) => m.statusName === selectedStatus.value);
-});
+// ✅ 修正語法錯誤 - 用反引號
+const tableKey = ref(`table-${props.selectedStatus}-${props.currentPage}`);
+watch(
+  [() => props.currentPage, () => props.selectedStatus],
+  () => {
+    tableKey.value = `table-${props.selectedStatus}-${props.currentPage}`;
+  }
+);
 
-// 顯示「審核操作」欄的條件
+// 保持 tab 狀態同步
+watch(
+  () => props.selectedStatus,
+  (val) => {
+    localStatus.value = val;
+  }
+);
+
+function changePage(page) {
+  emit("change-page", page + 1); // 分頁元件從 0 開始
+}
+
+function onStatusChange(tab) {
+  emit("change-status", tab.props.name);
+}
+
 const showApprovalColumn = computed(() => {
-  return props.employeeId === 1002 && selectedStatus.value === "審核中";
+  return props.employeeId === 1002 && props.selectedStatus === "審核中";
 });
 
-// 時間格式化
+function onSortChange({ prop, order }) {
+  emit("change-sort", { prop, order });
+}
+
 function formatDate(dateStr) {
   return new Date(dateStr).toLocaleString();
 }
 
-// 狀態顏色
 function statusTagType(status) {
   switch (status) {
     case "審核中":
@@ -99,7 +134,6 @@ function statusTagType(status) {
   }
 }
 
-// 審核請求
 async function approve(meetingId) {
   try {
     await axios.put(`${import.meta.env.VITE_API_URL}/api/meetings/${meetingId}/approve`, null, {
@@ -115,7 +149,6 @@ async function approve(meetingId) {
   }
 }
 
-// 拒絕請求
 async function reject(meetingId) {
   try {
     await axios.put(`${import.meta.env.VITE_API_URL}/api/meetings/${meetingId}/approve`, null, {
@@ -130,15 +163,11 @@ async function reject(meetingId) {
     Swal.fire("錯誤", "拒絕失敗：" + error.message, "error");
   }
 }
-
-// 切換 tab 時自動重設（如有其他互動邏輯未來可加）
-function resetTab() {
-  // 若未來切換 tab 需要額外處理可以加在這
-}
 </script>
 
 <style scoped>
-.el-table {
-  margin-top: 10px;
+.pagination {
+  display: flex;
+  gap: 6px;
 }
 </style>
