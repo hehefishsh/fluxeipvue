@@ -1,51 +1,49 @@
 <template>
-  <div id="app" class="navbar-fixed sidebar-fixed">
-    <div class="content-wrapper">
-      <div class="card">
-        <!-- 時鐘顯示 -->
-        <div class="clock">
-          <canvas id="clock-canvas"></canvas>
-        </div>
+  <div class="accordion accordion-shadow">
+    <div class="card card-default" style="border-radius: 0%; box-shadow: none">
+      <!-- 時鐘顯示 -->
+      <div class="clock">
+        <canvas id="clock-canvas"></canvas>
+      </div>
 
-        <!-- 上班/下班 打卡按鈕 -->
-        <div class="button-group">
-          <button @click="clockIn" class="mb-1 btn btn-pill btn-primary">
-            上班打卡
-          </button>
-          <button @click="clockOut" class="mb-1 btn btn-pill btn-primary">
-            下班打卡
-          </button>
-        </div>
+      <!-- 上班/下班 打卡按鈕 -->
+      <div class="button-group">
+        <button @click="clockIn" class="mb-1 btn btn-pill btn-primary">
+          上班打卡
+        </button>
+        <button @click="clockOut" class="mb-1 btn btn-pill btn-primary">
+          下班打卡
+        </button>
+      </div>
 
-        <!-- 外出/外出結束 打卡按鈕 -->
-        <div class="button-group">
-          <button
-            @click="startFieldWork"
-            class="mb-1 btn btn-outline-primary btn-pill"
-          >
-            外出打卡
-          </button>
-          <button
-            @click="endFieldWork"
-            class="mb-1 btn btn-outline-primary btn-pill"
-          >
-            外出結束
-          </button>
-        </div>
+      <!-- 外出/外出結束 打卡按鈕 -->
+      <div class="button-group">
+        <button
+          @click="startFieldWork"
+          class="mb-1 btn btn-outline-primary btn-pill"
+        >
+          外出打卡
+        </button>
+        <button
+          @click="endFieldWork"
+          class="mb-1 btn btn-outline-primary btn-pill"
+        >
+          外出結束
+        </button>
+      </div>
 
-        <div v-if="errorMessage" class="alert alert-danger">
-          {{ errorMessage }}
-        </div>
-        <div v-if="message" class="alert alert-success">{{ message }}</div>
+      <div v-if="errorMessage" class="alert alert-danger">
+        {{ errorMessage }}
+      </div>
+      <div v-if="message" class="alert alert-success">{{ message }}</div>
 
-        <br />
-        <div>
-          <router-link to="/attendance/log">
-            <button type="button" class="mb-1 btn btn-pill btn-success">
-              出勤記錄查詢
-            </button>
-          </router-link>
-        </div>
+      <br />
+      <div>
+        <router-link to="/attendance/log">
+          <button type="button" class="mb-1 btn btn-pill btn-success">
+            出勤記錄查詢
+          </button>
+        </router-link>
       </div>
     </div>
   </div>
@@ -73,7 +71,6 @@ const sendClockRequest = async (url) => {
     throw error;
   }
 };
-
 
 // 打卡按鈕方法整理
 const clockIn = () => sendClockRequest("/api/clock/in");
