@@ -117,8 +117,8 @@
                       <span class="nav-text">請假申請</span>
                     </RouterLink>
                   </li>
-                  <li :class="{ active: route.path === '/requestform/leave' }">
-                    <RouterLink class="sidenav-item-link" to="/requestform/leave">
+                  <li :class="{ active: route.path === '/requestform/workadjust' }">
+                    <RouterLink class="sidenav-item-link" to="/requestform/workadjust">
                       <span class="nav-text">加班申請</span>
                     </RouterLink>
                   </li>
@@ -161,9 +161,9 @@
                       <span class="nav-text">補卡查詢</span>
                     </RouterLink>
                   </li>
-                  <li :class="{ active: route.path === '/requestmanage/leave' }">
-                    <RouterLink class="sidenav-item-link" to="/requestmanage/leave">
-                      <span class="nav-text">加班查詢</span>
+                  <li :class="{ active: route.path === '/requestmanage/workadjust' }">
+                    <RouterLink class="sidenav-item-link" to="/requestmanage/workadjust">
+                      <span class="nav-text">加減班查詢</span>
                     </RouterLink>
                   </li>
                 </div>
