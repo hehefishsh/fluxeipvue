@@ -1,43 +1,44 @@
 <template>
   <div class="accordion accordion-shadow">
-    <div class="card card-default" style="border-radius: 0%; box-shadow: none">
+    <div class="card card-default">
       <!-- 時鐘顯示 -->
-      <div class="clock">
+      <div class="clock" style="padding: 10px;">
         <canvas id="clock-canvas"></canvas>
       </div>
-
-      <!-- 上班/下班 打卡按鈕 -->
-      <div class="button-group">
-        <button @click="clockIn" class="mb-1 btn btn-pill btn-primary">
-          上班打卡
-        </button>
-        <button @click="clockOut" class="mb-1 btn btn-pill btn-primary">
-          下班打卡
-        </button>
-      </div>
-
-      <!-- 外出/外出結束 打卡按鈕 -->
-      <div class="button-group">
-        <button @click="startFieldWork" class="mb-1 btn btn-outline-primary btn-pill">
-          外出打卡
-        </button>
-        <button @click="endFieldWork" class="mb-1 btn btn-outline-primary btn-pill">
-          外出結束
-        </button>
-      </div>
-
-      <div v-if="errorMessage" class="alert alert-danger">
-        {{ errorMessage }}
-      </div>
-      <div v-if="message" class="alert alert-success">{{ message }}</div>
-
-      <br />
       <div>
-        <router-link to="/attendance/log">
-          <button type="button" class="mb-1 btn btn-pill btn-success">
-            出勤記錄查詢
+        <!-- 上班/下班 打卡按鈕 -->
+        <div class="button-group">
+          <button @click="clockIn" class="mb-1 btn btn-pill btn-primary">
+            上班打卡
           </button>
-        </router-link>
+          <button @click="clockOut" class="mb-1 btn btn-pill btn-primary">
+            下班打卡
+          </button>
+        </div>
+
+        <!-- 外出/外出結束 打卡按鈕 -->
+        <div class="button-group">
+          <button @click="startFieldWork" class="mb-1 btn btn-outline-primary btn-pill">
+            外出打卡
+          </button>
+          <button @click="endFieldWork" class="mb-1 btn btn-outline-primary btn-pill">
+            外出結束
+          </button>
+        </div>
+
+        <div v-if="errorMessage" class="alert alert-danger">
+          {{ errorMessage }}
+        </div>
+        <div v-if="message" class="alert alert-success">{{ message }}</div>
+
+        <br />
+        <div>
+          <router-link to="/attendance/log">
+            <button type="button" class="mb-1 btn btn-pill btn-success">
+              出勤記錄查詢
+            </button>
+          </router-link>
+        </div>
       </div>
     </div>
   </div>
@@ -124,23 +125,17 @@ onBeforeUnmount(() => {
   justify-content: center;
 }
 
-body {
-  font-family: "Roboto", sans-serif;
-  background-color: #f2f2f2;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
-}
+
 
 .card {
   background-color: #fff;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-  padding: 30px;
+  padding: 30px 0px 30px 0px;
   border-radius: 10px;
   text-align: center;
   width: 400px;
+  border-radius: 0%;
+  box-shadow: none
 }
 
 .clock {
@@ -153,7 +148,10 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 10px;
+  flex-wrap: wrap;
+  /* 讓按鈕在視窗變小時自動換行 */
+  gap: 10px;
+  /* 按鈕間距 */
 }
 
 .button-group button {

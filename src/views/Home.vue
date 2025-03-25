@@ -3,7 +3,7 @@
   <div class="content-wrapper">
     <div class="content">
       <div class="row">
-        <div class="col-xl-4">
+        <div class="col-xl-3">
           <div class="card card-default" id="leave-request-query">
             <div class="card-header">
               <h2>打卡</h2>
@@ -13,7 +13,7 @@
             </div>
           </div>
         </div>
-        <div class="col-xl-3">
+        <div class="col-xl-4">
           <div class="card card-default" id="leave-request-query">
             <div class="card-header">
               <h2>工作事項</h2>

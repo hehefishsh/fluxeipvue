@@ -8,22 +8,16 @@
 
       <label>部門：</label>
       <select v-model="department" class="custom-select my-1 mr-sm-2">
-        <option
-          v-for="dep in departments"
-          :key="dep.id"
-          :value="dep.departmentName"
-        >
+        <option v-for="dep in departments" :key="dep.id" :value="dep.departmentName">
           {{ dep.departmentName }}
         </option>
       </select>
 
-      <label>職位：</label>
+      <label>
+        <font color="red">*</font>職位：
+      </label>
       <select v-model="position" class="custom-select my-1 mr-sm-2">
-        <option
-          v-for="pos in positions"
-          :key="pos.positionId"
-          :value="pos.positionName"
-        >
+        <option v-for="pos in positions" :key="pos.positionId" :value="pos.positionName">
           {{ pos.positionName }}
         </option>
       </select>
@@ -38,33 +32,19 @@
         <br />
         <h4></h4>
         <ul class="list-group">
-          <li
-            v-for="employee in employees"
-            :key="employee.id"
-            class="list-group-item list-group-item-action"
-          >
+          <li v-for="employee in employees" :key="employee.id" class="list-group-item list-group-item-action">
             <div class="media media-sm mb-0">
               <div class="media-body">
-                <span class="title"
-                  >{{ employee.employeeId }}-{{ employee.employeeName }}</span
-                >
+                <span class="title">{{ employee.employeeId }}-{{ employee.employeeName }}</span>
                 <p>
                   {{ employee.department.departmentName }} -
                   {{ employee.position.positionName }}
                 </p>
               </div>
               <div class="custom-control custom-checkbox align-self-center">
-                <input
-                  type="checkbox"
-                  class="custom-control-input"
-                  :id="'customCheck' + employee.employeeId"
-                  v-model="selectedEmployees"
-                  :value="employee.employeeId"
-                />
-                <label
-                  class="custom-control-label"
-                  :for="'customCheck' + employee.employeeId"
-                ></label>
+                <input type="checkbox" class="custom-control-input" :id="'customCheck' + employee.employeeId"
+                  v-model="selectedEmployees" :value="employee.employeeId" />
+                <label class="custom-control-label" :for="'customCheck' + employee.employeeId"></label>
               </div>
             </div>
           </li>
@@ -72,59 +52,29 @@
         <br />
       </div>
 
-      <!-- 分頁控制 -->
       <!-- Separated Pagination -->
-      <div
-        class="align-items-center"
-        v-if="employees.length > 0 && totalPages > 1"
-      >
+      <div class="align-items-center" v-if="employees.length > 0 && totalPages > 1">
         <nav aria-label="Page navigation example">
-          <ul
-            class="pagination pagination-seperated pagination-seperated-rounded"
-          >
+          <ul class="pagination pagination-seperated pagination-seperated-rounded">
             <li class="page-item" :class="{ disabled: pageNumber <= 1 }">
-              <a
-                class="page-link"
-                href="#"
-                @click="searchEmployees(pageNumber - 1)"
-                aria-label="Previous"
-              >
-                <span
-                  aria-hidden="true"
-                  class="mdi mdi-chevron-left mr-1"
-                ></span>
+              <a class="page-link" href="#" @click="searchEmployees(pageNumber - 1)" aria-label="Previous">
+                <span aria-hidden="true" class="mdi mdi-chevron-left mr-1"></span>
                 Prev
                 <span class="sr-only">Previous</span>
               </a>
             </li>
 
             <!-- 動態生成頁面數量 -->
-            <li
-              v-for="page in totalPagesArray"
-              :key="page"
-              class="page-item"
-              :class="{ active: pageNumber === page }"
-            >
+            <li v-for="page in totalPagesArray" :key="page" class="page-item" :class="{ active: pageNumber === page }">
               <a class="page-link" href="#" @click="searchEmployees(page)">
                 {{ page }}
               </a>
             </li>
 
-            <li
-              class="page-item"
-              :class="{ disabled: pageNumber >= totalPages }"
-            >
-              <a
-                class="page-link"
-                href="#"
-                @click="searchEmployees(pageNumber + 1)"
-                aria-label="Next"
-              >
+            <li class="page-item" :class="{ disabled: pageNumber >= totalPages }">
+              <a class="page-link" href="#" @click="searchEmployees(pageNumber + 1)" aria-label="Next">
                 Next
-                <span
-                  aria-hidden="true"
-                  class="mdi mdi-chevron-right ml-1"
-                ></span>
+                <span aria-hidden="true" class="mdi mdi-chevron-right ml-1"></span>
                 <span class="sr-only">Next</span>
               </a>
             </li>
@@ -157,13 +107,8 @@
               <td class="text">{{ flow.approverPosition }}</td>
               <td class="text">
                 <!-- 只有 stepOrder 為 1 的流程才顯示勾選框 -->
-                <input
-                  v-if="flow.stepOrder === 1"
-                  type="checkbox"
-                  :id="'flowCheck' + flow.flowId"
-                  v-model="selectedFlows"
-                  :value="flow.flowId"
-                />
+                <input v-if="flow.stepOrder === 1" type="checkbox" :id="'flowCheck' + flow.flowId"
+                  v-model="selectedFlows" :value="flow.flowId" />
               </td>
             </tr>
           </tbody>
@@ -174,10 +119,7 @@
       </div>
 
       <!-- 提交選擇的簽核流程 -->
-      <div
-        v-if="selectedEmployees.length > 0 && selectedFlows.length > 0"
-        style="margin-top: 20px"
-      >
+      <div v-if="selectedEmployees.length > 0 && selectedFlows.length > 0" style="margin-top: 20px">
         <button type="button" @click="submitEmployeeFlow" class="submit-button">
           提交選擇的簽核流程
         </button>
@@ -220,8 +162,8 @@ onMounted(async () => {
     const positionResponse = await axiosapi.get("/position/find");
     positions.value = positionResponse.data;
 
-    const flowResponse = await axiosapi.get("/api/approval/flow/all");
-    approvalFlows.value = flowResponse.data;
+    // const flowResponse = await axiosapi.get("/api/approval/flow/all");
+    // approvalFlows.value = flowResponse.data;
   } catch (error) {
     console.error(
       "Error fetching departments, positions, and approval flows:",
@@ -233,6 +175,15 @@ onMounted(async () => {
 // 查詢員工
 async function searchEmployees(page) {
   try {
+    if (!position.value) {
+      Swal.fire({
+        // title: "Warn!",
+        text: "請選擇職位再進行查詢",
+        icon: "warning",
+        confirmButtonText: "重新查詢",
+      });
+      return;
+    }
     if (page < 1 || page > totalPages.value) return;
 
     pageNumber.value = page;
@@ -241,21 +192,44 @@ async function searchEmployees(page) {
       position: position.value,
     };
 
+    // 查詢員工
     const response = await axiosapi.post(
       `/employee/search?page=${pageNumber.value - 1}&size=${pageSize.value}`,
       requestPayload
     );
-
+    console.log(response.data.content);
     if (!response.data || !response.data.content) {
-      throw new Error("無法取得員工資料");
+      Swal.fire({
+        title: "錯誤!",
+        text: "查無資料",
+        icon: "error",
+        confirmButtonText: "重新查詢",
+      })
+      employees.value = []; // 確保查無資料時清空
+      approvalFlows.value = []; // 也清空流程
+      return;
     }
 
     employees.value = response.data.content;
     totalPages.value = response.data.totalPages || 1;
+
+    // 重新獲取所有簽核流程，然後根據所選職位篩選
+    const flowResponse = await axiosapi.get("/api/approval/flow/all");
+    approvalFlows.value = flowResponse.data.filter(
+      (flow) => flow.employeePosition === position.value
+    );
   } catch (error) {
     console.error("Error searching employees:", error);
+    Swal.fire({
+      title: "錯誤!",
+      text: error,
+      icon: "error",
+      confirmButtonText: "重新查詢",
+    });
   }
 }
+
+
 
 // 計算總頁數的數組
 const totalPagesArray = computed(() => {
@@ -325,6 +299,7 @@ async function submitEmployeeFlow() {
   background: #008cba;
   color: white;
 }
+
 .pagination-container {
   display: flex;
   justify-content: center;
