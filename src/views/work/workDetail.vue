@@ -144,6 +144,7 @@ async function openModal(data){
     else{
         task.value={}
         task.value.status ="未完成"
+        task.value.createDate =getTodayDate()
         isShowButtonInsert.value=false
     }
     modal.value.showModal();
@@ -195,6 +196,14 @@ function getStatusStyle(statusName) {
     }
     return {}; // 預設無顏色
   }
+function getTodayDate() {
+    const today = new Date();
+    const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0'); // 月份從0開始，需加1
+        const day = String(today.getDate()).padStart(2, '0'); // 使日期為兩位數
+
+    return `${year}-${month}-${day}`;
+}
 </script>
     
 <style>

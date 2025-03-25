@@ -67,6 +67,11 @@
                       <span class="nav-text">新增工作</span>
                     </RouterLink>
                   </li>
+                  <li>
+                    <RouterLink class="sidenav-item-link" to="/work/taskprogress">
+                      <span class="nav-text">交辦事項</span>
+                    </RouterLink>
+                  </li>
                 </div>
               </ul>
             </li>
