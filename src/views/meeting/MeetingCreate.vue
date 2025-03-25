@@ -7,11 +7,16 @@
       :current="currentPageForStatus"
       :pages="pagesForStatus"
       @refresh="refreshMeetings"
-      @change-status="handleStatusChange"
+      @change-status="handleStatusChange" 
       @change-sort="handleSortChange"
       @change-page="handlePageChange"
     />
   </div>
+
+<!-- current 第幾頁 -->
+<!-- pages 總共幾頁 -->
+<!-- change-page 用來接受子元件頁碼點擊 -->
+
 </template>
 
 <script setup>
@@ -28,11 +33,11 @@ const selectedStatus = ref('all');
 const sortInfo = ref({ prop: 'createdAt', order: 'ascending' });
 const itemsPerPage = 10;
 
-// 分頁狀態（每個狀態各自記錄目前頁碼 & 總頁數）
+// 分頁狀態（記錄目前頁碼 & 總頁數）
 const current = ref({ all: 1, 審核中: 1, 已審核: 1, 未核准: 1 });
 const pages = ref({ all: 0, 審核中: 0, 已審核: 0, 未核准: 0 });
 
-// ✅ 用 computed 包裝 current / pages，確保 reactive
+//用 computed 包裝 current / pages，確保 reactive
 const currentPageForStatus = computed(() => current.value[selectedStatus.value]);
 const pagesForStatus = computed(() => pages.value[selectedStatus.value]);
 
