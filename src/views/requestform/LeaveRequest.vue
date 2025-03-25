@@ -132,46 +132,50 @@ function validateDateRange() {
   updateLeaveHours()
 }
 
-// 計算請假時數
 function updateLeaveHours() {
   if (!leaveRequest.startTime || !leaveRequest.endTime) return;
 
   const start = new Date(leaveRequest.startTime);
   const end = new Date(leaveRequest.endTime);
 
-  let totalHours = 0;
+  let totalMinutes = 0; // 將所有分鐘數累加
   let current = new Date(start);
 
   while (current < end) {
     let workStart = new Date(current);
-    workStart.setHours(8, 0, 0, 0); // 08:00 上班
+    workStart.setHours(8, 0, 0, 0); // 工作日開始時間 08:00
     let workEnd = new Date(current);
-    workEnd.setHours(17, 0, 0, 0); // 17:00 下班
+    workEnd.setHours(17, 0, 0, 0); // 工作日結束時間 17:00
 
-    // 計算當前工作日的結束時間
-    let dayEnd = new Date(workEnd);
-    if (current.getDate() !== end.getDate()) {
-      dayEnd.setHours(17, 0, 0, 0); // 不是同一天，則算到17:00
-    } else {
-      dayEnd = end; // 是同一天，則算到請假結束時間
+    let lunchStart = new Date(current);
+    lunchStart.setHours(12, 0, 0, 0); // 午休開始時間 12:00
+    let lunchEnd = new Date(current);
+    lunchEnd.setHours(13, 0, 0, 0); // 午休結束時間 13:00
+
+    let actualStart = current < workStart ? workStart : current; // 確定實際開始時間
+    let actualEnd = end < workEnd ? end : workEnd; // 確定實際結束時間
+
+    if (actualStart < actualEnd) {
+      let minutes = (actualEnd - actualStart) / (1000 * 60); // 計算總分鐘數
+
+      // 扣除午休時間
+      if (actualStart < lunchEnd && actualEnd > lunchStart) {
+        let overlapStart = actualStart < lunchStart ? lunchStart : actualStart;
+        let overlapEnd = actualEnd > lunchEnd ? lunchEnd : actualEnd;
+        let lunchMinutes = (overlapEnd - overlapStart) / (1000 * 60); // 計算午休重疊的分鐘數
+        minutes -= Math.max(0, lunchMinutes); // 扣除午休時間
+      }
+
+      totalMinutes += Math.max(0, Math.min(minutes, 8 * 60)); // 每日最多 8 小時 (480 分鐘)
     }
 
-    // 計算當前請假時數
-    if (current < workEnd) {
-      // 確保請假開始時間不早於上班時間
-      let actualStart = current < workStart ? workStart : current;
-      let hours = (dayEnd - actualStart) / (1000 * 60 * 60); // 計算小時數
-      hours = Math.max(0, Math.min(hours, 8)); // 每天最多8小時
-      totalHours += Math.floor(hours); // 以30分鐘為單位計算
-    }
-
-    // 跳到下一個工作日
-    current.setDate(current.getDate() + 1);
-    current.setHours(8, 0, 0, 0); // 跳到下一個工作日的08:00
+    current.setDate(current.getDate() + 1); // 跳到下一個工作日
+    current.setHours(8, 0, 0, 0); // 下一工作日從 08:00 開始
   }
 
-
-  leaveRequest.leaveHours = Math.floor(totalHours);
+  console.log(totalMinutes);
+  // 將分鐘數轉換為小時，並無條件進位
+  leaveRequest.leaveHours = Math.ceil(totalMinutes / 60);
 }
 
 
