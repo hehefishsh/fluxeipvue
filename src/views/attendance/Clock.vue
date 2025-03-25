@@ -18,16 +18,10 @@
 
       <!-- 外出/外出結束 打卡按鈕 -->
       <div class="button-group">
-        <button
-          @click="startFieldWork"
-          class="mb-1 btn btn-outline-primary btn-pill"
-        >
+        <button @click="startFieldWork" class="mb-1 btn btn-outline-primary btn-pill">
           外出打卡
         </button>
-        <button
-          @click="endFieldWork"
-          class="mb-1 btn btn-outline-primary btn-pill"
-        >
+        <button @click="endFieldWork" class="mb-1 btn btn-outline-primary btn-pill">
           外出結束
         </button>
       </div>
@@ -125,6 +119,11 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+.accordion {
+  display: flex;
+  justify-content: center;
+}
+
 body {
   font-family: "Roboto", sans-serif;
   background-color: #f2f2f2;
@@ -134,6 +133,7 @@ body {
   height: 100vh;
   margin: 0;
 }
+
 .card {
   background-color: #fff;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
@@ -142,39 +142,48 @@ body {
   text-align: center;
   width: 400px;
 }
+
 .clock {
   font-size: 4rem;
   font-weight: bold;
   color: #333;
 }
+
 .button-group {
   display: flex;
   justify-content: center;
   align-items: center;
   margin-bottom: 10px;
 }
+
 .button-group button {
   padding: 12px 24px;
   cursor: pointer;
   font-size: 16px;
   margin: 0 10px;
 }
+
 .status {
   margin-top: 10px;
   font-size: 18px;
 }
+
 .success {
   color: green;
 }
+
 .success::before {
   content: "✓ ";
 }
+
 .error {
   color: red;
 }
+
 .error::before {
   content: "✗ ";
 }
+
 .subtle {
   color: #7f8c8d;
 }
