@@ -1,11 +1,22 @@
 <template>
-  <div class="modal fade" id="leaveRequestModal" tabindex="-1" role="dialog" aria-labelledby="leaveRequestModalLabel"
-    aria-hidden="true">
+  <div
+    class="modal fade"
+    id="leaveRequestModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="leaveRequestModalLabel"
+    aria-hidden="true"
+  >
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">請假詳情</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-label="Close"
+          >
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -48,8 +59,15 @@
                 <tr v-if="leaveRequest.attachmentName">
                   <td>附件</td>
                   <td>
-                    <button @click="downloadFile(leaveRequest.attachmentName, leaveRequest.attachmentPath)"
-                      class="badge badge-primary">
+                    <button
+                      @click="
+                        downloadFile(
+                          leaveRequest.attachmentName,
+                          leaveRequest.attachmentPath
+                        )
+                      "
+                      class="badge badge-primary"
+                    >
                       下載附件
                     </button>
                     {{ leaveRequest.attachmentName }}
@@ -66,11 +84,11 @@
             <table class="table table-borderless">
               <thead>
                 <tr>
-                  <th style="width: 12%;">步驟</th>
+                  <th style="width: 12%">步驟</th>
                   <th>審核人</th>
                   <th>狀態</th>
                   <th>意見</th>
-                  <th style="width: 40%;">更新時間</th>
+                  <th style="width: 40%">更新時間</th>
                 </tr>
               </thead>
               <tbody>
@@ -78,7 +96,7 @@
                   <td>{{ step.currentStep }}</td>
                   <td>{{ step.approverName }}</td>
                   <td>{{ step.status }}</td>
-                  <td>{{ step.comment || '無' }}</td>
+                  <td>{{ step.comment || "無" }}</td>
                   <td>{{ formatDate(step.updatedAt) }}</td>
                 </tr>
               </tbody>
@@ -89,7 +107,9 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-danger" data-dismiss="modal">關閉</button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">
+            關閉
+          </button>
         </div>
       </div>
     </div>
@@ -97,11 +117,11 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
-import axiosapi from '@/plugins/axios';
+import { ref, watch } from "vue";
+import axiosapi from "@/plugins/axios";
 
 const props = defineProps({
-  leaveRequest: Object
+  leaveRequest: Object,
 });
 
 const approvalSteps = ref([]);
@@ -109,13 +129,21 @@ const approvalSteps = ref([]);
 const formatDate = (dateStr) => {
   if (!dateStr) return "";
   const date = new Date(dateStr);
-  return date.toLocaleString("zh-TW", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
+  return date.toLocaleString("zh-TW", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 };
 
 const fetchApprovalSteps = async () => {
   if (!props.leaveRequest) return;
   try {
-    const response = await axiosapi.get(`/api/approval/steps/${props.leaveRequest.leaveRequestId}`);
+    const response = await axiosapi.get(
+      `/api/approval/leave/steps/${props.leaveRequest.leaveRequestId}`
+    );
     approvalSteps.value = response.data;
   } catch (error) {
     console.error("獲取審核步驟失敗", error);
@@ -123,11 +151,16 @@ const fetchApprovalSteps = async () => {
 };
 
 const downloadFile = (attachmentName, attachmentPath) => {
-  axiosapi.get(`/api/leave-requests/attachments/${attachmentPath}`, { responseType: 'blob' })
-    .then(response => {
-      const blob = new Blob([response.data], { type: response.headers['content-type'] });
+  axiosapi
+    .get(`/api/leave-requests/attachments/${attachmentPath}`, {
+      responseType: "blob",
+    })
+    .then((response) => {
+      const blob = new Blob([response.data], {
+        type: response.headers["content-type"],
+      });
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
       a.download = decodeURIComponent(attachmentName);
       document.body.appendChild(a);
@@ -135,14 +168,17 @@ const downloadFile = (attachmentName, attachmentPath) => {
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
     })
-    .catch(error => {
+    .catch((error) => {
       console.error("下載失敗", error);
     });
 };
 
-watch(() => props.leaveRequest, (newVal) => {
-  if (newVal) fetchApprovalSteps();
-});
+watch(
+  () => props.leaveRequest,
+  (newVal) => {
+    if (newVal) fetchApprovalSteps();
+  }
+);
 </script>
 
 <style scoped>

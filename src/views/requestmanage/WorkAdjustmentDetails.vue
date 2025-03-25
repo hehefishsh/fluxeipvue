@@ -1,11 +1,22 @@
 <template>
-  <div class="modal fade" id="overtimeRequestModal" tabindex="-1" role="dialog"
-    aria-labelledby="overtimeRequestModalLabel" aria-hidden="true">
+  <div
+    class="modal fade"
+    id="overtimeRequestModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="overtimeRequestModalLabel"
+    aria-hidden="true"
+  >
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">加減班申請詳情</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-label="Close"
+          >
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -41,7 +52,6 @@
                   <td>狀態</td>
                   <td>{{ overtimeRequest.status }}</td>
                 </tr>
-
               </tbody>
             </table>
 
@@ -53,11 +63,11 @@
             <table class="table table-borderless">
               <thead>
                 <tr>
-                  <th style="width: 12%;">步驟</th>
+                  <th style="width: 12%">步驟</th>
                   <th>審核人</th>
                   <th>狀態</th>
                   <th>意見</th>
-                  <th style="width: 40%;">更新時間</th>
+                  <th style="width: 40%">更新時間</th>
                 </tr>
               </thead>
               <tbody>
@@ -65,7 +75,7 @@
                   <td>{{ step.currentStep }}</td>
                   <td>{{ step.approverName }}</td>
                   <td>{{ step.status }}</td>
-                  <td>{{ step.comment || '無' }}</td>
+                  <td>{{ step.comment || "無" }}</td>
                   <td>{{ formatDate(step.updatedAt) }}</td>
                 </tr>
               </tbody>
@@ -76,7 +86,9 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-danger" data-dismiss="modal">關閉</button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">
+            關閉
+          </button>
         </div>
       </div>
     </div>
@@ -84,11 +96,11 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
-import axiosapi from '@/plugins/axios';
+import { ref, watch } from "vue";
+import axiosapi from "@/plugins/axios";
 
 const props = defineProps({
-  overtimeRequest: Object
+  overtimeRequest: Object,
 });
 
 const approvalSteps = ref([]);
@@ -96,24 +108,31 @@ const approvalSteps = ref([]);
 const formatDate = (dateStr) => {
   if (!dateStr) return "";
   const date = new Date(dateStr);
-  return date.toLocaleString("zh-TW", { year: "numeric", month: "2-digit", day: "2-digit" });
+  return date.toLocaleString("zh-TW", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
 };
 
-// const fetchApprovalSteps = async () => {
-//   if (!props.overtimeRequest) return;
-//   try {
-//     const response = await axiosapi.get(`/api/approval/steps/${props.overtimeRequest.overtimeRequestId}`);
-//     approvalSteps.value = response.data;
-//   } catch (error) {
-//     console.error("獲取審核步驟失敗", error);
-//   }
-// };
+const fetchApprovalSteps = async () => {
+  if (!props.overtimeRequest) return;
+  try {
+    const response = await axiosapi.get(
+      `/api/approval/workadjust/steps/${props.overtimeRequest.workAdjustmentRequestId}`
+    );
+    approvalSteps.value = response.data;
+  } catch (error) {
+    console.error("獲取審核步驟失敗", error);
+  }
+};
 
-
-
-// watch(() => props.overtimeRequest, (newVal) => {
-//   if (newVal) fetchApprovalSteps();
-// });
+watch(
+  () => props.overtimeRequest,
+  (newVal) => {
+    if (newVal) fetchApprovalSteps();
+  }
+);
 </script>
 
 <style scoped>
