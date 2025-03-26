@@ -8,16 +8,22 @@
 
       <label>部門：</label>
       <select v-model="department" class="custom-select my-1 mr-sm-2">
-        <option v-for="dep in departments" :key="dep.id" :value="dep.departmentName">
+        <option
+          v-for="dep in departments"
+          :key="dep.id"
+          :value="dep.departmentName"
+        >
           {{ dep.departmentName }}
         </option>
       </select>
 
-      <label>
-        <font color="red">*</font>職位：
-      </label>
+      <label> <font color="red">*</font>職位： </label>
       <select v-model="position" class="custom-select my-1 mr-sm-2">
-        <option v-for="pos in positions" :key="pos.positionId" :value="pos.positionName">
+        <option
+          v-for="pos in positions"
+          :key="pos.positionId"
+          :value="pos.positionName"
+        >
           {{ pos.positionName }}
         </option>
       </select>
@@ -32,19 +38,33 @@
         <br />
         <h4></h4>
         <ul class="list-group">
-          <li v-for="employee in employees" :key="employee.id" class="list-group-item list-group-item-action">
+          <li
+            v-for="employee in employees"
+            :key="employee.id"
+            class="list-group-item list-group-item-action"
+          >
             <div class="media media-sm mb-0">
               <div class="media-body">
-                <span class="title">{{ employee.employeeId }}-{{ employee.employeeName }}</span>
+                <span class="title"
+                  >{{ employee.employeeId }}-{{ employee.employeeName }}</span
+                >
                 <p>
                   {{ employee.department.departmentName }} -
                   {{ employee.position.positionName }}
                 </p>
               </div>
               <div class="custom-control custom-checkbox align-self-center">
-                <input type="checkbox" class="custom-control-input" :id="'customCheck' + employee.employeeId"
-                  v-model="selectedEmployees" :value="employee.employeeId" />
-                <label class="custom-control-label" :for="'customCheck' + employee.employeeId"></label>
+                <input
+                  type="checkbox"
+                  class="custom-control-input"
+                  :id="'customCheck' + employee.employeeId"
+                  v-model="selectedEmployees"
+                  :value="employee.employeeId"
+                />
+                <label
+                  class="custom-control-label"
+                  :for="'customCheck' + employee.employeeId"
+                ></label>
               </div>
             </div>
           </li>
@@ -53,28 +73,55 @@
       </div>
 
       <!-- Separated Pagination -->
-      <div class="align-items-center" v-if="employees.length > 0 && totalPages > 1">
+      <div
+        class="align-items-center"
+        v-if="employees.length > 0 && totalPages > 1"
+      >
         <nav aria-label="Page navigation example">
-          <ul class="pagination pagination-seperated pagination-seperated-rounded">
+          <ul class="pagination pagination-seperated">
             <li class="page-item" :class="{ disabled: pageNumber <= 1 }">
-              <a class="page-link" href="#" @click="searchEmployees(pageNumber - 1)" aria-label="Previous">
-                <span aria-hidden="true" class="mdi mdi-chevron-left mr-1"></span>
+              <a
+                class="page-link"
+                href="#"
+                @click="searchEmployees(pageNumber - 1)"
+                aria-label="Previous"
+              >
+                <span
+                  aria-hidden="true"
+                  class="mdi mdi-chevron-left mr-1"
+                ></span>
                 Prev
                 <span class="sr-only">Previous</span>
               </a>
             </li>
 
             <!-- 動態生成頁面數量 -->
-            <li v-for="page in totalPagesArray" :key="page" class="page-item" :class="{ active: pageNumber === page }">
+            <li
+              v-for="page in totalPagesArray"
+              :key="page"
+              class="page-item"
+              :class="{ active: pageNumber === page }"
+            >
               <a class="page-link" href="#" @click="searchEmployees(page)">
                 {{ page }}
               </a>
             </li>
 
-            <li class="page-item" :class="{ disabled: pageNumber >= totalPages }">
-              <a class="page-link" href="#" @click="searchEmployees(pageNumber + 1)" aria-label="Next">
+            <li
+              class="page-item"
+              :class="{ disabled: pageNumber >= totalPages }"
+            >
+              <a
+                class="page-link"
+                href="#"
+                @click="searchEmployees(pageNumber + 1)"
+                aria-label="Next"
+              >
                 Next
-                <span aria-hidden="true" class="mdi mdi-chevron-right ml-1"></span>
+                <span
+                  aria-hidden="true"
+                  class="mdi mdi-chevron-right ml-1"
+                ></span>
                 <span class="sr-only">Next</span>
               </a>
             </li>
@@ -84,7 +131,7 @@
 
       <div v-if="approvalFlows.length">
         <br />
-        <h3><span class="badge badge-secondary">審核流程</span></h3>
+        <h3><span class="badge badge-secondary">簽核流程</span></h3>
         <table class="table table-borderless table-thead-border">
           <thead>
             <tr>
@@ -94,21 +141,39 @@
               <th class="text">步驟數</th>
               <th class="text">適用職位</th>
               <th class="text">簽核職位</th>
+              <th class="text">其他</th>
               <th class="text">選擇</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(flow, index) in approvalFlows" :key="index">
+            <tr v-for="(flow, index) in paginatedFlows" :key="index">
               <td class="text">{{ flow.flowId }}</td>
               <td class="text">{{ flow.flowName }}</td>
               <td class="text">{{ flow.requestType }}</td>
               <td class="text">{{ flow.stepOrder }}</td>
               <td class="text">{{ flow.employeePosition }}</td>
               <td class="text">{{ flow.approverPosition }}</td>
+              <td>
+                <h6>
+                  <button
+                    class="badge badge-info"
+                    @click="showModal(flow)"
+                    data-toggle="modal"
+                    data-target="#approvalFlowAssignModal"
+                  >
+                    查看詳情
+                  </button>
+                </h6>
+              </td>
               <td class="text">
                 <!-- 只有 stepOrder 為 1 的流程才顯示勾選框 -->
-                <input v-if="flow.stepOrder === 1" type="checkbox" :id="'flowCheck' + flow.flowId"
-                  v-model="selectedFlows" :value="flow.flowId" />
+                <input
+                  v-if="flow.stepOrder === 1"
+                  type="checkbox"
+                  :id="'flowCheck' + flow.flowId"
+                  v-model="selectedFlows"
+                  :value="flow.flowId"
+                />
               </td>
             </tr>
           </tbody>
@@ -119,13 +184,64 @@
       </div>
 
       <!-- 提交選擇的簽核流程 -->
-      <div v-if="selectedEmployees.length > 0 && selectedFlows.length > 0" style="margin-top: 20px">
+      <div
+        v-if="selectedEmployees.length > 0 && selectedFlows.length > 0"
+        style="margin-top: 20px"
+      >
         <button type="button" @click="submitEmployeeFlow" class="submit-button">
           提交選擇的簽核流程
         </button>
       </div>
     </div>
+    <!-- 分頁 -->
+    <nav
+      aria-label="Page navigation example"
+      class="d-flex justify-content-center"
+      v-if="approvalFlows.length"
+    >
+      <ul class="pagination pagination-separated">
+        <li class="page-item" :class="{ disabled: currentPage === 1 }">
+          <a
+            class="page-link"
+            href="#"
+            @click.prevent="changePage(currentPage - 1)"
+          >
+            <span aria-hidden="true" class="mdi mdi-chevron-left mr-1"></span>
+            Prev
+          </a>
+        </li>
+        <li
+          class="page-item"
+          v-for="page in visiblePages"
+          :key="page"
+          :class="{ active: currentPage === page }"
+        >
+          <a
+            v-if="page !== '...'"
+            class="page-link"
+            href="#"
+            @click.prevent="changePage(page)"
+          >
+            {{ page }}
+          </a>
+          <span v-else class="page-link">...</span>
+        </li>
+        <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+          <a
+            class="page-link"
+            href="#"
+            @click.prevent="changePage(currentPage + 1)"
+          >
+            Next
+            <span aria-hidden="true" class="mdi mdi-chevron-right ml-1"></span>
+          </a>
+        </li>
+      </ul>
+    </nav>
     <div class="bg-white py-4"></div>
+    <ApprovalFlowAssignDetails
+      :approvalFlowAssign="selectedApprovalFlowAssign"
+    />
   </div>
 </template>
 
@@ -133,6 +249,7 @@
 import { ref, onMounted, computed } from "vue";
 import axiosapi from "@/plugins/axios.js";
 import Swal from "sweetalert2";
+import ApprovalFlowAssignDetails from "./ApprovalFlowAssignDetails.vue";
 
 const department = ref(null);
 const position = ref(null);
@@ -204,7 +321,7 @@ async function searchEmployees(page) {
         text: "查無資料",
         icon: "error",
         confirmButtonText: "重新查詢",
-      })
+      });
       employees.value = []; // 確保查無資料時清空
       approvalFlows.value = []; // 也清空流程
       return;
@@ -214,7 +331,7 @@ async function searchEmployees(page) {
     totalPages.value = response.data.totalPages || 1;
 
     // 重新獲取所有簽核流程，然後根據所選職位篩選
-    const flowResponse = await axiosapi.get("/api/approval/flow/all");
+    const flowResponse = await axiosapi.get("/api/approval/flow/stepone/all");
     approvalFlows.value = flowResponse.data.filter(
       (flow) => flow.employeePosition === position.value
     );
@@ -229,12 +346,56 @@ async function searchEmployees(page) {
   }
 }
 
-
-
 // 計算總頁數的數組
 const totalPagesArray = computed(() => {
   return Array.from({ length: totalPages.value }, (_, i) => i + 1);
 });
+
+const currentPage = ref(1);
+const itemsPerPage = 5;
+const selectedApprovalFlowAssign = ref(null);
+
+const showModal = (request) => {
+  selectedApprovalFlowAssign.value = request;
+};
+
+const totalPagess = computed(() =>
+  Math.ceil(approvalFlows.value.length / itemsPerPage)
+);
+
+const paginatedFlows = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  return approvalFlows.value.slice(start, start + itemsPerPage);
+});
+
+const visiblePages = computed(() => {
+  const pages = [];
+  if (totalPagess.value <= 4) {
+    for (let i = 1; i <= totalPagess.value; i++) {
+      pages.push(i);
+    }
+  } else {
+    pages.push(1);
+    if (currentPage.value > 3) pages.push("...");
+
+    let start = Math.max(2, currentPage.value - 1);
+    let end = Math.min(totalPagess.value - 1, currentPage.value + 1);
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+
+    if (currentPage.value < totalPagess.value - 2) pages.push("...");
+    pages.push(totalPagess.value);
+  }
+  return pages;
+});
+
+const changePage = (page) => {
+  if (page !== "..." && page >= 1 && page <= totalPagess.value) {
+    currentPage.value = page;
+  }
+};
 
 // 提交員工與簽核流程
 async function submitEmployeeFlow() {

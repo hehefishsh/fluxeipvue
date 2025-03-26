@@ -1,6 +1,7 @@
 import CreateApprovalFlow from "./CreateApprovalFlow.vue";
 import ApprovalFlowManage from "./ApprovalFlowManage.vue";
 import ApprovalFlowAssign from "./ApprovalFlowAssign.vue";
+import ApprovalFlowManageDetails from "./ApprovalFlowManageDetails.vue";
 
 const approvalflowRoutes = {
   path: "/approvalflow",
@@ -24,6 +25,11 @@ const approvalflowRoutes = {
       name: "approvalflow-assign-link",
       component: ApprovalFlowAssign,
       meta: { title: "指派簽核流程" },
+    },
+    {
+      path: "approvalflow-manage-details/:id",
+      name: " ApprovalFlowManageDetails",
+      component: ApprovalFlowManageDetails,
     },
   ],
 };
