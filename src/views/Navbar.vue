@@ -607,6 +607,15 @@
                       <span class="nav-text">薪資結算</span>
                     </RouterLink>
                   </li>
+                  <li :class="{ active: route.path === '/salary/manage' }" v-if="
+                    ['最高管理員', '次等管理員', '人資主管'].includes(
+                      user.roleName
+                    )
+                  ">
+                    <RouterLink class="sidenav-item-link" to="/salary/manage">
+                      <span class="nav-text">薪資明細管理</span>
+                    </RouterLink>
+                  </li>
                   <li :class="{ active: route.path === '/salary/detail' }">
                     <RouterLink class="sidenav-item-link" to="/salary/detail">
                       <span class="nav-text">薪資明細</span>
