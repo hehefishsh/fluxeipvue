@@ -11,26 +11,56 @@
 
         <!-- 分類標籤 -->
         <div class="d-flex justify-content-between">
-          <ul class="nav nav-pills mb-3 justify-content-between" id="workadjust-tabs" role="tablist">
+          <ul
+            class="nav nav-pills mb-3 justify-content-between"
+            id="workadjust-tabs"
+            role="tablist"
+          >
             <li class="nav-item">
-              <a class="nav-link" :class="{ active: activeTab === 'all' }" @click="activeTab = 'all'">全部</a>
+              <a
+                class="nav-link"
+                :class="{ active: activeTab === 'all' }"
+                @click="activeTab = 'all'"
+                >全部</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" :class="{ active: activeTab === 'pending' }" @click="activeTab = 'pending'">待審核</a>
+              <a
+                class="nav-link"
+                :class="{ active: activeTab === 'pending' }"
+                @click="activeTab = 'pending'"
+                >待審核</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" :class="{ active: activeTab === 'reviewing' }"
-                @click="activeTab = 'reviewing'">審核中</a>
+              <a
+                class="nav-link"
+                :class="{ active: activeTab === 'reviewing' }"
+                @click="activeTab = 'reviewing'"
+                >審核中</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" :class="{ active: activeTab === 'approved' }" @click="activeTab = 'approved'">已核決</a>
+              <a
+                class="nav-link"
+                :class="{ active: activeTab === 'approved' }"
+                @click="activeTab = 'approved'"
+                >已核決</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" :class="{ active: activeTab === 'rejected' }" @click="activeTab = 'rejected'">未核准</a>
+              <a
+                class="nav-link"
+                :class="{ active: activeTab === 'rejected' }"
+                @click="activeTab = 'rejected'"
+                >未核准</a
+              >
             </li>
           </ul>
           <div>
-            <RouterLink class="btn btn-outline-primary btn-pill ms-auto" to="/">返回首頁</RouterLink>
+            <RouterLink class="btn btn-outline-primary btn-pill ms-auto" to="/"
+              >返回首頁</RouterLink
+            >
           </div>
         </div>
 
@@ -51,25 +81,36 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(missingPunch, index) in filteredMissingPunchRequests" :key="index">
+                <tr
+                  v-for="(missingPunch, index) in filteredMissingPunchRequests"
+                  :key="index"
+                >
                   <td class="text">{{ missingPunch.requestId }}</td>
                   <td class="text">{{ missingPunch.requestEmployeeName }}</td>
                   <td class="text">{{ missingPunch.type }}</td>
-                  <td class="text">
-                    {{ formatDate(missingPunch.missingDate) }}
+                  <td class="text highlinestar">
+                    <span>{{ formatDate(missingPunch.missingDate) }}</span>
                   </td>
                   <td class="text">{{ missingPunch.reason }}</td>
                   <td class="text">
-                    {{ formatDateTime(missingPunch.submittedAt) }}
+                    {{ formatDateSecond(missingPunch.submittedAt) }}
                   </td>
                   <td class="text">{{ missingPunch.status }}</td>
                   <td class="text">
-                    <button class="badge badge-square badge-success" @click="showModal(missingPunch, 'approve')"
-                      data-toggle="modal" data-target="#missingPunchModal">
+                    <button
+                      class="badge badge-square badge-success"
+                      @click="showModal(missingPunch, 'approve')"
+                      data-toggle="modal"
+                      data-target="#missingPunchModal"
+                    >
                       核可
                     </button>
-                    <button class="badge badge-square badge-warning" @click="showModal(missingPunch, 'reject')"
-                      data-toggle="modal" data-target="#missingPunchModal">
+                    <button
+                      class="badge badge-square badge-warning"
+                      @click="showModal(missingPunch, 'reject')"
+                      data-toggle="modal"
+                      data-target="#missingPunchModal"
+                    >
                       否決
                     </button>
                   </td>
@@ -87,8 +128,11 @@
     </div>
 
     <!-- 呼叫加減班詳情元件並傳遞 selectedWorkAdjustRequest -->
-    <MissingPunchApprovalDetails :missingPunchRequest="selectedMissingPunchRequest" :actionType="actionType"
-      @updatemissingPunchRequest="reloadData" />
+    <MissingPunchApprovalDetails
+      :missingPunchRequest="selectedMissingPunchRequest"
+      :actionType="actionType"
+      @update:missingPunchRequest="reloadData"
+    />
   </div>
 </template>
 
@@ -105,9 +149,9 @@ const activeTab = ref("pending"); // 預設顯示 "待審核"
 const selectedMissingPunchRequest = ref(null);
 const actionType = ref("");
 
-// 顯示加減班詳情 Modal
+// 顯示補卡詳情 Modal
 const showModal = (missingPunch, type) => {
-  selectedMissingPunchRequest.value = adjustment;
+  selectedMissingPunchRequest.value = missingPunch;
   actionType.value = type; // 設定是「核准」還是「否決」
 };
 
@@ -137,7 +181,7 @@ onMounted(async () => {
   }
 });
 
-// 根據標籤篩選加減班資料
+// 根據標籤篩選補卡資料
 const filteredMissingPunchRequests = computed(() => {
   if (!Array.isArray(missingPunchRequestData.value)) return [];
   if (activeTab.value === "all") return missingPunchRequestData.value;
@@ -157,15 +201,40 @@ const filteredMissingPunchRequests = computed(() => {
   });
 });
 
-// 日期格式化
+// 簡單日期格式化函式，依需求調整格式
 const formatDate = (dateStr) => {
   if (!dateStr) return "";
-  return new Date(dateStr).toLocaleDateString("zh-TW");
+  const date = new Date(dateStr);
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // 月份從0開始
+  const day = String(date.getDate()).padStart(2, "0");
+
+  // 取得星期幾的中文名稱
+  const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
+  const weekDay = weekdays[date.getDay()];
+
+  return `${year}年${month}月${day}日 (${weekDay})`;
 };
 
-const formatDateTime = (dateTimeStr) => {
-  if (!dateTimeStr) return "";
-  return new Date(dateTimeStr).toLocaleString("zh-TW");
+// 簡單日期格式化函式，依需求調整格式
+const formatDateSecond = (dateStr) => {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // 月份從0開始
+  const day = String(date.getDate()).padStart(2, "0");
+
+  // 取得星期幾的中文名稱
+  const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
+  const weekDay = weekdays[date.getDay()];
+
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+
+  return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
 };
 </script>
 

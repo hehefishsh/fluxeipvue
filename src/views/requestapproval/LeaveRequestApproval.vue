@@ -84,6 +84,7 @@
                   <th class="text">結束時間</th>
                   <th class="text">請假時數</th>
                   <th class="text">請假原因</th>
+                  <th class="text">申請時間</th>
                   <th class="text">附件</th>
                   <th class="text">狀態</th>
                   <th class="text">核准</th>
@@ -97,10 +98,17 @@
                   <td class="text">{{ leave.leaveRequestId }}</td>
                   <td class="text">{{ leave.requestEmployeeName }}</td>
                   <td class="text">{{ leave.leaveType }}</td>
-                  <td class="text">{{ formatDate(leave.startDatetime) }}</td>
-                  <td class="text">{{ formatDate(leave.endDatetime) }}</td>
+                  <td class="text highlinestar">
+                    {{ formatDate(leave.startDatetime) }}
+                  </td>
+                  <td class="text highlinestar">
+                    {{ formatDate(leave.endDatetime) }}
+                  </td>
                   <td class="text">{{ leave.leaveHours }}</td>
                   <td class="text">{{ leave.reason }}</td>
+                  <td class="text">
+                    {{ formatDateSecond(leave.submittedAt) }}
+                  </td>
                   <td class="text">
                     <button
                       v-if="leave.attachmentName"
@@ -112,6 +120,7 @@
                       下載附件
                     </button>
                     <span v-else>無</span>
+                    {{ leave.attachmentName }}
                   </td>
                   <td class="text">{{ leave.status }}</td>
                   <td class="text">
@@ -220,17 +229,38 @@ const filteredLeaveRequests = computed(() => {
 const formatDate = (dateStr) => {
   if (!dateStr) return "";
   const date = new Date(dateStr);
-  const options = {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    weekday: "short", // 週日, 週一等
-  };
-  return new Intl.DateTimeFormat("zh-TW", options)
-    .format(date)
-    .replace(",", ""); // 替換逗號
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // 月份從0開始
+  const day = String(date.getDate()).padStart(2, "0");
+
+  // 取得星期幾的中文名稱
+  const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
+  const weekDay = weekdays[date.getDay()];
+
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+
+  return `${year}年${month}月${day}日 (${weekDay}) ${hours}:${minutes}`;
+};
+
+const formatDateSecond = (dateStr) => {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // 月份從0開始
+  const day = String(date.getDate()).padStart(2, "0");
+
+  // 取得星期幾的中文名稱
+  const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
+  const weekDay = weekdays[date.getDay()];
+
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+
+  return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
 };
 
 function downloadfile(attachmentName, attachmentPath) {

@@ -10,10 +10,18 @@
         </div>
 
         <div class="d-flex justify-content-between">
-          <ul class="nav nav-pills mb-3 justify-content-between" id="pills-tab12" role="tablist">
+          <ul
+            class="nav nav-pills mb-3 justify-content-between"
+            id="pills-tab12"
+            role="tablist"
+          >
             <li class="nav-item" v-for="status in statuses" :key="status.key">
-              <a class="nav-link" :class="{ active: activeTab === status.key }" @click="activeTab = status.key"
-                href="#">
+              <a
+                class="nav-link"
+                :class="{ active: activeTab === status.key }"
+                @click="activeTab = status.key"
+                href="#"
+              >
                 {{ status.label }}
               </a>
             </li>
@@ -37,22 +45,33 @@
                   <th>加班日期</th>
                   <th>時數</th>
                   <th>原因</th>
+                  <th>申請時間</th>
                   <th>狀態</th>
                   <th>其他</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(request, index) in filteredOvertimeRequests" :key="index">
+                <tr
+                  v-for="(request, index) in filteredOvertimeRequests"
+                  :key="index"
+                >
                   <td>{{ request.workAdjustmentRequestId }}</td>
                   <td>{{ request.employeeName }}</td>
                   <td>{{ request.adjustmentType }}</td>
-                  <td>{{ formatDate(request.adjustmentDate) }}</td>
+                  <td class="highlinestar">
+                    {{ formatDate(request.adjustmentDate) }}
+                  </td>
                   <td>{{ request.hours }}</td>
                   <td>{{ request.reason }}</td>
+                  <td>{{ formatDateSecond(request.submittedAt) }}</td>
                   <td>{{ request.status }}</td>
                   <td>
-                    <button class="badge badge-info" @click="showModal(request)" data-toggle="modal"
-                      data-target="#overtimeRequestModal">
+                    <button
+                      class="badge badge-info"
+                      @click="showModal(request)"
+                      data-toggle="modal"
+                      data-target="#overtimeRequestModal"
+                    >
                       查看詳情
                     </button>
                   </td>
@@ -88,7 +107,7 @@ const statuses = [
   { key: "pending", label: "待審核" },
   { key: "reviewing", label: "審核中" },
   { key: "approved", label: "已核決" },
-  { key: "rejected", label: "未核准" }
+  { key: "rejected", label: "未核准" },
 ];
 
 const showModal = (request) => {
@@ -97,7 +116,9 @@ const showModal = (request) => {
 
 onMounted(async () => {
   try {
-    const response = await axiosapi.get(`/api/work-adjustments/employee/${user.empId}`);
+    const response = await axiosapi.get(
+      `/api/work-adjustments/employee/${user.empId}`
+    );
     overtimeRequestData.value = response.data;
   } catch (err) {
     error.value = "無法獲取加減班申請資料";
@@ -106,28 +127,59 @@ onMounted(async () => {
 
 const filteredOvertimeRequests = computed(() => {
   if (activeTab.value === "all") return overtimeRequestData.value;
-  return overtimeRequestData.value.filter((request) => request.status === statuses.find(s => s.key === activeTab.value)?.label);
+  return overtimeRequestData.value.filter(
+    (request) =>
+      request.status === statuses.find((s) => s.key === activeTab.value)?.label
+  );
 });
 
+// 簡單日期格式化函式，依需求調整格式
 const formatDate = (dateStr) => {
   if (!dateStr) return "";
-  return new Intl.DateTimeFormat("zh-TW", {
-    year: "numeric", month: "2-digit", day: "2-digit"
-  }).format(new Date(dateStr));
+  const date = new Date(dateStr);
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // 月份從0開始
+  const day = String(date.getDate()).padStart(2, "0");
+
+  // 取得星期幾的中文名稱
+  const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
+  const weekDay = weekdays[date.getDay()];
+
+  return `${year}年${month}月${day}日 (${weekDay})`;
+};
+
+// 簡單日期格式化函式，依需求調整格式
+const formatDateSecond = (dateStr) => {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // 月份從0開始
+  const day = String(date.getDate()).padStart(2, "0");
+
+  // 取得星期幾的中文名稱
+  const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
+  const weekDay = weekdays[date.getDay()];
+
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+
+  return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
 };
 </script>
 
 <style scoped>
-.table {
-  table-layout: fixed;
-  width: 100%;
-}
-
 .table td,
 .table th {
   word-wrap: break-word;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 200px;
+}
+
+.text {
+  white-space: nowrap;
 }
 </style>

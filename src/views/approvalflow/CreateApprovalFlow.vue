@@ -7,26 +7,49 @@
       <!-- 流程名稱輸入 -->
       <div>
         <h4><span class="badge badge-primary badge-pill">流程名稱</span></h4>
-        <input v-model="flowName" type="text" placeholder="請輸入流程名稱" class="form-control" style="margin-top: 10px" />
+        <input
+          v-model="flowName"
+          type="text"
+          placeholder="請輸入流程名稱"
+          class="form-control"
+          style="margin-top: 10px"
+          maxlength="20"
+        />
+        <small class="form-text text-muted">最多可輸入 20字。</small>
       </div>
 
       <!-- 簽核步驟列表 -->
-      <div v-for="(step, index) in approvalSteps" :key="index" class="step-group">
+      <div
+        v-for="(step, index) in approvalSteps"
+        :key="index"
+        class="step-group"
+      >
         <h3>步驟 {{ index + 1 }}</h3>
 
         <!-- 申請類型選單（僅第一步可變更） -->
         <label>申請類型：</label>
-        <select v-model="selectedCategory" class="custom-select my-1 mr-sm-2" @change="onCategoryChange"
-          :disabled="index !== 0">
-          <option v-for="cat in applicationCategories" :key="cat.value" :value="cat.value">
+        <select
+          v-model="selectedCategory"
+          class="custom-select my-1 mr-sm-2"
+          @change="onCategoryChange"
+          :disabled="index !== 0"
+        >
+          <option
+            v-for="cat in applicationCategories"
+            :key="cat.value"
+            :value="cat.value"
+          >
             {{ cat.label }}
           </option>
         </select>
 
         <!-- 請求類型選單（根據所選申請類型取得的） -->
         <label>請求類型：</label>
-        <select v-model="step.requestTypeId" class="custom-select my-1 mr-sm-2"
-          :disabled="!requestTypes.length || index !== 0">
+        <select
+          v-model="step.requestTypeId"
+          class="custom-select my-1 mr-sm-2"
+          :disabled="!requestTypes.length || index !== 0"
+        >
           <option v-for="type in requestTypes" :key="type.id" :value="type.id">
             {{ type.typeName }}
           </option>
@@ -34,23 +57,42 @@
 
         <!-- 員工職位（第一步固定） -->
         <label>員工職位：</label>
-        <select v-model="step.employeePositionId" class="custom-select my-1 mr-sm-2" :disabled="index !== 0">
-          <option v-for="position in positions" :key="position.positionId" :value="position.positionId">
+        <select
+          v-model="step.employeePositionId"
+          class="custom-select my-1 mr-sm-2"
+          :disabled="index !== 0"
+        >
+          <option
+            v-for="position in positions"
+            :key="position.positionId"
+            :value="position.positionId"
+          >
             {{ position.positionName }}
           </option>
         </select>
 
         <!-- 簽核人職位（依照條件過濾） -->
         <label>簽核人職位：</label>
-        <select v-model="step.approverPositionId" class="custom-select my-1 mr-sm-2"
-          @change="handleApproverChange(index)">
-          <option v-for="position in getAvailableApproverPositions(index)" :key="position.positionId"
-            :value="position.positionId">
+        <select
+          v-model="step.approverPositionId"
+          class="custom-select my-1 mr-sm-2"
+          @change="handleApproverChange(index)"
+        >
+          <option
+            v-for="position in getAvailableApproverPositions(index)"
+            :key="position.positionId"
+            :value="position.positionId"
+          >
             {{ position.positionName }}
           </option>
         </select>
 
-        <button type="button" @click="removeStep(index)" class="delete-button" v-if="index !== 0">
+        <button
+          type="button"
+          @click="removeStep(index)"
+          class="delete-button"
+          v-if="index !== 0"
+        >
           刪除步驟
         </button>
       </div>
@@ -74,7 +116,9 @@ import Swal from "sweetalert2";
 
 const flowName = ref("");
 // 初始僅有一個步驟，其他步驟會繼承第一步的設定
-const approvalSteps = ref([{ requestTypeId: "", employeePositionId: "", approverPositionId: "" }]);
+const approvalSteps = ref([
+  { requestTypeId: "", employeePositionId: "", approverPositionId: "" },
+]);
 
 // 申請類型選單固定資料
 const applicationCategories = ref([
@@ -96,7 +140,9 @@ const positions = ref([]);
 // 取得請求類型資料（根據 selectedCategory）
 const fetchRequestTypes = async () => {
   try {
-    const response = await axiosapi.get(`/api/types/category/${selectedCategory.value}`);
+    const response = await axiosapi.get(
+      `/api/types/category/${selectedCategory.value}`
+    );
     if (selectedCategory.value === "clock_type") {
       requestTypes.value = response.data.filter(
         (item) => item.typeName !== "外出打卡" && item.typeName !== "外出結束"
@@ -121,7 +167,10 @@ onMounted(async () => {
 
 // 當第一步驟的請求類型或員工職位改變時，自動更新後續步驟
 watch(
-  () => [approvalSteps.value[0].requestTypeId, approvalSteps.value[0].employeePositionId],
+  () => [
+    approvalSteps.value[0].requestTypeId,
+    approvalSteps.value[0].employeePositionId,
+  ],
   ([newRequestTypeId, newEmployeePositionId]) => {
     for (let i = 1; i < approvalSteps.value.length; i++) {
       approvalSteps.value[i].requestTypeId = newRequestTypeId;
@@ -139,12 +188,15 @@ const onCategoryChange = async () => {
 // 新增步驟：若最後一步的簽核人職位已選擇老闆（positionId === 1），則不允許新增
 function addStep() {
   const lastStep = approvalSteps.value[approvalSteps.value.length - 1];
-  if (lastStep.approverPositionId && parseInt(lastStep.approverPositionId) === 1) {
+  if (
+    lastStep.approverPositionId &&
+    parseInt(lastStep.approverPositionId) === 1
+  ) {
     Swal.fire({
       title: "警告",
       text: "已選擇老闆作為簽核人，無法新增後續步驟！",
       icon: "warning",
-      confirmButtonText: "確定"
+      confirmButtonText: "確定",
     });
     return;
   }
@@ -152,7 +204,7 @@ function addStep() {
   approvalSteps.value.push({
     requestTypeId: firstStep.requestTypeId,
     employeePositionId: firstStep.employeePositionId,
-    approverPositionId: ""
+    approverPositionId: "",
   });
 }
 
@@ -199,14 +251,16 @@ function getAvailableApproverPositions(stepIndex) {
   if (!approvalSteps.value[0].employeePositionId) return [];
   const empPosId = parseInt(approvalSteps.value[0].employeePositionId);
   if (stepIndex === 0) {
-    return positions.value.filter(p => parseInt(p.positionId) < empPosId);
+    return positions.value.filter((p) => parseInt(p.positionId) < empPosId);
   } else {
     const prevStep = approvalSteps.value[stepIndex - 1];
     if (prevStep.approverPositionId) {
       const prevApprover = parseInt(prevStep.approverPositionId);
-      return positions.value.filter(p => parseInt(p.positionId) < prevApprover);
+      return positions.value.filter(
+        (p) => parseInt(p.positionId) < prevApprover
+      );
     } else {
-      return positions.value.filter(p => parseInt(p.positionId) < empPosId);
+      return positions.value.filter((p) => parseInt(p.positionId) < empPosId);
     }
   }
 }
@@ -222,7 +276,10 @@ async function submitForm() {
   }));
 
   try {
-    const response = await axiosapi.post(`/api/approval/create/approval-flows`, payload);
+    const response = await axiosapi.post(
+      `/api/approval/create/approval-flows`,
+      payload
+    );
     Swal.fire({
       title: "成功!",
       text: response.data,
@@ -232,9 +289,10 @@ async function submitForm() {
       window.location.href = "/approvalflow/create";
     });
   } catch (error) {
-    const errorMessage = error.response && error.response.data
-      ? error.response.data
-      : "提交簽核流程時發生未知錯誤";
+    const errorMessage =
+      error.response && error.response.data
+        ? error.response.data
+        : "提交簽核流程時發生未知錯誤";
     Swal.fire({
       title: "錯誤!",
       text: errorMessage,
