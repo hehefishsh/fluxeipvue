@@ -32,13 +32,13 @@
     </div>
 
     <div>
-      <label>遲到時數：(半小時)</label>
-      <input type="number" v-model="lateHours" required disabled/>
+      <label>遲到時數：(小時)</label>
+      <input type="number" v-model="displayLateHours" required disabled/>
     </div>
 
     <div>
-      <label>早退時數：(半小時)</label>
-      <input type="number" v-model="earlyLeaveHours" required disabled/>
+      <label>早退時數：(小時)</label>
+      <input type="number" v-model="displayEarlyLeaveHours" required disabled/>
     </div>
 
     <div>
@@ -83,7 +83,7 @@
 </template>
     
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted,computed } from 'vue';
 import axios from 'axios';
 const path = import.meta.env.VITE_API_URL;
 import Swal from 'sweetalert2';
@@ -110,6 +110,10 @@ const workData = ref({
   lateEarlyHours: { lateHour: 0, earlyLeaveHour: 0 },
   overtimeHours:0
 });
+
+// 顯示的數值為後端數據除以 2
+const displayLateHours = computed(() => lateHours.value / 2);
+const displayEarlyLeaveHours = computed(() => earlyLeaveHours.value / 2);
 
 const fetchBonusOptions = async () => {
   try {

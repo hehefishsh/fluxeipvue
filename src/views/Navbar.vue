@@ -607,6 +607,11 @@
                       <span class="nav-text">薪資結算</span>
                     </RouterLink>
                   </li>
+                  <li :class="{ active: route.path === '/salary/detail' }">
+                    <RouterLink class="sidenav-item-link" to="/salary/detail">
+                      <span class="nav-text">薪資明細</span>
+                    </RouterLink>
+                  </li>
                 </div>
               </ul>
             </li>
