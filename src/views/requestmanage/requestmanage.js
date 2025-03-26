@@ -1,6 +1,8 @@
 import LeaveRequestManage from "@/views/requestmanage/LeaveRequestManage.vue"
 import LeaveRequestDetails from "./LeaveRequestDetails.vue";
 import ExpenseRequestManage from "@/views/requestmanage/ExpenseRequestManage.vue";
+import WorkAdjustmentManage from "./WorkAdjustmentManage.vue";
+import WorkAdjustmentDetails from "./WorkAdjustmentDetails.vue";
 
 const requestmanageRoutes = {
   path: "/requestmanage",
@@ -14,9 +16,20 @@ const requestmanageRoutes = {
       meta: { title: '請假申請查詢' },
     },
     {
+      path: "workadjust",
+      name: "requestmanage-workadjust-link",
+      component: WorkAdjustmentManage,
+      meta: { title: '加減班申請查詢' },
+    },
+    {
       path: 'leave-request-details/:id',
       name: 'LeaveRequestDetails',
       component: LeaveRequestDetails
+    },
+    {
+      path: 'work-adjustment-details/:id',
+      name: 'WorkAdjustmentDetails',
+      component: WorkAdjustmentDetails
     },
     {
       path: "expense",

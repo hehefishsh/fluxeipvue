@@ -159,6 +159,7 @@ import { ref, onMounted, computed } from "vue";
 import axiosapi from "@/plugins/axios.js";
 import useUserStore from "@/stores/user";
 import LeaveRequestDetails from "./LeaveRequestDetails.vue";
+import Swal from "sweetalert2";
 const user = useUserStore();
 // 用來儲存請假資料
 const leaveRequestData = ref([]);

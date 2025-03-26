@@ -1,11 +1,22 @@
 <template>
-  <div v-if="leaveRequest" class="modal fade" id="leaveRequestModal" tabindex="-1"
-    aria-labelledby="leaveRequestModalLabel" aria-hidden="true">
+  <div
+    v-if="leaveRequest"
+    class="modal fade"
+    id="leaveRequestModal"
+    tabindex="-1"
+    aria-labelledby="leaveRequestModalLabel"
+    aria-hidden="true"
+  >
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="leaveRequestModalLabel">請假詳情</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
         </div>
         <div class="modal-body">
           <table class="table table-borderless">
@@ -41,12 +52,15 @@
               <tr v-if="leaveRequest.attachmentName">
                 <td>附件</td>
                 <td>
-                  <button @click="
-                    downloadFile(
-                      leaveRequest.attachmentName,
-                      leaveRequest.attachmentPath
-                    )
-                    " class="badge badge-primary">
+                  <button
+                    @click="
+                      downloadFile(
+                        leaveRequest.attachmentName,
+                        leaveRequest.attachmentPath
+                      )
+                    "
+                    class="badge badge-primary"
+                  >
                     下載附件
                   </button>
                   {{ leaveRequest.attachmentName }}
@@ -57,17 +71,34 @@
           <!-- 新增評論輸入框 -->
           <div class="mb-3">
             <label for="comment" class="form-label">評論</label>
-            <textarea v-model="comment" class="form-control" id="comment" rows="3"></textarea>
+            <textarea
+              v-model="comment"
+              class="form-control"
+              id="comment"
+              rows="3"
+            ></textarea>
           </div>
         </div>
         <div class="modal-footer">
-          <button v-if="actionType === 'approve'" class="btn btn-success" @click="approveLeave">
+          <button
+            v-if="actionType === 'approve'"
+            class="btn btn-success"
+            @click="approveLeave"
+          >
             核准
           </button>
-          <button v-if="actionType === 'reject'" class="btn btn-warning" @click="rejectLeave">
+          <button
+            v-if="actionType === 'reject'"
+            class="btn btn-warning"
+            @click="rejectLeave"
+          >
             否決
           </button>
-          <button class="btn btn-danger" @click="closeModal" data-dismiss="modal">
+          <button
+            class="btn btn-danger"
+            @click="closeModal"
+            data-dismiss="modal"
+          >
             取消
           </button>
         </div>
@@ -137,7 +168,7 @@ const reviewLeave = async (status) => {
   if (!props.leaveRequest) return;
   try {
     const response = await axiosapi.put(
-      `/api/approval/step/${props.leaveRequest.stepId}/review`,
+      `/api/approval/leave/step/${props.leaveRequest.stepId}/review`,
       null,
       {
         params: {

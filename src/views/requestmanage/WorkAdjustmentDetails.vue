@@ -1,16 +1,16 @@
 <template>
   <div
     class="modal fade"
-    id="leaveRequestModal"
+    id="overtimeRequestModal"
     tabindex="-1"
     role="dialog"
-    aria-labelledby="leaveRequestModalLabel"
+    aria-labelledby="overtimeRequestModalLabel"
     aria-hidden="true"
   >
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">請假詳情</h5>
+          <h5 class="modal-title">加減班申請詳情</h5>
           <button
             type="button"
             class="close"
@@ -21,57 +21,36 @@
           </button>
         </div>
         <div class="modal-body">
-          <div v-if="leaveRequest">
+          <div v-if="overtimeRequest">
             <table class="table table-borderless">
               <tbody>
                 <tr>
                   <td>申請Id</td>
-                  <td>{{ leaveRequest.leaveRequestId }}</td>
+                  <td>{{ overtimeRequest.workAdjustmentRequestId }}</td>
                 </tr>
                 <tr>
                   <td>申請人</td>
-                  <td>{{ leaveRequest.employeeName }}</td>
+                  <td>{{ overtimeRequest.employeeName }}</td>
                 </tr>
                 <tr>
-                  <td>請假類型</td>
-                  <td>{{ leaveRequest.leaveType }}</td>
+                  <td>加減班類型</td>
+                  <td>{{ overtimeRequest.adjustmentType }}</td>
                 </tr>
                 <tr>
-                  <td>開始時間</td>
-                  <td>{{ formatDate(leaveRequest.startDatetime) }}</td>
+                  <td>加班日期</td>
+                  <td>{{ formatDate(overtimeRequest.adjustmentDate) }}</td>
                 </tr>
                 <tr>
-                  <td>結束時間</td>
-                  <td>{{ formatDate(leaveRequest.endDatetime) }}</td>
+                  <td>加減班時數</td>
+                  <td>{{ overtimeRequest.hours }}</td>
                 </tr>
                 <tr>
-                  <td>請假時數</td>
-                  <td>{{ leaveRequest.leaveHours }}</td>
-                </tr>
-                <tr>
-                  <td>請假原因</td>
-                  <td>{{ leaveRequest.reason }}</td>
+                  <td>調整原因</td>
+                  <td>{{ overtimeRequest.reason }}</td>
                 </tr>
                 <tr>
                   <td>狀態</td>
-                  <td>{{ leaveRequest.status }}</td>
-                </tr>
-                <tr v-if="leaveRequest.attachmentName">
-                  <td>附件</td>
-                  <td>
-                    <button
-                      @click="
-                        downloadFile(
-                          leaveRequest.attachmentName,
-                          leaveRequest.attachmentPath
-                        )
-                      "
-                      class="badge badge-primary"
-                    >
-                      下載附件
-                    </button>
-                    {{ leaveRequest.attachmentName }}
-                  </td>
+                  <td>{{ overtimeRequest.status }}</td>
                 </tr>
               </tbody>
             </table>
@@ -103,7 +82,7 @@
             </table>
           </div>
           <div v-else>
-            <p>正在加載請假詳情...</p>
+            <p>正在加載加減班詳情...</p>
           </div>
         </div>
         <div class="modal-footer">
@@ -121,7 +100,7 @@ import { ref, watch } from "vue";
 import axiosapi from "@/plugins/axios";
 
 const props = defineProps({
-  leaveRequest: Object,
+  overtimeRequest: Object,
 });
 
 const approvalSteps = ref([]);
@@ -133,16 +112,14 @@ const formatDate = (dateStr) => {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
   });
 };
 
 const fetchApprovalSteps = async () => {
-  if (!props.leaveRequest) return;
+  if (!props.overtimeRequest) return;
   try {
     const response = await axiosapi.get(
-      `/api/approval/leave/steps/${props.leaveRequest.leaveRequestId}`
+      `/api/approval/workadjust/steps/${props.overtimeRequest.workAdjustmentRequestId}`
     );
     approvalSteps.value = response.data;
   } catch (error) {
@@ -150,31 +127,8 @@ const fetchApprovalSteps = async () => {
   }
 };
 
-const downloadFile = (attachmentName, attachmentPath) => {
-  axiosapi
-    .get(`/api/leave-requests/attachments/${attachmentPath}`, {
-      responseType: "blob",
-    })
-    .then((response) => {
-      const blob = new Blob([response.data], {
-        type: response.headers["content-type"],
-      });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = decodeURIComponent(attachmentName);
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-    })
-    .catch((error) => {
-      console.error("下載失敗", error);
-    });
-};
-
 watch(
-  () => props.leaveRequest,
+  () => props.overtimeRequest,
   (newVal) => {
     if (newVal) fetchApprovalSteps();
   }
