@@ -39,7 +39,8 @@
             <font color="red">*</font>加減班時數
           </label>
           <input type="number" id="hours" class="form-control rounded-0" v-model="adjustmentRequest.hours" step="1"
-            min="1" required />
+            min="1" max="24" @input="validateHours" required />
+          <small v-if="isHoursInvalid" class="text-danger">加減班時數不能超過 24 小時</small>
         </div>
 
         <!-- 申請原因 -->
@@ -52,7 +53,7 @@
 
         <!-- 按鈕區 -->
         <div class="form-footer">
-          <button type="submit" class="btn btn-secondary btn-pill">提交</button>
+          <button type="submit" class="btn btn-secondary btn-pill" :disabled="isHoursInvalid">提交</button>
           <button type="button" @click="goBack" class="btn btn-light btn-pill">取消</button>
         </div>
       </form>
@@ -93,12 +94,28 @@ onMounted(async () => {
   }
 })
 
+// 是否時數無效
+const isHoursInvalid = computed(() => adjustmentRequest.hours > 24)
+
+// 檢查時數是否超過 24 小時
+function validateHours() {
+  if (adjustmentRequest.hours > 24) {
+    adjustmentRequest.hours = 24 // 自動調整為最大值
+    Swal.fire({
+      title: '警告!',
+      text: '加減班時數不能超過 24 小時。',
+      icon: 'warning',
+      confirmButtonText: '確定'
+    });
+  }
+}
+
 // 提交加減班申請
 async function submitWorkAdjustment() {
-  if (adjustmentRequest.hours <= 0) {
+  if (isHoursInvalid.value) {
     Swal.fire({
       title: '錯誤!',
-      text: '加減班時數必須大於 0 小時。',
+      text: '加減班時數不能超過 24 小時。',
       icon: 'error',
       confirmButtonText: '確定'
     });
