@@ -90,6 +90,12 @@ function checkpas(){
 }
 
 async function passwordsubmit(){
+    if(password.value!=checkpassword.value){
+        Swal.fire({
+                title:"新密碼與確認密碼不同",
+                icon:"warning"
+            })
+    }else{
     const form = new FormData();
         form.append("token",token);
         form.append("newPassword",password.value);
@@ -108,6 +114,7 @@ async function passwordsubmit(){
                 icon:"warning"
             })
         }
+    }
 }
 
 

@@ -1,5 +1,6 @@
 import Salary from "./Salary.vue";
 import useUserStore from "@/stores/user";
+import MonthlySalary from "./MonthlySalary.vue";
 
 
 const adminRoles = ["最高管理員", "次等管理員"]; // 管理員角色
@@ -17,6 +18,20 @@ const salaryRoutes = {
             name: "salary-all-link",
             component: Salary,
             meta: { title: '薪資設定' },
+            beforeEnter: (to, from, next) => {
+                const userStore = useUserStore();
+                if ([...salarySettingRole].includes(userStore.roleName)) {
+                    next(); // 所有指定角色均允許訪問
+                } else {
+                    next("/403"); // 未授權角色禁止
+                }
+            },
+        },
+        {
+            path: "monthly",
+            name: "salary-monthly-link",
+            component: MonthlySalary,
+            meta: { title: '薪資結算' },
             beforeEnter: (to, from, next) => {
                 const userStore = useUserStore();
                 if ([...salarySettingRole].includes(userStore.roleName)) {

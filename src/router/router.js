@@ -7,6 +7,7 @@ import attendanceRoutes from "@/views/attendance/attendance.js";
 import requestformRoutes from "@/views/requestform/requestform";
 import requestmanageRoutes from "@/views/requestmanage/requestmanage";
 import requestapprovalRoutes from "@/views/requestapproval/requestapproval";
+import approvalflowRoutes from "@/views/approvalflow/approvalflow";
 import employeeRoutes from "@/views/employee/employee.js";
 import meetingRoutes from "@/views/meeting/meeting";
 import guidelineRoutes from "@/views/guideline/guideline";
@@ -55,6 +56,7 @@ const routes = [
   requestformRoutes,
   requestmanageRoutes,
   requestapprovalRoutes,
+  approvalflowRoutes,
   employeeRoutes,
   meetingRoutes,
   guidelineRoutes,

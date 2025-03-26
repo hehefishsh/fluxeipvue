@@ -1,5 +1,5 @@
 <template>
-    <div class="row">
+    <div class="card card-default">
         <div class="col">
             項目名 : {{work.workName}}
         </div>
@@ -14,7 +14,8 @@
         </div>
         <div class="col">
             負責主管 : {{supervisor}}
-        </div>
+        </div></div>
+    <div class="row">
         <div class="col-md-6 col-xl-10" v-for="taskAssign in taskAssigns" :key="taskAssign.taskId">
             <div class="card py-3 mb-4">
                 <div class="card-body">
@@ -31,14 +32,16 @@
             </div>
         </div>
     </div>
-    <button class="fixed-button" @click="createTaskassign">分配工作</button>
+    <button class="fixed-button" @click="openModal(null)">新增交辦事項</button>
     <Taskassign ref="modal" 
                     v-model:task="task" 
                     v-model:empselect="empselect"
                     v-model:review="review"
+                    :is-show-button-insert="isShowButtonInsert"
                     @update="callUpdate"
                     @deleteDate="deleteDate"
                     @reviewDate="reviewDate"
+                    @insert="insert"
     ></Taskassign>
 </template>
     
@@ -61,46 +64,90 @@ const review=ref(["未完成","已完成","待審核"])
 
 const task=ref({})
 async function callUpdate(){
-    if(task.value.status=="已完成"&&task.value.finishDate==(null||'')){
+    if (task.value.status == "已完成" && (task.value.finishDate == null || task.value.finishDate == '')) {
         Swal.fire({
-                title:"審核完成，請輸入完成日期",
-                icon:"warning"
-            })
-    }else{
-        console.log(task.value.status=="已完成")
+            title: "審核完成，請輸入完成日期",
+            icon: "warning"
+        });
+    } else if (task.value.status == "未完成" && task.value.finishDate != null) {
+        Swal.fire({
+            title: "完成日期已填寫，是否審核完成?",
+            icon: "warning"
+        });
+    } else if(task.value.taskName==''){
+        Swal.fire({
+            title: "請輸入名稱",
+            icon: "warning"
+        });
+    } else if(task.value.taskContent==''){
+        Swal.fire({
+            title: "請輸入內容",
+            icon: "warning"
+        });
+    }else {
+        task.value.reveiew=supervisor.value
         const response=await axiosapi.put(`/taskassign/${task.value.taskId}`,task.value);
         if(response){
-                Swal.fire({
-                    title:"修改成功",
-                    icon:"success"
-                })
-                task.value=""
-                findtaskAssign()
-                modal.value.closeModal();
-            }else{
-                Swal.fire({
-                    title:"修改失敗",
-                    icon:"warning"
-                })
-            }
+            Swal.fire({
+                title:"修改成功",
+                icon:"success"
+            })
+            task.value=""
+            findtaskAssign()
+            modal.value.closeModal();
+        }else{
+            Swal.fire({
+                title:"修改失敗",
+                icon:"warning"
+            })
+        }
     }
-}
-const modal=ref(null);
-async function openModal(data){
-    const response=await axiosapi.get(`/taskassign/${data}`);
-    task.value=response.data
-    task.value.status =task.value.status.statusName
-    task.value.createDate = formatDate(task.value.createDate);
-    task.value.expectedFinishDate = formatDate(task.value.expectedFinishDate);
-    if(task.value.finishDate!=null){
-        task.value.finishDate = formatDate(task.value.finishDate);
-    }
-    task.value.employee=response.data.assign.employeeName
-    modal.value.showModal();
 }
 
-function createTaskassign(){
-    openModal()
+async function insert(){
+    task.value.status ="未完成"
+    task.value.finishDate =null
+    task.value.reveiew=supervisor.value
+    console.log(task.value)
+    const response=await axiosapi.post(`/taskassign/create/${workId}`,task.value);
+    if(response){
+            Swal.fire({
+                title:"新增成功",
+                icon:"success"
+            })
+            task.value=""
+            findtaskAssign()
+            modal.value.closeModal();
+        }else{
+            Swal.fire({
+                title:"修改失敗",
+                icon:"warning"
+            })
+        }
+}
+
+const isShowButtonInsert=ref(true);
+const modal=ref(null);
+async function openModal(data){
+    if(data!=null){
+        isShowButtonInsert.value=true
+        const response=await axiosapi.get(`/taskassign/${data}`);
+        task.value=response.data
+        task.value.status =task.value.status.statusName
+        task.value.createDate = formatDate(task.value.createDate);
+        task.value.expectedFinishDate = formatDate(task.value.expectedFinishDate);
+            if(task.value.finishDate!=null){
+                task.value.finishDate = formatDate(task.value.finishDate);
+            }
+            task.value.employee=response.data.assign.employeeName
+            }
+    else{
+        task.value={}
+        task.value.status ="未完成"
+        task.value.createDate =getTodayDate()
+        isShowButtonInsert.value=false
+    }
+    modal.value.showModal();
 }
 
 async function findtaskAssign(){
@@ -149,6 +196,14 @@ function getStatusStyle(statusName) {
     }
     return {}; // 預設無顏色
   }
+function getTodayDate() {
+    const today = new Date();
+    const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0'); // 月份從0開始，需加1
+        const day = String(today.getDate()).padStart(2, '0'); // 使日期為兩位數
+
+    return `${year}-${month}-${day}`;
+}
 </script>
     
 <style>

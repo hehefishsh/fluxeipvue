@@ -1,5 +1,7 @@
 import workProgress from "@/views/work/workProgress.vue";
 import workDetail from "./workDetail.vue";
+import workCreate from "./workCreate.vue";
+import Taskprogress from "./Taskassign.vue";
 
 const workpro = {
     path: "/work",
@@ -17,6 +19,18 @@ const workpro = {
             name: "workprogressdetail-link",
             component: workDetail,
             meta: { title: "工作分配" }
+        },
+        {
+            path: "progress/create",
+            name: "workprogresscreate-link",
+            component: workCreate,
+            meta: { title: "新增工作" }
+        },
+        {
+            path: "taskprogress",
+            name: "taskprogress-link",
+            component: Taskprogress,
+            meta: { title: "交辦事項" }
         }
     ],
 };

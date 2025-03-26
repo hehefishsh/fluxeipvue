@@ -176,7 +176,9 @@ const reloadData = async () => {
   selectedLeaveRequest.value = null; // 確保 modal 關閉時清空選取
   actionType.value = ""; // 清空 actionType
   try {
-    const response = await axiosapi.get(`/api/approval/pending/${user.empId}`);
+    const response = await axiosapi.get(
+      `/api/approval/leave/pending/${user.empId}`
+    );
     leaveRequestData.value = response.data; // 更新列表
   } catch (err) {
     error.value = "無法獲取請假資料";
@@ -185,7 +187,9 @@ const reloadData = async () => {
 // 查詢請假資料
 onMounted(async () => {
   try {
-    const response = await axiosapi.get(`/api/approval/pending/${user.empId}`); // 查詢待審核的請假單
+    const response = await axiosapi.get(
+      `/api/approval/leave/pending/${user.empId}`
+    ); // 查詢待審核的請假單
     leaveRequestData.value = response.data;
   } catch (err) {
     error.value = "無法獲取請假資料";

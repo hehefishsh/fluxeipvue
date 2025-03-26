@@ -83,6 +83,7 @@
 
   <passwordForget ref="modal" 
                             v-model:check="check"
+                            v-model:disabled="disabled"
                             @submit="submit">
                             </passwordForget>
 </template>
@@ -101,28 +102,28 @@ function openModal(){
     modal.value.showModal();
 }
 
+const disabled=ref(false)
 const check=ref({})
 async function submit(){
+  disabled.value=true;
   const form = new FormData();
   form.append("id",check.value.id);
   form.append("name",check.value.name);
   form.append("email",check.value.email);
-  console.log(form)
-    const response = await axiosapi.post("/forgot/password", form, {});
-        console.log(response.data);
-        if(response.data){
-            Swal.fire({
-                title:"已寄驗證信到信箱",
-                icon:"success",
-            })
-            modal.value.closeModal();
-            // router.push("/employee/detail");
-        }else{
-            Swal.fire({
-                title:"id，姓名，信箱有錯誤",
-                icon:"warning"
-            })
-        }
+  const response = await axiosapi.post("/forgot/password", form, {});
+  disabled.value=false;
+    if(response.data){
+      Swal.fire({
+        title:"已寄驗證信到信箱",
+        icon:"success",
+      })
+      modal.value.closeModal();
+      }else{
+        Swal.fire({
+          title:"id，姓名，信箱有錯誤",
+          icon:"warning"
+        })
+      }
 }
 
 

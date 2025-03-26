@@ -68,6 +68,16 @@
               </tr>
             </tbody>
           </table>
+          <!-- 新增評論輸入框 -->
+          <div class="mb-3">
+            <label for="comment" class="form-label">評論</label>
+            <textarea
+              v-model="comment"
+              class="form-control"
+              id="comment"
+              rows="3"
+            ></textarea>
+          </div>
         </div>
         <div class="modal-footer">
           <button
@@ -101,7 +111,7 @@
 import { ref } from "vue";
 import axiosapi from "@/plugins/axios.js";
 import Swal from "sweetalert2";
-
+const comment = ref(""); // 新增評論變數
 const props = defineProps({
   leaveRequest: Object,
   actionType: String,
@@ -111,6 +121,7 @@ const emit = defineEmits(["update:leaveRequest"]);
 
 const closeModal = () => {
   emit("update:leaveRequest", null);
+  comment.value = ""; // 清空評論
 
   // 手動關閉 Bootstrap modal
   const modal = document.getElementById("leaveRequestModal");
@@ -157,13 +168,13 @@ const reviewLeave = async (status) => {
   if (!props.leaveRequest) return;
   try {
     const response = await axiosapi.put(
-      `/api/approval/step/${props.leaveRequest.stepId}/review`,
+      `/api/approval/leave/step/${props.leaveRequest.stepId}/review`,
       null,
       {
         params: {
           approverId: props.leaveRequest.approverId,
           status: status,
-          comment: "",
+          comment: comment.value, // 傳遞評論
         },
       }
     );

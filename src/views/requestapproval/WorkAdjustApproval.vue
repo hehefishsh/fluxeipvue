@@ -1,0 +1,230 @@
+<template>
+  <div>
+    <!-- 查詢加減班簽核資料 -->
+    <div class="card card-default" id="work-adjust-query">
+      <div class="card-header"></div>
+      <div class="card-body py-0" data-simplebar>
+        <!-- 顯示錯誤信息 -->
+        <div v-show="error" class="alert alert-danger" role="alert">
+          {{ error }}
+        </div>
+
+        <!-- 分類標籤 -->
+        <div class="d-flex justify-content-between">
+          <ul
+            class="nav nav-pills mb-3 justify-content-between"
+            id="workadjust-tabs"
+            role="tablist"
+          >
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                :class="{ active: activeTab === 'all' }"
+                @click="activeTab = 'all'"
+                >全部</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                :class="{ active: activeTab === 'pending' }"
+                @click="activeTab = 'pending'"
+                >待審核</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                :class="{ active: activeTab === 'reviewing' }"
+                @click="activeTab = 'reviewing'"
+                >審核中</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                :class="{ active: activeTab === 'approved' }"
+                @click="activeTab = 'approved'"
+                >已核決</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                :class="{ active: activeTab === 'rejected' }"
+                @click="activeTab = 'rejected'"
+                >未核准</a
+              >
+            </li>
+          </ul>
+          <div>
+            <RouterLink class="btn btn-outline-primary btn-pill ms-auto" to="/"
+              >返回首頁</RouterLink
+            >
+          </div>
+        </div>
+
+        <!-- 篩選顯示對應的加減班資料 -->
+        <div class="tab-content mt-3">
+          <div v-if="filteredWorkAdjustRequests.length">
+            <table class="table table-borderless table-thead-border">
+              <thead>
+                <tr>
+                  <th class="text">申請Id</th>
+                  <th class="text">申請人</th>
+                  <th class="text">加減班類型</th>
+                  <th class="text">調整日期</th>
+                  <th class="text">時數</th>
+                  <th class="text">原因</th>
+                  <th class="text">提交時間</th>
+                  <th class="text">狀態</th>
+                  <th class="text">核准</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="(adjustment, index) in filteredWorkAdjustRequests"
+                  :key="index"
+                >
+                  <td class="text">{{ adjustment.requestId }}</td>
+                  <td class="text">{{ adjustment.requestEmployeeName }}</td>
+                  <td class="text">{{ adjustment.type }}</td>
+                  <td class="text">
+                    {{ formatDate(adjustment.adjustmentDate) }}
+                  </td>
+                  <td class="text">{{ adjustment.hours }}</td>
+                  <td class="text">{{ adjustment.reason }}</td>
+                  <td class="text">
+                    {{ formatDateTime(adjustment.submittedAt) }}
+                  </td>
+                  <td class="text">{{ adjustment.status }}</td>
+                  <td class="text">
+                    <button
+                      class="badge badge-square badge-success"
+                      @click="showModal(adjustment, 'approve')"
+                      data-toggle="modal"
+                      data-target="#workAdjustModal"
+                    >
+                      核可
+                    </button>
+                    <button
+                      class="badge badge-square badge-warning"
+                      @click="showModal(adjustment, 'reject')"
+                      data-toggle="modal"
+                      data-target="#workAdjustModal"
+                    >
+                      否決
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div v-else>
+            <p class="text-center text-muted">無相關加減班資料</p>
+          </div>
+        </div>
+
+        <div class="bg-white py-4"></div>
+      </div>
+    </div>
+
+    <!-- 呼叫加減班詳情元件並傳遞 selectedWorkAdjustRequest -->
+    <WorkAdjustApprovalDetails
+      :workAdjustRequest="selectedWorkAdjustRequest"
+      :actionType="actionType"
+      @update:workAdjustRequest="reloadData"
+    />
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted, computed } from "vue";
+import axiosapi from "@/plugins/axios.js";
+import useUserStore from "@/stores/user";
+import WorkAdjustApprovalDetails from "./WorkAdjustApprovalDetails.vue";
+
+const user = useUserStore();
+const workAdjustRequestData = ref([]);
+const error = ref("");
+const activeTab = ref("pending"); // 預設顯示 "待審核"
+const selectedWorkAdjustRequest = ref(null);
+const actionType = ref("");
+
+// 顯示加減班詳情 Modal
+const showModal = (adjustment, type) => {
+  selectedWorkAdjustRequest.value = adjustment;
+  actionType.value = type; // 設定是「核准」還是「否決」
+};
+
+// 重新載入數據
+const reloadData = async () => {
+  selectedWorkAdjustRequest.value = null; // 清除選取
+  actionType.value = ""; // 清空 actionType
+  try {
+    const response = await axiosapi.get(
+      `/api/approval/workadjust/pending/${user.empId}`
+    );
+    workAdjustRequestData.value = response.data; // 更新列表
+  } catch (err) {
+    error.value = "無法獲取加減班資料";
+  }
+};
+
+// 查詢加減班資料
+onMounted(async () => {
+  try {
+    const response = await axiosapi.get(
+      `/api/approval/workadjust/pending/${user.empId}`
+    );
+    workAdjustRequestData.value = response.data;
+  } catch (err) {
+    error.value = "無法獲取加減班資料";
+  }
+});
+
+// 根據標籤篩選加減班資料
+const filteredWorkAdjustRequests = computed(() => {
+  if (!Array.isArray(workAdjustRequestData.value)) return [];
+  if (activeTab.value === "all") return workAdjustRequestData.value;
+  return workAdjustRequestData.value.filter((adjustment) => {
+    switch (activeTab.value) {
+      case "pending":
+        return adjustment.status === "待審核";
+      case "reviewing":
+        return adjustment.status === "審核中";
+      case "approved":
+        return adjustment.status === "已核決";
+      case "rejected":
+        return adjustment.status === "未核准";
+      default:
+        return true;
+    }
+  });
+});
+
+// 日期格式化
+const formatDate = (dateStr) => {
+  if (!dateStr) return "";
+  return new Date(dateStr).toLocaleDateString("zh-TW");
+};
+
+const formatDateTime = (dateTimeStr) => {
+  if (!dateTimeStr) return "";
+  return new Date(dateTimeStr).toLocaleString("zh-TW");
+};
+</script>
+
+<style scoped>
+.table td,
+.table th {
+  word-wrap: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.text {
+  white-space: nowrap;
+}
+</style>

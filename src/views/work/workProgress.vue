@@ -1,4 +1,20 @@
 <template>
+  <div class="row mb-4">
+    <div class="col-4">
+      <input type="text" class="form-control" placeholder="搜尋工作..." v-model="worksearch" @input="find">
+    </div>
+    <select v-model="status" @change="find">
+            <option value="">全部</option>
+            <!-- 使用v-for來動態顯示部門選項 -->
+            <option v-for="sta in statusSelect" :value="sta">
+              {{ sta }}
+            </option>
+    </select>
+    <RouterLink class="btn btn-primary btn-pill" to="/work/progress/create">
+      <span class="nav-text">新增工作</span>
+    </RouterLink>
+  </div>
+   <h2 v-if="check">查無資料</h2>
     <div class="accordion accordion-shadow" id="accordionShadow">
         <div class="card"  v-for="work in works" :key="work.workprogressId">
             <div class="card-header" :id="'headingShadow'+work.workprogressId">
@@ -18,49 +34,67 @@
                 </div>
             </div>
         </div>
-    </div>
-
-        <button class="fixed-button" @click="createWork">新增工作</button>
+      </div>
 </template>
-    
+
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted } from "vue";
 import axiosapi from "@/plugins/axios-login";
 import useUserStore from '@/stores/user';
-
+const worksearch=ref("")
 const works=ref({});
+const check=ref(false)
 
-async function allwork(){
+const status=ref("")
+const statusSelect=ref(["未完成","已完成"])
+async function find(){
+  if(status.value==''&&worksearch.value==''){
     const response=await axiosapi.get("/workProgress/all");
     works.value=response.data
+    check.value=false
+  }else if(worksearch.value==''&&status.value!=''){
+    const response=await axiosapi.get(`/workProgress/findstatus/${status.value}`);
+    works.value=response.data
+    check.value=false
+    if (response.data.length === 0) {
+        check.value=true
+    }
+  }else if(worksearch.value!=''&&status.value==''){
+    const response=await axiosapi.get(`/workProgress/findname/${worksearch.value}`);
+    works.value=response.data
+    check.value=false
+    if (response.data.length === 0) {
+        check.value=true
+    }
+  }else{
+    const response=await axiosapi.get(`/workProgress/find/${status.value}/${worksearch.value}`);
+    works.value=response.data
+    check.value=false
+    if (response.data.length === 0) {
+        check.value=true
+    }
+  }
+  
 }
 
-onMounted(function(){
+async function allwork() {
+  const response = await axiosapi.get("/workProgress/all");
+  works.value = response.data;
+}
+
+onMounted(function () {
   allwork();
-})
+});
 
 function formatDate(date) {
-    const formattedDate = new Date(date);
-    const year = formattedDate.getFullYear(); // 取得年份
-    const month = (formattedDate.getMonth() + 1).toString().padStart(2, '0'); // 取得月份並補零
-    const day = formattedDate.getDate().toString().padStart(2, '0'); // 取得日期並補零
-    return `${year}/${month}/${day}`; // 返回格式化的日期字符串
-};
-</script>
-    
-<style setup>
-.fixed-button {
-    position: fixed;
-    bottom: 20px; /* 按鈕離底部 20px */
-    right: 20px;  /* 按鈕離右邊 20px */
-    padding: 10px 20px;
-    background-color: #007BFF;
-    color: white;
-    border: none;
-    border-radius: 10%;
-    /* font-size: 16px; */
-    cursor: pointer;
-    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
-    transition: background-color 0.3s ease;
+  const formattedDate = new Date(date);
+  const year = formattedDate.getFullYear(); // 取得年份
+  const month = (formattedDate.getMonth() + 1).toString().padStart(2, "0"); // 取得月份並補零
+  const day = formattedDate.getDate().toString().padStart(2, "0"); // 取得日期並補零
+  return `${year}/${month}/${day}`; // 返回格式化的日期字符串
 }
+</script>
+
+<style setup>
+
 </style>

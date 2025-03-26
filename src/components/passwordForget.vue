@@ -28,7 +28,7 @@
                             
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary  btn-success">送出驗證信</button>
+                        <button type="submit" class="btn btn-primary  btn-success" :disabled="disabled">送出驗證信</button>
                         <button type="button" class="btn btn-primary  btn-danger" data-dismiss="modal">取消</button>
                     </div>
                 </form>
@@ -44,11 +44,7 @@ import { Modal } from 'bootstrap';
 const passwordModalRef = ref(null);
 const passwordModal = ref(null);
 const emits = defineEmits(["submit"])
-const props = defineProps(["check"])
-
-
-
-
+const props = defineProps(["check","disabled"])
 
 onMounted(function () {
 passwordModal.value =new Modal(passwordModalRef.value);
