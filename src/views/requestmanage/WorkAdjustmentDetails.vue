@@ -34,7 +34,7 @@
                   <td>{{ overtimeRequest.hours }}</td>
                 </tr>
                 <tr>
-                  <td>調整原因</td>
+                  <td>原因</td>
                   <td>{{ overtimeRequest.reason }}</td>
                 </tr>
                 <tr>

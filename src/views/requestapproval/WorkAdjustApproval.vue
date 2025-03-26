@@ -11,56 +11,26 @@
 
         <!-- 分類標籤 -->
         <div class="d-flex justify-content-between">
-          <ul
-            class="nav nav-pills mb-3 justify-content-between"
-            id="workadjust-tabs"
-            role="tablist"
-          >
+          <ul class="nav nav-pills mb-3 justify-content-between" id="workadjust-tabs" role="tablist">
             <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'all' }"
-                @click="activeTab = 'all'"
-                >全部</a
-              >
+              <a class="nav-link" :class="{ active: activeTab === 'all' }" @click="activeTab = 'all'">全部</a>
             </li>
             <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'pending' }"
-                @click="activeTab = 'pending'"
-                >待審核</a
-              >
+              <a class="nav-link" :class="{ active: activeTab === 'pending' }" @click="activeTab = 'pending'">待審核</a>
             </li>
             <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'reviewing' }"
-                @click="activeTab = 'reviewing'"
-                >審核中</a
-              >
+              <a class="nav-link" :class="{ active: activeTab === 'reviewing' }"
+                @click="activeTab = 'reviewing'">審核中</a>
             </li>
             <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'approved' }"
-                @click="activeTab = 'approved'"
-                >已核決</a
-              >
+              <a class="nav-link" :class="{ active: activeTab === 'approved' }" @click="activeTab = 'approved'">已核決</a>
             </li>
             <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'rejected' }"
-                @click="activeTab = 'rejected'"
-                >未核准</a
-              >
+              <a class="nav-link" :class="{ active: activeTab === 'rejected' }" @click="activeTab = 'rejected'">未核准</a>
             </li>
           </ul>
           <div>
-            <RouterLink class="btn btn-outline-primary btn-pill ms-auto" to="/"
-              >返回首頁</RouterLink
-            >
+            <RouterLink class="btn btn-outline-primary btn-pill ms-auto" to="/">返回首頁</RouterLink>
           </div>
         </div>
 
@@ -73,7 +43,7 @@
                   <th class="text">申請Id</th>
                   <th class="text">申請人</th>
                   <th class="text">加減班類型</th>
-                  <th class="text">調整日期</th>
+                  <th class="text">加減班日期</th>
                   <th class="text">時數</th>
                   <th class="text">原因</th>
                   <th class="text">提交時間</th>
@@ -82,10 +52,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  v-for="(adjustment, index) in filteredWorkAdjustRequests"
-                  :key="index"
-                >
+                <tr v-for="(adjustment, index) in filteredWorkAdjustRequests" :key="index">
                   <td class="text">{{ adjustment.requestId }}</td>
                   <td class="text">{{ adjustment.requestEmployeeName }}</td>
                   <td class="text">{{ adjustment.type }}</td>
@@ -99,20 +66,12 @@
                   </td>
                   <td class="text">{{ adjustment.status }}</td>
                   <td class="text">
-                    <button
-                      class="badge badge-square badge-success"
-                      @click="showModal(adjustment, 'approve')"
-                      data-toggle="modal"
-                      data-target="#workAdjustModal"
-                    >
+                    <button class="badge badge-square badge-success" @click="showModal(adjustment, 'approve')"
+                      data-toggle="modal" data-target="#workAdjustModal">
                       核可
                     </button>
-                    <button
-                      class="badge badge-square badge-warning"
-                      @click="showModal(adjustment, 'reject')"
-                      data-toggle="modal"
-                      data-target="#workAdjustModal"
-                    >
+                    <button class="badge badge-square badge-warning" @click="showModal(adjustment, 'reject')"
+                      data-toggle="modal" data-target="#workAdjustModal">
                       否決
                     </button>
                   </td>
@@ -130,11 +89,8 @@
     </div>
 
     <!-- 呼叫加減班詳情元件並傳遞 selectedWorkAdjustRequest -->
-    <WorkAdjustApprovalDetails
-      :workAdjustRequest="selectedWorkAdjustRequest"
-      :actionType="actionType"
-      @update:workAdjustRequest="reloadData"
-    />
+    <WorkAdjustApprovalDetails :workAdjustRequest="selectedWorkAdjustRequest" :actionType="actionType"
+      @update:workAdjustRequest="reloadData" />
   </div>
 </template>
 
