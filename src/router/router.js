@@ -20,10 +20,11 @@ import BulletinList from "@/views/bulletin/BulletinList.vue";
 import BulletinForm from "@/views/bulletin/BulletinForm.vue";
 import workpro from "@/views/work/work";
 import salaryRoutes from "@/views/salary/salary";
-import PersonalCalendar from "@/views/calendar/PersonalCalendar.vue";
 import calendarRoutes from "@/views/calendar/calendar";
 
+
 const routes = [
+  
   {
     path: "/",
     component: Home,
@@ -35,7 +36,7 @@ const routes = [
     component: Login,
     name: "login-link",
     meta: { title: "登入", hideNavbar: true },
-  },
+    },
   {
     path: "/403",
     component: Forbidden,
@@ -65,7 +66,7 @@ const routes = [
   scheduleRoutes,
   workpro,
   salaryRoutes,
-  calendarRoutes
+  ...calendarRoutes
 ];
 
 const router = createRouter({

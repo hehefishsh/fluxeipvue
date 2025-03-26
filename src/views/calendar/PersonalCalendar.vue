@@ -1,102 +1,118 @@
 <template>
-    <div class="max-w-lg mx-auto p-4">
-      <div class="flex items-center justify-between mb-4">
-        <div class="flex gap-2">
-          <select v-model="selectedYear" @change="updateDate" class="px-2 py-1 border rounded">
-            <option v-for="year in yearRange" :key="year" :value="year">{{ year }}</option>
-          </select>
-          <select v-model="selectedMonth" @change="updateDate" class="px-2 py-1 border rounded">
-            <option v-for="(month, index) in months" :key="index" :value="index">{{ month }}</option>
-          </select>
-        </div>
-        <div class="flex gap-4">
-        <button @click="prevMonth" class="w-16 h-16 bg-blue-500 text-white rounded-lg shadow-lg text-3xl flex items-center justify-center hover:bg-blue-600">
-          ⏪
-        </button>
-        <button @click="nextMonth" class="w-16 h-16 bg-blue-500 text-white rounded-lg shadow-lg text-3xl flex items-center justify-center hover:bg-blue-600">
-          ⏩
-        </button>
-      </div>
-      </div>
-      <div class="grid grid-cols-7 gap-2 text-center">
-        <div v-for="day in daysOfWeek" :key="day" class="font-bold">{{ day }}</div>
-        <div v-for="blank in startDay" :key="'b' + blank" class="invisible"></div>
-        <div v-for="date in daysInMonth" :key="date" class="border p-2 cursor-pointer h-16 flex flex-col justify-between items-center">
-          <span class="block" @click="addEvent(date)">{{ date }}</span>
-          <ul class="text-xs text-blue-500">
-            <li v-for="(event, index) in events[date]" :key="index" class="flex justify-between items-center">
-              {{ event }}
-              <button @click.stop="removeEvent(date, index)" class="ml-2 text-red-500">✖</button>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      const currentDate = new Date();
-      return {
-        currentDate,
-        selectedYear: currentDate.getFullYear(),
-        selectedMonth: currentDate.getMonth(),
-        events: {},
-        daysOfWeek: ["日", "一", "二", "三", "四", "五", "六"],
-        months: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
-        yearRange: Array.from({ length: 21 }, (_, i) => currentDate.getFullYear() - 10 + i),
-      };
-    },
-    computed: {
-      startDay() {
-        return new Date(this.selectedYear, this.selectedMonth, 1).getDay();
-      },
-      daysInMonth() {
-        return new Date(this.selectedYear, this.selectedMonth + 1, 0).getDate();
+  <div>
+    <RouterLink class="btn btn-primary btn-pill" to="/calendar/create">
+      <span class="nav-text">新增事件</span>
+    </RouterLink>
+    <FullCalendar :options="calendarOptions" />
+  </div>
+</template>
+
+<script>
+import { ref, onMounted, watch } from "vue";
+import FullCalendar from "@fullcalendar/vue3";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import { useRoute } from "vue-router";
+import axios from "axios";
+
+export default {
+  components: {
+    FullCalendar,
+  },
+  setup() {
+    const route = useRoute();
+    const events = ref([]); // 事件列表
+
+    const apiBaseUrl = "http://localhost:8080/api/calendar"; // 假設您的 API 地址
+
+    // 從後端加載事件
+    const loadEventsFromBackend = async () => {
+      try {
+        const response = await axios.get(`${apiBaseUrl}/events`);
+        if (response.data) {
+          events.value = response.data.map((event) => ({
+            title: event.content, // 這裡假設您的後端字段是 content
+            start: event.start_date,
+            end: event.finish_date,
+          }));
+        }
+      } catch (error) {
+        console.error("無法加載事件", error);
       }
-    },
-    methods: {
-      prevMonth() {
-        if (this.selectedMonth === 0) {
-          this.selectedMonth = 11;
-          this.selectedYear--;
-        } else {
-          this.selectedMonth--;
+    };
+
+    // 儲存事件到後端
+    const saveEventToBackend = async (newEvent) => {
+      try {
+        await axios.post(`${apiBaseUrl}/events`, {
+          content: newEvent.title,
+          start_date: newEvent.start,
+          finish_date: newEvent.end,
+        });
+      } catch (error) {
+        console.error("無法保存事件", error);
+      }
+    };
+
+    // 刪除事件
+    const deleteEventFromBackend = async (eventId) => {
+      try {
+        await axios.delete(`${apiBaseUrl}/events/${eventId}`);
+      } catch (error) {
+        console.error("無法刪除事件", error);
+      }
+    };
+
+    const calendarOptions = ref({
+      plugins: [dayGridPlugin, interactionPlugin],
+      initialView: "dayGridMonth",
+      events: events.value, // 綁定事件
+      eventClick: (info) => {
+        if (confirm(`確定要刪除事件: ${info.event.title}?`)) {
+          const eventId = info.event.id; // 假設事件有 id 屬性
+          info.event.remove();
+          deleteEventFromBackend(eventId); // 刪除後端事件
         }
       },
-      nextMonth() {
-        if (this.selectedMonth === 11) {
-          this.selectedMonth = 0;
-          this.selectedYear++;
-        } else {
-          this.selectedMonth++;
-        }
-      },
-      updateDate() {
-        this.currentDate = new Date(this.selectedYear, this.selectedMonth, 1);
-      },
-      addEvent(date) {
-        const event = prompt("輸入事件:");
-        if (event) {
-          if (!this.events[date]) {
-            this.events[date] = [];
+    });
+
+    // 監聽 URL 變化，並且當路由有 `event` 參數時，將新事件添加到事件列表中
+    watch(
+      () => route.query.event,
+      (newEvent) => {
+        if (newEvent) {
+          try {
+            const parsedEvent = JSON.parse(newEvent);
+            events.value.push({
+              title: parsedEvent.name,
+              start: parsedEvent.start,
+              end: parsedEvent.end,
+            });
+            saveEventToBackend(parsedEvent); // 儲存到後端
+          } catch (error) {
+            console.error("事件解析錯誤", error);
           }
-          this.events[date].push(event);
         }
       },
-      removeEvent(date, index) {
-        this.events[date].splice(index, 1);
-        if (this.events[date].length === 0) {
-          delete this.events[date];
-        }
-      }
-    }
-  };
-  </script>
-  
-  <style>
-    .grid-cols-7 { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
-    .h-16 { height: 4rem; }
-  </style>
-  
+      { immediate: true }
+    );
+
+    // 初始化並加載事件
+    onMounted(() => {
+      loadEventsFromBackend(); // 從後端加載事件
+    });
+
+    // 監聽事件列表變化，並保存到後端
+    watch(events, (newEvents) => {
+      newEvents.forEach((event) => {
+        saveEventToBackend(event);
+      });
+    }, { deep: true });
+
+    return {
+      calendarOptions,
+      events,
+    };
+  },
+};
+</script>
