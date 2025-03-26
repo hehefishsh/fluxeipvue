@@ -16,7 +16,7 @@
        
                <div class="mb-3">
                  <label class="form-label">部門：</label>
-                 <select class="form-select" v-model="departmentName">
+                 <select class="form-select" v-model="departmentName" disabled>
                    <option value="">選擇部門</option>
                    <option v-for="dep in departments" :key="dep.departmentId" :value="dep.departmentName">
                      {{ dep.departmentName }}

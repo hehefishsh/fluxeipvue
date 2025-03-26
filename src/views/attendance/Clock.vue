@@ -1,12 +1,11 @@
 <template>
-  <div id="app" class="navbar-fixed sidebar-fixed">
-    <div class="content-wrapper">
-      <div class="card">
-        <!-- 時鐘顯示 -->
-        <div class="clock">
-          <canvas id="clock-canvas"></canvas>
-        </div>
-
+  <div class="accordion accordion-shadow">
+    <div class="card card-default">
+      <!-- 時鐘顯示 -->
+      <div class="clock" style="padding: 10px;">
+        <canvas id="clock-canvas"></canvas>
+      </div>
+      <div>
         <!-- 上班/下班 打卡按鈕 -->
         <div class="button-group">
           <button @click="clockIn" class="mb-1 btn btn-pill btn-primary">
@@ -19,16 +18,10 @@
 
         <!-- 外出/外出結束 打卡按鈕 -->
         <div class="button-group">
-          <button
-            @click="startFieldWork"
-            class="mb-1 btn btn-outline-primary btn-pill"
-          >
+          <button @click="startFieldWork" class="mb-1 btn btn-outline-primary btn-pill">
             外出打卡
           </button>
-          <button
-            @click="endFieldWork"
-            class="mb-1 btn btn-outline-primary btn-pill"
-          >
+          <button @click="endFieldWork" class="mb-1 btn btn-outline-primary btn-pill">
             外出結束
           </button>
         </div>
@@ -73,7 +66,6 @@ const sendClockRequest = async (url) => {
     throw error;
   }
 };
-
 
 // 打卡按鈕方法整理
 const clockIn = () => sendClockRequest("/api/clock/in");
@@ -128,56 +120,68 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-body {
-  font-family: "Roboto", sans-serif;
-  background-color: #f2f2f2;
+.accordion {
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
 }
+
+
+
 .card {
   background-color: #fff;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-  padding: 30px;
+  padding: 30px 0px 30px 0px;
   border-radius: 10px;
   text-align: center;
   width: 400px;
+  border-radius: 0%;
+  box-shadow: none
 }
+
 .clock {
   font-size: 4rem;
   font-weight: bold;
   color: #333;
 }
+
 .button-group {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 10px;
+  flex-wrap: wrap;
+  /* 讓按鈕在視窗變小時自動換行 */
+  gap: 10px;
+  /* 按鈕間距 */
 }
+
 .button-group button {
   padding: 12px 24px;
   cursor: pointer;
   font-size: 16px;
   margin: 0 10px;
 }
+
 .status {
   margin-top: 10px;
   font-size: 18px;
 }
+
 .success {
   color: green;
 }
+
 .success::before {
   content: "✓ ";
 }
+
 .error {
   color: red;
 }
+
 .error::before {
   content: "✗ ";
 }
+
 .subtle {
   color: #7f8c8d;
 }

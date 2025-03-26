@@ -1,20 +1,20 @@
 <template>
   <div class="row mb-4">
-  <div class="col-4">
-    <input type="text" class="form-control" placeholder="搜尋工作..." v-model="worksearch" @input="find">
+    <div class="col-4">
+      <input type="text" class="form-control" placeholder="搜尋工作..." v-model="worksearch" @input="find">
+    </div>
+    <select v-model="status" @change="find">
+            <option value="">全部</option>
+            <!-- 使用v-for來動態顯示部門選項 -->
+            <option v-for="sta in statusSelect" :value="sta">
+              {{ sta }}
+            </option>
+    </select>
+    <RouterLink class="btn btn-primary btn-pill" to="/work/progress/create">
+      <span class="nav-text">新增工作</span>
+    </RouterLink>
   </div>
-  <select v-model="status" @change="find">
-          <option value="">全部</option>
-          <!-- 使用v-for來動態顯示部門選項 -->
-          <option v-for="sta in statusSelect" :value="sta">
-            {{ sta }}
-          </option>
-  </select>
-  <RouterLink class="btn btn-primary btn-pill" to="/work/progress/create">
-    <span class="nav-text">新增工作</span>
-  </RouterLink>
-  </div>
-  <h2 v-if="check">查無資料</h2>
+   <h2 v-if="check">查無資料</h2>
     <div class="accordion accordion-shadow" id="accordionShadow">
         <div class="card"  v-for="work in works" :key="work.workprogressId">
             <div class="card-header" :id="'headingShadow'+work.workprogressId">
@@ -34,12 +34,11 @@
                 </div>
             </div>
         </div>
-    </div>
-    
+      </div>
 </template>
-    
+
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted } from "vue";
 import axiosapi from "@/plugins/axios-login";
 import useUserStore from '@/stores/user';
 const worksearch=ref("")
@@ -78,24 +77,24 @@ async function find(){
   
 }
 
-async function allwork(){
-    const response=await axiosapi.get("/workProgress/all");
-    works.value=response.data
+async function allwork() {
+  const response = await axiosapi.get("/workProgress/all");
+  works.value = response.data;
 }
 
-onMounted(function(){
+onMounted(function () {
   allwork();
-})
+});
 
 function formatDate(date) {
-    const formattedDate = new Date(date);
-    const year = formattedDate.getFullYear(); // 取得年份
-    const month = (formattedDate.getMonth() + 1).toString().padStart(2, '0'); // 取得月份並補零
-    const day = formattedDate.getDate().toString().padStart(2, '0'); // 取得日期並補零
-    return `${year}/${month}/${day}`; // 返回格式化的日期字符串
-};
+  const formattedDate = new Date(date);
+  const year = formattedDate.getFullYear(); // 取得年份
+  const month = (formattedDate.getMonth() + 1).toString().padStart(2, "0"); // 取得月份並補零
+  const day = formattedDate.getDate().toString().padStart(2, "0"); // 取得日期並補零
+  return `${year}/${month}/${day}`; // 返回格式化的日期字符串
+}
 </script>
-    
+
 <style setup>
 
 </style>

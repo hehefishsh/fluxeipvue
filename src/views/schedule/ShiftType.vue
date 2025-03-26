@@ -23,13 +23,13 @@
                 <td class="text">{{ shiftType.departmentName }}</td>
                 <td class="text">{{ shiftType.startTime }}</td>
                 <td class="text">{{ shiftType.finishTime }}</td>
-                <td>
+                <td v-show="department.departmentName==shiftType.departmentName">
                     <!-- 編輯按鈕 -->
-        <RouterLink :to="`/schedule/shiftType/edit/${shiftType.shiftTypeId}`" class="btn btn-primary btn-sm">編輯</RouterLink>
-        <!-- 刪除按鈕 -->
-        <button class="btn btn-danger btn-sm ms-2" @click="deleteShiftType(shiftType.shiftTypeId)">
-          刪除
-        </button>
+                <RouterLink :to="`/schedule/shiftType/edit/${shiftType.shiftTypeId}`" class="btn btn-primary btn-sm">編輯</RouterLink>
+                <!-- 刪除按鈕 -->
+                <button class="btn btn-danger btn-sm ms-2" @click="deleteShiftType(shiftType.shiftTypeId)">
+                  刪除
+                </button>
                 </td>
               </tr>
             </tbody>
@@ -44,11 +44,15 @@
 </template>
     
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted,watch } from 'vue'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 const path = import.meta.env.VITE_API_URL;
-
+import useUserStore from "@/stores/user";
+const userStore=useUserStore()
+const departments = ref([]); // 部門列表
+const department = ref(""); // 部門列表
+const contacts=ref([])
 
 
 const allShiftType = ref([])
@@ -100,6 +104,30 @@ async function deleteShiftType(id){
     }
 
 }
+
+
+onMounted(async () => {
+  try {
+    const res = await axios.get(`${path}/department/find`);
+    departments.value = res.data;
+  } catch (error) {
+    console.error("取得部門資料失敗:", error);
+  }
+
+    
+  try {
+    const res = await axios.get(`${path}/api/contacts`);
+    contacts.value = res.data; // 取得班別資料    
+  } catch (error) {
+    console.error("取得員工資料失敗:", error);
+  }
+})
+
+
+watch(contacts, (newContacts) => {
+const contact = newContacts.find((emp) => emp.empId === userStore.empId);
+department.value = departments.value.find(dep => dep.departmentName === contact.department);
+})
 </script>
     
 <style scoped>
