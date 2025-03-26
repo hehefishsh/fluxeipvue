@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- 查詢加減班簽核資料 -->
+    <!-- 查詢補卡簽核資料 -->
     <div class="card card-default" id="work-adjust-query">
       <div class="card-header"></div>
       <div class="card-body py-0" data-simplebar>
@@ -34,17 +34,16 @@
           </div>
         </div>
 
-        <!-- 篩選顯示對應的加減班資料 -->
+        <!-- 篩選顯示對應的補卡資料 -->
         <div class="tab-content mt-3">
-          <div v-if="filteredWorkAdjustRequests.length">
+          <div v-if="filteredMissingPunchRequests.length">
             <table class="table table-borderless table-thead-border">
               <thead>
                 <tr>
                   <th class="text">申請Id</th>
                   <th class="text">申請人</th>
-                  <th class="text">加減班類型</th>
-                  <th class="text">加減班日期</th>
-                  <th class="text">時數</th>
+                  <th class="text">補卡類型</th>
+                  <th class="text">缺卡日期</th>
                   <th class="text">原因</th>
                   <th class="text">提交時間</th>
                   <th class="text">狀態</th>
@@ -52,26 +51,25 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(adjustment, index) in filteredWorkAdjustRequests" :key="index">
-                  <td class="text">{{ adjustment.requestId }}</td>
-                  <td class="text">{{ adjustment.requestEmployeeName }}</td>
-                  <td class="text">{{ adjustment.type }}</td>
+                <tr v-for="(missingPunch, index) in filteredMissingPunchRequests" :key="index">
+                  <td class="text">{{ missingPunch.requestId }}</td>
+                  <td class="text">{{ missingPunch.requestEmployeeName }}</td>
+                  <td class="text">{{ missingPunch.type }}</td>
                   <td class="text">
-                    {{ formatDate(adjustment.adjustmentDate) }}
+                    {{ formatDate(missingPunch.missingDate) }}
                   </td>
-                  <td class="text">{{ adjustment.hours }}</td>
-                  <td class="text">{{ adjustment.reason }}</td>
+                  <td class="text">{{ missingPunch.reason }}</td>
                   <td class="text">
-                    {{ formatDateTime(adjustment.submittedAt) }}
+                    {{ formatDateTime(missingPunch.submittedAt) }}
                   </td>
-                  <td class="text">{{ adjustment.status }}</td>
+                  <td class="text">{{ missingPunch.status }}</td>
                   <td class="text">
-                    <button class="badge badge-square badge-success" @click="showModal(adjustment, 'approve')"
-                      data-toggle="modal" data-target="#workAdjustModal">
+                    <button class="badge badge-square badge-success" @click="showModal(missingPunch, 'approve')"
+                      data-toggle="modal" data-target="#missingPunchModal">
                       核可
                     </button>
-                    <button class="badge badge-square badge-warning" @click="showModal(adjustment, 'reject')"
-                      data-toggle="modal" data-target="#workAdjustModal">
+                    <button class="badge badge-square badge-warning" @click="showModal(missingPunch, 'reject')"
+                      data-toggle="modal" data-target="#missingPunchModal">
                       否決
                     </button>
                   </td>
@@ -80,7 +78,7 @@
             </table>
           </div>
           <div v-else>
-            <p class="text-center text-muted">無相關加減班資料</p>
+            <p class="text-center text-muted">無相關補卡資料</p>
           </div>
         </div>
 
@@ -89,8 +87,8 @@
     </div>
 
     <!-- 呼叫加減班詳情元件並傳遞 selectedWorkAdjustRequest -->
-    <WorkAdjustApprovalDetails :workAdjustRequest="selectedWorkAdjustRequest" :actionType="actionType"
-      @update:workAdjustRequest="reloadData" />
+    <MissingPunchApprovalDetails :missingPunchRequest="selectedMissingPunchRequest" :actionType="actionType"
+      @updatemissingPunchRequest="reloadData" />
   </div>
 </template>
 
@@ -98,61 +96,61 @@
 import { ref, onMounted, computed } from "vue";
 import axiosapi from "@/plugins/axios.js";
 import useUserStore from "@/stores/user";
-import WorkAdjustApprovalDetails from "./WorkAdjustApprovalDetails.vue";
+import MissingPunchApprovalDetails from "./MissingPunchApprovalDetails.vue";
 
 const user = useUserStore();
-const workAdjustRequestData = ref([]);
+const missingPunchRequestData = ref([]);
 const error = ref("");
 const activeTab = ref("pending"); // 預設顯示 "待審核"
-const selectedWorkAdjustRequest = ref(null);
+const selectedMissingPunchRequest = ref(null);
 const actionType = ref("");
 
 // 顯示加減班詳情 Modal
-const showModal = (adjustment, type) => {
-  selectedWorkAdjustRequest.value = adjustment;
+const showModal = (missingPunch, type) => {
+  selectedMissingPunchRequest.value = adjustment;
   actionType.value = type; // 設定是「核准」還是「否決」
 };
 
 // 重新載入數據
 const reloadData = async () => {
-  selectedWorkAdjustRequest.value = null; // 清除選取
+  selectedMissingPunchRequest.value = null; // 清除選取
   actionType.value = ""; // 清空 actionType
   try {
     const response = await axiosapi.get(
-      `/api/approval/workadjust/pending/${user.empId}`
+      `/api/approval/missingpunch/pending/${user.empId}`
     );
-    workAdjustRequestData.value = response.data; // 更新列表
+    missingPunchRequestData.value = response.data; // 更新列表
   } catch (err) {
-    error.value = "無法取得加減班資料";
+    error.value = "無法取得補卡資料";
   }
 };
 
-// 查詢加減班資料
+// 查詢補卡資料
 onMounted(async () => {
   try {
     const response = await axiosapi.get(
-      `/api/approval/workadjust/pending/${user.empId}`
+      `/api/approval/missingpunch/pending/${user.empId}`
     );
-    workAdjustRequestData.value = response.data;
+    missingPunchRequestData.value = response.data;
   } catch (err) {
-    error.value = "無法取得加減班資料";
+    error.value = "無法取得補卡資料";
   }
 });
 
 // 根據標籤篩選加減班資料
-const filteredWorkAdjustRequests = computed(() => {
-  if (!Array.isArray(workAdjustRequestData.value)) return [];
-  if (activeTab.value === "all") return workAdjustRequestData.value;
-  return workAdjustRequestData.value.filter((adjustment) => {
+const filteredMissingPunchRequests = computed(() => {
+  if (!Array.isArray(missingPunchRequestData.value)) return [];
+  if (activeTab.value === "all") return missingPunchRequestData.value;
+  return missingPunchRequestData.value.filter((missingPunch) => {
     switch (activeTab.value) {
       case "pending":
-        return adjustment.status === "待審核";
+        return missingPunch.status === "待審核";
       case "reviewing":
-        return adjustment.status === "審核中";
+        return missingPunch.status === "審核中";
       case "approved":
-        return adjustment.status === "已核決";
+        return missingPunch.status === "已核決";
       case "rejected":
-        return adjustment.status === "未核准";
+        return missingPunch.status === "未核准";
       default:
         return true;
     }
