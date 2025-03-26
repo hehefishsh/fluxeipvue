@@ -81,6 +81,7 @@ const applicationCategories = ref([
   { value: "leave_type", label: "請假" },
   { value: "work_adjustment_type", label: "加減班" },
   { value: "clock_type", label: "補卡" },
+  { value: "expense_type", label: "費用" },
 ]);
 
 // 選擇的申請類型（僅第一步可修改），預設請假

@@ -135,7 +135,7 @@
                     </RouterLink>
                   </li>
                   <li :class="{ active: route.path === '/requestform/expense' }">
-                    <RouterLink class="sidenav-item-link" to="/requestform/leave">
+                    <RouterLink class="sidenav-item-link" to="/requestform/expense">
                       <span class="nav-text">費用申請</span>
                     </RouterLink>
                   </li>
