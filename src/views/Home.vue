@@ -16,17 +16,18 @@
         <div class="col-xl-4">
           <div class="card card-default" id="leave-request-query">
             <div class="card-header">
-              <h2>工作事項</h2>
+              <h2>待辦事項</h2>
             </div>
             <div class="card-body py-0" data-simplebar>
-              <WorkProgress></WorkProgress>
+              
+              <Taskassign></Taskassign>
             </div>
           </div>
         </div>
         <div class="col-xl-5">
           <div class="card card-default" id="leave-request-query">
             <div class="card-header">
-              <h2>工作事項</h2>
+              <h2>公佈欄</h2>
             </div>
             <div class="card-body py-0" data-simplebar>
               <BulletinList></BulletinList>
@@ -41,7 +42,7 @@
 
 <script setup>
 import Clock from "@/views/attendance/Clock.vue";
-import WorkProgress from "./work/workProgress.vue";
+import Taskassign from "./work/Taskassign.vue";
 import BulletinList from "./bulletin/BulletinList.vue";
 </script>
 

@@ -4,18 +4,13 @@
             <div class="card-header">
 
             </div>
-            
+            <div class="card-body py-0" data-simplebar>
                 <ul class="nav nav-tabs mb-3" id="pills-tab" role="tablist">
                     <li class="nav-item">
-                      <!-- <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#nav-tabs-home" role="tab"
-      aria-controls="nav-tabs" aria-selected="true">Home</a>
-  </li> -->
-
-
                         <a class="nav-link" data-toggle="pill" @click="find('')">全部</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link"  data-toggle="pill" @click="find('未完成')">未完成</a>
+                        <a class="nav-link active"  data-toggle="pill" @click="find('未完成')">未完成</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link"  data-toggle="pill" @click="find('待審核')">待審核</a>
@@ -25,38 +20,39 @@
                     </li>
                 </ul>
                 <div class="tab-content mt-3">
-          <div>
-            <table class="table table-borderless table-thead-border">
-              <thead>
-                <tr>
-                  <th class="text">工作名</th>
-                  <th class="text">工作內容</th>
-                  <th class="text">開始時間</th>
-                  <th class="text">預計結束時間</th>
-                  <th class="text">結束時間</th>
-                  <th class="text">狀態</th>
-                  <th class="text" v-if="status!=''&&status!='已完成'">提交</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="task in taskassign" :key="task.taskId">
-                  <td class="text">{{ task.taskName }}</td>
-                  <td class="text">{{ task.taskContent }}</td>
-                  <td class="text">{{ formatDate(task.createDate) }}</td>
-                  <td class="text">{{ formatDate(task.expectedFinishDate) }}</td>
-                  <td class="text">{{ formatDate(task.finishDate) }}</td>
-                  <td class="text">{{ task.status.statusName }}</td>
-                  <td class="text" v-if="status=='未完成'"><button class="badge badge-square badge-success" @click="review(task.taskId,'待審核')">送出審核</button>
-                  </td>
-                  <td class="text" v-if="status=='待審核'"><button class="badge badge-square badge-success" @click="review(task.taskId,'未完成')">收回審核</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  <div>
+                    <table class="table table-borderless table-thead-border">
+                      <thead>
+                        <tr>
+                          <th class="text">工作名</th>
+                          <th class="text">工作內容</th>
+                          <th class="text">開始時間</th>
+                          <th class="text">預計結束時間</th>
+                          <th class="text">結束時間</th>
+                          <th class="text">狀態</th>
+                          <th class="text" v-if="status!=''&&status!='已完成'">提交</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          v-for="task in taskassign" :key="task.taskId">
+                          <td class="text">{{ task.taskName }}</td>
+                          <td class="text">{{ task.taskContent }}</td>
+                          <td class="text">{{ formatDate(task.createDate) }}</td>
+                          <td class="text">{{ formatDate(task.expectedFinishDate) }}</td>
+                          <td class="text">{{ formatDate(task.finishDate) }}</td>
+                          <td class="text">{{ task.status.statusName }}</td>
+                          <td class="text" v-if="status=='未完成'"><button class="badge badge-square badge-success" @click="review(task.taskId,'待審核')">送出審核</button>
+                          </td>
+                          <td class="text" v-if="status=='待審核'"><button class="badge badge-square badge-success" @click="review(task.taskId,'未完成')">收回審核</button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+            </div>
           </div>
-        </div>
-        </div>
     </div>
 </template>
     
@@ -80,10 +76,8 @@ async function find(data){
   }
 }
 async function review(data,review){
-  console.log(review)
   const response =await axiosapi.put(`/taskassign/update/${data}/${review}`);
   if(response){
-    console.log('good');
     find(status.value)
   }
 }
@@ -95,7 +89,7 @@ function formatDate(date) {
   return `${year}/${month}/${day}`; // 返回格式化的日期字符串
     };
 onMounted(function(){
-  find('')
+  find('未完成')
 });
 </script>
     

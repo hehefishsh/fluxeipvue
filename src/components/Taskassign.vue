@@ -40,22 +40,6 @@
                                 <td><input type="date" id="expectedFinishDate" v-model="task.expectedFinishDate" class="custom-select my-1 mr-sm-2 w-auto"
                                     required /></td>
                             </tr>
-                            <tr v-show="isShowButtonInsert">
-                                <td><label for="empId">完成日期 :</label></td>
-                                <td v-if="task.finishDate!=null"><input type="date" id="finishDate" v-model="task.finishDate" class="custom-select my-1 mr-sm-2 w-auto"
-                                    /></td>
-                                    <td v-if="task.finishDate==null"><input type="date" id="finishDate" v-model="task.finishDate" class="custom-select my-1 mr-sm-2 w-auto"
-                                        value=''/></td>
-                                <td><button @click="emits('deleteDate')">清除完成日</button></td>
-                            </tr>
-                            <tr v-show="isShowButtonInsert">
-                                <td><label for="review">審核狀態 :</label></td>
-                                <td><select class="form-control" id="review" v-model="task.status" required @change="emits('reviewDate')">
-                                        <option v-for="rev in review"  :value="rev">
-                                            {{ rev }}
-                                        </option>
-                                    </select></td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -76,9 +60,8 @@ import { Modal } from 'bootstrap';
 
 const TaskassignModalRef = ref(null);
 const TaskassignModal = ref(null);
-const emits = defineEmits(["update:task", "update","deleteDate","reviewDate","insert"]);
-const props = defineProps(["isShowButtonInsert","task","empselect","review"]);
-const formattedDate = ref('');
+const emits = defineEmits(["update:task", "update","insert"]);
+const props = defineProps(["isShowButtonInsert","task","empselect"]);
 // 更新輸入值
 function doinput(action, event) {
     emits("update:task", {

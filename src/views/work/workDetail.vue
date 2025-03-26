@@ -1,46 +1,91 @@
 <template>
     <div class="card card-default">
-        <div class="col">
-            項目名 : {{work.workName}}
-        </div>
-        <div class="col">
-            創建日期 : {{formatDate(work.createDate)}}
-        </div>
-        <div class="col">
-            預計完成日期 : {{formatDate(work.expectedFinishDate)}}
-        </div>
-        <div class="col">
-            完成日期 : {{formatDate(work.finishDate)}}
-        </div>
-        <div class="col">
-            負責主管 : {{supervisor}}
-        </div></div>
-    <div class="row">
-        <div class="col-md-6 col-xl-10" v-for="taskAssign in taskAssigns" :key="taskAssign.taskId">
-            <div class="card py-3 mb-4">
-                <div class="card-body">
-                    <h5 class="card-title" :style="getStatusStyle(taskAssign.status.statusName)">{{taskAssign.taskName}}</h5>
-                    <button type="button" class="mb-1 btn btn-pill btn-info" @click="openModal(taskAssign.taskId)">編輯</button>
-                    <p class="card-text pb-4 pt-1">工作內容 : {{taskAssign.taskContent}}</p>
-                    <p class="card-text pb-4 pt-1">負責員工 : {{taskAssign.assign.employeeName}}</p>
-                    <p class="card-text pb-4 pt-1">開始日期 : {{formatDate(taskAssign.createDate)}}</p>
-                    <p class="card-text pb-4 pt-1">預計完成日期 : {{formatDate(taskAssign.expectedFinishDate)}}</p>
-                    <p class="card-text pb-4 pt-1" v-if="taskAssign.finishDate==null">完成日期 : 尚未完成</p>
-                    <p class="card-text pb-4 pt-1" v-if="taskAssign.finishDate!=null">完成日期 : {{formatDate(taskAssign.finishDate)}}</p>
-                    <p class="card-text pb-4 pt-1">狀態 : {{taskAssign.status.statusName}}</p>
+        <div>
+            <div class="card-header">
+                <div class="col">
+                    <h2>項目名 : {{work.workName}}</h2>
+                </div>
+                <div class="col">
+                    <h2>創建日期 : {{formatDate(work.createDate)}}</h2>
+                </div>
+                <div class="col">
+                    <h2>預計完成日期 : {{formatDate(work.expectedFinishDate)}}</h2>
+                </div>
+                <div class="col">
+                    <h2 v-if="work.finishDate!=null">完成日期 : {{formatDate(work.finishDate)}}</h2>
+                    <h2 v-if="work.finishDate==null">完成日期 : 未完成</h2>
+                </div>
+                <div class="col">
+                    <h2>負責主管 : {{supervisor}}</h2>
+                </div>
+            </div>
+            <div class="card-body py-0" data-simplebar>
+                <div class="progress mb-3">
+                    <div class="progress-bar" role="progressbar" style="width: 55%" aria-valuenow="70" aria-valuemin="0"
+                        aria-valuemax="100">{{work.progress}}
+                    </div>
+                </div>
+            </div>
+            <div class="card-body py-0" data-simplebar>
+                <ul class="nav nav-tabs mb-3" id="pills-tab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="pill" @click="findtaskAssign('')">全部</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"  data-toggle="pill" @click="findtaskAssign('未完成')">未完成</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active"  data-toggle="pill" @click="findtaskAssign('待審核')">待審核</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"  data-toggle="pill" @click="findtaskAssign('已完成')">已完成</a>
+                    </li>
+                </ul>
+                <div class="tab-content mt-3">
+                    <div>
+                        <table class="table table-borderless table-thead-border">
+                            <thead>
+                                <tr>
+                                    <th class="text">工作名</th>
+                                    <th class="text">工作內容</th>
+                                    <th class="text">負責員工</th>
+                                    <th class="text">開始時間</th>
+                                    <th class="text">預計結束時間</th>
+                                    <th class="text">結束時間</th>
+                                    <th class="text" v-if="status=='待審核'">審核</th>
+                                    <th class="text"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                v-for="task in taskAssigns" :key="task.taskId">
+                                    <td class="text">{{ task.taskName }}</td>
+                                    <td class="text">{{ task.taskContent }}</td>
+                                    <td class="text">{{ task.assign.employeeName }}</td>
+                                    <td class="text">{{ formatDate(task.createDate) }}</td>
+                                    <td class="text">{{ formatDate(task.expectedFinishDate) }}</td>
+                                    <td class="text" v-if="task.finishDate!=null">{{ formatDate(task.finishDate) }}</td>
+                                    <td class="text" v-else>未完成</td>
+                                    <td class="text" v-if="status=='待審核'">
+                                        <button class="badge badge-square badge-success" @click="review(task.taskId,'已完成')">完成</button>
+                                        <button class="badge badge-square badge-warning" @click="review(task.taskId,'未完成')">重做</button>
+                                    </td>
+                                    <td class="text"><button type="button" class="mb-1 btn btn-pill btn-info" @click="openModal(task.taskId)">編輯</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
     <button class="fixed-button" @click="openModal(null)">新增交辦事項</button>
     <Taskassign ref="modal" 
                     v-model:task="task" 
                     v-model:empselect="empselect"
-                    v-model:review="review"
                     :is-show-button-insert="isShowButtonInsert"
                     @update="callUpdate"
-                    @deleteDate="deleteDate"
-                    @reviewDate="reviewDate"
                     @insert="insert"
     ></Taskassign>
 </template>
@@ -48,33 +93,20 @@
 <script setup>
 import Taskassign from "@/components/Taskassign.vue";
 import { ref,onMounted } from "vue";
-import { useRouter,useRoute } from "vue-router";
+import { useRoute } from "vue-router";
 import axiosapi from "@/plugins/axios";
 import Swal from "sweetalert2";
-const router = useRouter(); // 用來跳轉頁面
 const route = useRoute();
 const workId = route.params.id;
-const workTaskAssigns=ref({});
 const work=ref({})
 const taskAssigns=ref({})
 const supervisor=ref("")
 const empselect=ref([])
-
-const review=ref(["未完成","已完成","待審核"])
+const status=ref('')
 
 const task=ref({})
 async function callUpdate(){
-    if (task.value.status == "已完成" && (task.value.finishDate == null || task.value.finishDate == '')) {
-        Swal.fire({
-            title: "審核完成，請輸入完成日期",
-            icon: "warning"
-        });
-    } else if (task.value.status == "未完成" && task.value.finishDate != null) {
-        Swal.fire({
-            title: "完成日期已填寫，是否審核完成?",
-            icon: "warning"
-        });
-    } else if(task.value.taskName==''){
+    if(task.value.taskName==''){
         Swal.fire({
             title: "請輸入名稱",
             icon: "warning"
@@ -93,7 +125,7 @@ async function callUpdate(){
                 icon:"success"
             })
             task.value=""
-            findtaskAssign()
+            findtaskAssign(status.value)
             modal.value.closeModal();
         }else{
             Swal.fire({
@@ -116,7 +148,7 @@ async function insert(){
                 icon:"success"
             })
             task.value=""
-            findtaskAssign()
+            findtaskAssign(status.value)
             modal.value.closeModal();
         }else{
             Swal.fire({
@@ -126,6 +158,13 @@ async function insert(){
         }
 }
 
+async function review(data,review){
+    const response =await axiosapi.put(`/taskassign/update/${data}/${review}`);
+    if(response){
+        findtaskAssign(status.value)
+    }
+}
+
 const isShowButtonInsert=ref(true);
 const modal=ref(null);
 async function openModal(data){
@@ -133,51 +172,54 @@ async function openModal(data){
         isShowButtonInsert.value=true
         const response=await axiosapi.get(`/taskassign/${data}`);
         task.value=response.data
-        task.value.status =task.value.status.statusName
         task.value.createDate = formatDate(task.value.createDate);
         task.value.expectedFinishDate = formatDate(task.value.expectedFinishDate);
-            if(task.value.finishDate!=null){
-                task.value.finishDate = formatDate(task.value.finishDate);
-            }
-            task.value.employee=response.data.assign.employeeName
-            }
+        task.value.employee=response.data.assign.employeeName
+    }
     else{
         task.value={}
-        task.value.status ="未完成"
         task.value.createDate =getTodayDate()
         isShowButtonInsert.value=false
     }
     modal.value.showModal();
 }
 
-async function findtaskAssign(){
+async function findwork(){
     const response=await axiosapi.get(`/work/taskassign/${workId}`);
-    workTaskAssigns.value=response.data
     work.value=response.data.workprogress
-    taskAssigns.value=response.data.taskassign
+    console.log(work.value)
     supervisor.value=response.data.workprogress.supervisor.employeeName
     const dep=await axiosapi.get(`/employee/find/department/${response.data.workprogress.supervisor.department.departmentName}`);
     empselect.value=dep.data
 }
 
-function reviewDate(){
-    if(task.value.status=="已完成"){
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = (today.getMonth() + 1).toString().padStart(2, '0'); // 月份從0開始，所以需要加1，並補零
-        const day = today.getDate().toString().padStart(2, '0'); // 補零以保持格式一致
-        task.value.finishDate= `${year}-${month}-${day}`; // 格式：YYYY-MM-DD
-    }else{
-        deleteDate();
+async function findtaskAssign(data){
+    if(data==''){
+        const response=await axiosapi.get(`/work/taskassign/${workId}`);
+        taskAssigns.value=response.data.taskassign
+        status.value=data
+        return;
+    }else if(data=='待審核'){
+        const response=await axiosapi.get(`/work/taskassign/${workId}/${data}`);
+        taskAssigns.value=response.data
+        status.value=data
+        return;
+    }else if(data=='已完成'){
+        const response=await axiosapi.get(`/work/taskassign/${workId}/${data}`);
+        taskAssigns.value=response.data
+        status.value=data
+        return;
+    }else if(data=='未完成'){
+        const response=await axiosapi.get(`/work/taskassign/${workId}/${data}`);
+        taskAssigns.value=response.data
+        status.value=data
+        return;
     }
 }
 
-function deleteDate(){
-    task.value.finishDate=''
-}
-
 onMounted(function(){
-    findtaskAssign()
+    findwork()
+    findtaskAssign('待審核')
 })
 function formatDate(date) {
     const formattedDate = new Date(date);
@@ -186,16 +228,6 @@ function formatDate(date) {
     const day = formattedDate.getDate().toString().padStart(2, '0'); // 取得日期並補零
     return `${year}-${month}-${day}`; // 返回格式化的日期字符串
 };
-function getStatusStyle(statusName) {
-    if (statusName === '未完成') {
-        return { color: 'red' };
-    } else if (statusName === '已完成') {
-        return { color: 'green' };
-    } else if (statusName === '待審核') {
-        return { color: 'blue' };
-    }
-    return {}; // 預設無顏色
-  }
 function getTodayDate() {
     const today = new Date();
     const year = today.getFullYear();
