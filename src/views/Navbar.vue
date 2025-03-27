@@ -646,7 +646,10 @@
                   <i class="mdi mdi-contacts icon"></i>
                 </a>
               </li>
-              <li class="custom-dropdown">
+              <li class="custom-dropdown" >
+                <Bell />
+              </li>
+              <!-- <li class="custom-dropdown">
                 <button class="notify-toggler custom-dropdown-toggler">
                   <i class="mdi mdi-bell-outline icon"></i>
                   <span class="badge badge-xs rounded-circle">21</span>
@@ -977,7 +980,7 @@
                     </div>
                   </footer>
                 </div>
-              </li>
+              </li> -->
               <!-- User Account -->
               <li class="dropdown user-menu">
                 <button class="dropdown-toggle nav-link" data-toggle="dropdown">
@@ -1177,6 +1180,7 @@ const user = useUserStore();
 import { useRouter } from "vue-router";
 const router = useRouter();
 import axiosapi from "@/plugins/axios-login";
+import Bell from "@/views/bell/Bell.vue"; 
 
 function logOut() {
   axiosapi.defaults.headers.common["Authorization"] = ``;
