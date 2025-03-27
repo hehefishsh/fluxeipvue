@@ -79,7 +79,7 @@ async function submit() {
             return;
   }
   for (let task of contents.value) {
-      console.log(new Date(task.createDate) > new Date(task.expectedFinishDate));  // 列印每個 taskassign 的員工名稱
+      console.log(task);  // 列印每個 taskassign 的員工名稱
       if(new Date(task.createDate) > new Date(task.expectedFinishDate)){
         Swal.fire({
                 title:"分配工作的開始日期比預計完成日期晚",
@@ -87,6 +87,42 @@ async function submit() {
             })
             return;
           }
+      if(task.createDate==''){
+        Swal.fire({
+                title:"請輸入交辦事項的創建日期",
+                icon:"warning"
+        })
+        return;
+      }
+      if(task.employee==''){
+        Swal.fire({
+                title:"請輸入交辦事項的員工",
+                icon:"warning"
+        })
+        return;
+      }
+      if(task.expectedFinishDate==''){
+        Swal.fire({
+                title:"請輸入交辦事項的預計完成日期",
+                icon:"warning"
+        })
+        return;
+      }
+      if(task.taskContent==''){
+        Swal.fire({
+                title:"請輸入交辦事項的內容",
+                icon:"warning"
+        })
+        return;
+      }
+      if(task.taskName==''){
+        Swal.fire({
+                title:"請輸入交辦事項的名稱",
+                icon:"warning"
+        })
+        return;
+      }
+
     };
     const workRequest = {
       supervisorId: employeeId,

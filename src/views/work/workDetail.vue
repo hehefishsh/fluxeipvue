@@ -18,11 +18,16 @@
                 <div class="col">
                     <h2>負責主管 : {{supervisor}}</h2>
                 </div>
+                <div class="col">
+                    <RouterLink class="btn btn-primary btn-pill" :to="`/work/progress/update/${work.workprogressId}`">
+                        <span class="nav-text">編輯工作</span>
+                    </RouterLink>
+                </div>
             </div>
             <div class="card-body py-0" data-simplebar>
                 <div class="progress mb-3">
-                    <div class="progress-bar" role="progressbar" style="width: 55%" aria-valuenow="70" aria-valuemin="0"
-                        aria-valuemax="100">{{work.progress}}
+                    <div class="progress-bar" role="progressbar" :style="{ width: work.progress + '%' }" :aria-valuenow="work.progress"  aria-valuemin="0"
+                    aria-valuemax="100">{{work.progress}}%
                     </div>
                 </div>
             </div>
@@ -70,7 +75,9 @@
                                         <button class="badge badge-square badge-success" @click="review(task.taskId,'已完成')">完成</button>
                                         <button class="badge badge-square badge-warning" @click="review(task.taskId,'未完成')">重做</button>
                                     </td>
-                                    <td class="text"><button type="button" class="mb-1 btn btn-pill btn-info" @click="openModal(task.taskId)">編輯</button></td>
+                                    <td class="text"><i class="mdi mdi-pencil mdi-24px" @click="openModal(task.taskId)"></i></td>
+                                    <td class="text"><i class="mdi mdi-delete mdi-24px"
+                                    @click="deletetask(task.taskId)"></i></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -137,25 +144,50 @@ async function callUpdate(){
 }
 
 async function insert(){
-    task.value.status ="未完成"
-    task.value.finishDate =null
-    task.value.reveiew=supervisor.value
-    console.log(task.value)
-    const response=await axiosapi.post(`/taskassign/create/${workId}`,task.value);
-    if(response){
-            Swal.fire({
-                title:"新增成功",
-                icon:"success"
-            })
-            task.value=""
-            findtaskAssign(status.value)
-            modal.value.closeModal();
-        }else{
-            Swal.fire({
-                title:"修改失敗",
-                icon:"warning"
+    if(task.value.taskName==''){
+        Swal.fire({
+            title: "請輸入名稱",
+            icon: "warning"
+        });
+    } else if(task.value.taskContent==''){
+        Swal.fire({
+            title: "請輸入內容",
+            icon: "warning"
+        });
+    }else if(task.value.expectedFinishDate==null){
+        Swal.fire({
+            title: "請輸入預計完成日期",
+            icon: "warning"
+        });
+    }else {
+        task.value.status ="未完成"
+        task.value.finishDate =null
+        task.value.reveiew=supervisor.value
+        console.log(task.value)
+        const response=await axiosapi.post(`/taskassign/create/${workId}`,task.value);
+        if(response){
+                Swal.fire({
+                    title:"新增成功",
+                    icon:"success"
+                })
+                task.value=""
+                findwork()
+                findtaskAssign(status.value)
+                modal.value.closeModal();
+            }else{
+                Swal.fire({
+                    title:"修改失敗",
+                    icon:"warning"
             })
         }
+    }
+}
+
+async function deletetask(data){
+    const response =await axiosapi.delete(`/taskassign/${data}`);
+    if(response){
+        findtaskAssign(status.value)
+    }
 }
 
 async function review(data,review){

@@ -15,16 +15,16 @@
                         <tbody>
                             <tr>
                                 <td><label for="empId">項目名 :</label></td>
-                                <td><input type="text" name="name" :value="task.taskName" @input="doinput('taskName',$event)" required></td>
+                                <td><input type="text" name="name" :value="task.taskName" @input="doinput('taskName',$event)"></td>
                             </tr>
                             <tr>
                                 <td><label for="empId">工作內容 : </label></td>
-                                <td><textarea name="taskContent" :value="task.taskContent" @input="doinput('taskContent', $event)" class="form-control" rows="3" required></textarea>
+                                <td><textarea name="taskContent" :value="task.taskContent" @input="doinput('taskContent', $event)" class="form-control" rows="3"></textarea>
                                 </td>
                             </tr>
                             <tr>
                                 <td><label for="empId">負責員工 :</label></td>
-                                <td><select class="form-control" id="empId" v-model="task.employee" required>
+                                <td><select class="form-control" id="empId" v-model="task.employee">
                                         <option v-for="emplo in empselect"  :value="emplo.employeeName">
                                             {{ emplo.employeeName }}
                                         </option>
@@ -32,13 +32,11 @@
                             </tr>
                             <tr>
                                 <td><label for="empId">開始日期 :</label></td>
-                                <td><input type="date" id="createDate" v-model="task.createDate" class="custom-select my-1 mr-sm-2 w-auto"
-                                    required /></td>
+                                <td><input type="date" id="createDate" v-model="task.createDate" class="custom-select my-1 mr-sm-2 w-auto" /></td>
                             </tr>
                             <tr>
                                 <td><label for="empId">預計完成日期 :</label></td>
-                                <td><input type="date" id="expectedFinishDate" v-model="task.expectedFinishDate" class="custom-select my-1 mr-sm-2 w-auto"
-                                    required /></td>
+                                <td><input type="date" id="expectedFinishDate" v-model="task.expectedFinishDate" class="custom-select my-1 mr-sm-2 w-auto" /></td>
                             </tr>
                         </tbody>
                     </table>

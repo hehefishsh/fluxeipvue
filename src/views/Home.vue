@@ -13,13 +13,12 @@
             </div>
           </div>
         </div>
-        <div class="col-xl-4">
+        <div class="col-xl-9">
           <div class="card card-default" id="leave-request-query">
             <div class="card-header">
               <h2>待辦事項</h2>
             </div>
-            <div class="card-body py-0" data-simplebar>
-              
+            <div class="card-body py-0" data-simplebar style="height: 400px;">
               <Taskassign></Taskassign>
             </div>
           </div>

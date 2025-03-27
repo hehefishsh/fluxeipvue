@@ -40,7 +40,8 @@
                           <td class="text">{{ task.taskContent }}</td>
                           <td class="text">{{ formatDate(task.createDate) }}</td>
                           <td class="text">{{ formatDate(task.expectedFinishDate) }}</td>
-                          <td class="text">{{ formatDate(task.finishDate) }}</td>
+                          <td class="text" v-if="task.finishDate!=null">{{ formatDate(task.finishDate) }}</td>
+                          <td class="text" v-else>未完成</td>
                           <td class="text">{{ task.status.statusName }}</td>
                           <td class="text" v-if="status=='未完成'"><button class="badge badge-square badge-success" @click="review(task.taskId,'待審核')">送出審核</button>
                           </td>
@@ -56,7 +57,7 @@
     </div>
 </template>
     
-<script setup lang='ts'>
+<script setup>
 import { ref, onMounted } from "vue";
 import axiosapi from "@/plugins/axios.js";
 import useUserStore from '@/stores/user';
