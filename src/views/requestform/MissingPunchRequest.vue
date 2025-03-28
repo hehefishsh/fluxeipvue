@@ -8,13 +8,7 @@
         <!-- 申請人 -->
         <div class="form-group">
           <label for="employee">申請人</label>
-          <input
-            type="text"
-            id="employee"
-            class="form-control rounded-0"
-            v-model="currentEmployeeName"
-            readonly
-          />
+          <input type="text" id="employee" class="form-control rounded-0" v-model="currentEmployeeName" readonly />
         </div>
 
         <!-- 補卡類型 -->
@@ -22,42 +16,29 @@
           <label for="adjustmentType">
             <font color="red">*</font>補卡類型
           </label>
-          <select
-            id="adjustmentType"
-            class="form-control rounded-0"
-            v-model="missingPunchRequest.clockTypeId"
-            required
-          >
+          <select id="adjustmentType" class="form-control rounded-0" v-model="missingPunchRequest.clockTypeId" required>
             <option v-for="type in clockTypes" :key="type.id" :value="type.id">
               {{ type.typeName }}
             </option>
           </select>
         </div>
 
-        <!-- 加減班日期 -->
+        <!-- 補卡日期 -->
         <div class="form-group">
           <label for="adjustmentDate">
             <font color="red">*</font>補卡日期
           </label>
-          <input
-            type="date"
-            id="adjustmentDate"
-            class="form-control rounded-0"
-            v-model="missingPunchRequest.missingDate"
-            required
-          />
+          <input type="date" id="adjustmentDate" class="form-control rounded-0"
+            v-model="missingPunchRequest.missingDate" required />
         </div>
 
         <!-- 申請原因 -->
         <div class="form-group">
-          <label for="reason"> <font color="red">*</font>申請原因 </label>
-          <textarea
-            id="reason"
-            class="form-control rounded-0"
-            v-model="missingPunchRequest.reason"
-            required
-            maxlength="200"
-          ></textarea>
+          <label for="reason">
+            <font color="red">*</font>申請原因
+          </label>
+          <textarea id="reason" class="form-control rounded-0" v-model="missingPunchRequest.reason" required
+            maxlength="200"></textarea>
           <small class="form-text text-muted">最多可輸入 200 字。</small>
         </div>
 
