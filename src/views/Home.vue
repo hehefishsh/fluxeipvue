@@ -2,9 +2,9 @@
   <!-- <Navbar></Navbar> -->
   <div class="content-wrapper">
     <div class="content">
-      <div class="row">
-        <div class="col-xl-3">
-          <div class="card card-default" id="leave-request-query">
+      <div class="row  min-vh-100">
+        <div class="col-xl-4" >
+          <div class="card card-default" id="leave-request-query" style="height: 94%;">
             <div class="card-header">
               <h2>打卡</h2>
             </div>
@@ -13,17 +13,17 @@
             </div>
           </div>
         </div>
-        <div class="col-xl-9">
-          <div class="card card-default" id="leave-request-query">
+        <div class="col-xl-8" >
+          <div class="card card-default" id="leave-request-query"style="height: 94%;">
             <div class="card-header">
               <h2>待辦事項</h2>
             </div>
-            <div class="card-body py-0" data-simplebar style="height: 400px;">
+            <div class="card-body py-0" data-simplebar>
               <Taskassign></Taskassign>
             </div>
           </div>
         </div>
-        <div class="col-xl-5">
+        <div class="col-xl-12">
           <div class="card card-default" id="leave-request-query">
             <div class="card-header">
               <h2>公佈欄</h2>

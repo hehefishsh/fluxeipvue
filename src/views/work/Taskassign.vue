@@ -1,10 +1,6 @@
 <template>
+  <div class="accordion accordion-shadow">
     <div class="card card-default">
-        <div class="container">
-            <div class="card-header">
-
-            </div>
-            <div class="card-body py-0" data-simplebar>
                 <ul class="nav nav-tabs mb-3" id="pills-tab" role="tablist">
                     <li class="nav-item">
                         <a class="nav-link" data-toggle="pill" @click="find('')">全部</a>
@@ -54,7 +50,6 @@
                 </div>
             </div>
           </div>
-    </div>
 </template>
     
 <script setup>
@@ -94,6 +89,20 @@ onMounted(function(){
 });
 </script>
     
-<style>
-    
+<style scoped>
+.accordion {
+  display: flex;
+  justify-content: center;
+}
+    .card {
+  background-color: #fff;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  padding: 30px 0px 30px 0px;
+  border-radius: 10px;
+  text-align: center;
+  width: 100%;
+  border-radius: 0%;
+  box-shadow: none
+}
+
 </style>
