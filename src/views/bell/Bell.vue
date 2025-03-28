@@ -1,137 +1,205 @@
 <template>
-    <li class="custom-dropdown" ref="dropdownRef">
-      <button class="notify-toggler" @click="toggleDropdown">
-        <span class="bell-wrapper">
-          <i class="mdi mdi-bell-outline icon"></i>
-          <span class="badge badge-xs" v-if="unreadCount > 0">{{ unreadCount }}</span>
-        </span>
+    <div>
+      <button @click="toggleDropdown" class="notify-btn">
+        <i class="mdi mdi-bell-outline notify-icon"></i>
+        <span v-if="unreadCount > 0" class="notify-badge">{{ unreadCount }}</span>
       </button>
   
-      <div :class="['dropdown-notify', { show: dropdownVisible }]">
-        <header class="px-3 py-2 border-bottom">
-          <span class="nav-item nav-link active">通知 ({{ notifyList.length }})</span>
-        </header>
-        <div class="p-2" style="max-height: 300px; overflow-y: auto">
-          <div v-if="notifyList.length === 0" class="text-center text-muted">目前無通知</div>
-          <div v-for="notify in notifyList" :key="notify.id" class="media media-sm p-2 mb-1" :class="{ 'bg-warning-10': !notify.isRead }">
-            <div class="media-body">
-              <div class="title">{{ notify.message }}</div>
-              <small class="text-muted">{{ formatTime(notify.createTime) }}</small>
+      <!-- Dropdown 從 body 中 teleport -->
+      <Teleport to="body">
+        <div v-if="dropdownVisible" class="notify-dropdown">
+          <header class="dropdown-header">
+            通知 ({{ notifyList.length }})
+          </header>
+  
+          <div class="dropdown-body">
+            <div v-if="notifyList.length === 0" class="empty">目前無通知</div>
+            <div
+              v-for="notify in notifyList"
+              :key="notify.id"
+              class="notify-item"
+              :class="{ unread: !notify.isRead }"
+            >
+              <div class="message">{{ notify.message }}</div>
+              <div class="time">{{ formatTime(notify.createTime) }}</div>
             </div>
           </div>
+  
+          <footer class="dropdown-footer">
+            <button @click="fetchNotifications">重新整理</button>
+          </footer>
         </div>
-        <footer class="border-top text-center py-2">
-          <a href="javascript:" class="btn btn-sm" @click="refresh">重新整理</a>
-        </footer>
-      </div>
-    </li>
+      </Teleport>
+    </div>
   </template>
   
   <script setup>
-  import { ref, onMounted, watchEffect } from 'vue';
-  import useUserStore from '@/stores/user';
+  import { ref, onMounted, onUnmounted } from 'vue';
   import axios from '@/plugins/axios-login';
+  import useUserStore from '@/stores/user';
   
   const user = useUserStore();
   const dropdownVisible = ref(false);
-  const dropdownRef = ref(null);
   const notifyList = ref([]);
   const unreadCount = ref(0);
-  
-  watchEffect(() => {
-    if (user.empId) fetchNotifications();
-  });
-  
-  async function fetchNotifications() {
-    try {
-      const res = await axios.get(`/api/notify/${user.empId}`);
-      notifyList.value = res.data || [];
-      unreadCount.value = notifyList.value.filter(n => !n.isRead).length;
-    } catch (error) {
-      console.error('讀取通知失敗', error);
-    }
-  }
   
   function toggleDropdown() {
     dropdownVisible.value = !dropdownVisible.value;
     if (dropdownVisible.value) fetchNotifications();
   }
   
-  function refresh() {
-    fetchNotifications();
-  }
-  
-  function formatTime(timeStr) {
-    const time = new Date(timeStr);
-    return time.toLocaleString();
-  }
-  
-  // 點擊外部區域關閉 dropdown
+  // 初始化時載入通知數量（不開 dropdown）
   onMounted(() => {
-    document.addEventListener('click', (e) => {
-      if (dropdownRef.value && !dropdownRef.value.contains(e.target)) {
-        dropdownVisible.value = false;
-      }
-    });
+    fetchNotifications();
+    document.addEventListener('click', handleClickOutside);
   });
+  onUnmounted(() => {
+    document.removeEventListener('click', handleClickOutside);
+  });
+  
+  function handleClickOutside(e) {
+    const dropdown = document.querySelector('.notify-dropdown');
+    const btn = document.querySelector('.notify-btn');
+    if (
+      dropdown &&
+      !dropdown.contains(e.target) &&
+      btn &&
+      !btn.contains(e.target)
+    ) {
+      dropdownVisible.value = false;
+    }
+  }
+  
+  async function fetchNotifications() {
+    try {
+      const res = await axios.get(`/api/notify/${user.empId}`);
+      notifyList.value = res.data || [];
+      unreadCount.value = notifyList.value.filter(n => !n.isRead).length;
+    } catch (err) {
+      console.error('通知讀取失敗', err);
+    }
+  }
+  
+  function formatTime(str) {
+    return new Date(str).toLocaleString();
+  }
   </script>
   
   <style scoped>
-  .custom-dropdown {
-    position: relative;
-    margin: 0;
-    padding: 0;
-  }
-  .notify-toggler {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-  }
-  .bell-wrapper {
-    position: relative;
-    display: inline-block;
-    width: 28px;
-    text-align: center;
-  }
-  .icon {
-    font-size: 30px;
-    line-height: 1;
-  }
-  .badge-xs {
-    position: absolute;
-    top: -6px;
-    right: -8px;
-    font-size: 10px;
-    padding: 2px 6px;
-    background-color: #f54281;
-    color: white;
-    border-radius: 50%;
-    min-width: 18px;
-    height: 18px;
-    line-height: 14px;
-    text-align: center;
-    z-index: 10;
-  }
-  .dropdown-notify {
-    display: none;
-    position: absolute;
-    top: 100%;
-    right: 0;
-    width: 320px;
-    background: white;
-    border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-  }
-  .dropdown-notify.show {
-    display: block !important;
-  }
-  .media-sm {
-    border-bottom: 1px solid #eee;
-  }
-  .title {
-    font-weight: bold;
-  }
+  
+  .notify-btn {
+  position: relative;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0 1px;
+  cursor: pointer;
+}
+
+.notify-icon {
+  font-size: 30px;
+  color: #333;
+}
+
+.notify-badge {
+  position: absolute;
+  top: -2px;
+  right: -4px;
+  background: #f54281;
+  color: white;
+  border-radius: 50%;
+  padding: 1px 5px;
+  font-size: 10px;
+  font-weight: bold;
+  min-width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notify-dropdown {
+  position: fixed;
+  top: 56px;
+  right: 16px;
+  width: 320px;
+  max-width: 90vw;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+  z-index: 99999;
+  overflow: hidden;
+  font-size: 14.5px;
+}
+
+.dropdown-header {
+  background-color: #f8f9fa;
+  padding: 10px 14px;
+  font-weight: bold;
+  border-bottom: 1px solid #eee;
+}
+
+.dropdown-body {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.notify-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f4f4f4;
+  background-color: #fff7e0; /* 淡黃背景 */
+  margin: 6px 10px;
+  border-radius: 6px;
+}
+
+.notify-item.unread {
+  background-color: 	#D2E9FF;
+}
+
+.message {
+  margin-bottom: 4px;
+  line-height: 1.4;
+  color: #000;
+  font-weight: 500;
+}
+
+.message strong {
+  color: #000;
+  font-weight: bold;
+}
+
+.time {
+  font-size: 12px;
+  color: #444;
+}
+
+.empty {
+  text-align: center;
+  color: #aaa;
+  padding: 20px 12px;
+}
+
+.dropdown-footer {
+  padding: 8px;
+  text-align: center;
+  background-color: #f9f9f9;
+  border-top: 1px solid #eee;
+}
+
+.dropdown-footer button {
+  font-size: 12px;
+  padding: 4px 8px;
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.dropdown-footer button:hover {
+  background: #e0e0e0;
+}
+
+
   </style>
   
