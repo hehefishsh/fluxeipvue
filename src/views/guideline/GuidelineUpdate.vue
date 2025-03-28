@@ -3,7 +3,7 @@
       <form @submit.prevent="submitForm">
         <!-- 標題 -->
         <h3 class="form-title">標題</h3>
-        <input v-model="guideline.guideTitle" placeholder="輸入標題" class="input-field" />
+        <input v-model="guideline.guideTitle" placeholder="輸入標題" class="input-field" required/>
   
         <!-- 內容區塊 -->
         <h3 class="form-title">內容</h3>
@@ -119,7 +119,6 @@ async function submitForm() {
     const response = await axios.post(`${path}/api/guidelines`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
-    console.log("提交成功:", response.data);
     router.push({ name: "guideline-all-link" });
   } catch (error) {
     console.error("提交失敗:", error);
