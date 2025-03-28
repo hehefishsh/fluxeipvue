@@ -22,6 +22,8 @@
     <thead>
       <tr>
         <th>年月</th>
+        <th>部門</th>
+        <th>姓名</th>
         <th>總工時</th>
         <th>加班時數</th>
         <th>遲到時數</th>
@@ -38,6 +40,8 @@
     <tbody>
       <tr v-for="detail in filteredSalaryDetails" :key="detail.salaryDetailId">
         <td>{{ detail.yearMonth }}</td>
+        <td>{{ detail.department }}</td>
+        <td>{{ detail.employeeName }}</td>
         <td>{{ detail.monthlyRegularHours }}</td>
         <td>{{ detail.overtimeHours }}</td>
         <td>{{ detail.lateHours / 2 }}</td>
