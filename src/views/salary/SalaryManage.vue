@@ -2,7 +2,20 @@
     <div class="container">
 
   <div class="filter-container">
-
+    <label class="form-label">選擇部門：</label>
+      <select v-model="selectedDepartment" @change="(fetchEmployees(), filterSalaryData(),clearEmp())">
+        <option value="" disabled>請選擇部門</option>
+        <option v-for="dep in departments" :key="dep.departmentId" :value="dep">
+          {{ dep.departmentName }}
+        </option>
+      </select>
+      <label>員工：</label>
+      <select v-model="selectedEmployee" @change="filterSalaryData">
+        <option value="" disabled>請選擇員工</option>
+        <option v-for="employee in employees" :key="employee.employeeId" :value="employee.employeeName">
+          {{ employee.employeeName }}
+        </option>
+      </select>
 <label>年份：</label>
   <select v-model="selectedYear" @change="filterSalaryData">
     <option v-for="year in availableYears" :key="year" :value="year">{{ year }}</option>
@@ -84,15 +97,20 @@
 
 <script setup>
 import { ref, onMounted,computed,watch } from 'vue';
-import axios from 'axios';
+import axios, { all } from 'axios';
+import axiosapi from "@/plugins/axios";
 import Swal from "sweetalert2";
 const path = import.meta.env.VITE_API_URL;
 import useUserStore from "@/stores/user";
 const userStore=useUserStore()
-
+const departments = ref([]); // 部門列表
+const employees=ref([]); 
+const selectedDepartment = ref(""); // 已選擇的部門
 const salaryDetails = ref([]);
 const selectedYear = ref(new Date().getFullYear()); // 預設當前年
 const selectedMonth = ref(new Date().getMonth() + 1); // 預設當前月
+const selectedEmployee = ref("");
+const allEmps=ref([])
 
 // 產生年份範圍（例如 2020~2030）
 const availableYears = computed(() => {
@@ -103,6 +121,34 @@ return Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
 // 產生月份選單 (1~12)
 const availableMonths = computed(() => [null, ...Array.from({ length: 12 }, (_, i) => i + 1)]);
 
+onMounted(async () => {
+  try {
+    const res = await axiosapi.get(`/department/find`);
+    departments.value = res.data;
+  } catch (error) {
+    console.error("取得部門資料失敗:", error);
+  }
+  try {
+    const res = await axiosapi.get(`/api/salary/allEmp`);
+    allEmps.value = res.data;
+    employees.value = res.data;
+  } catch (error) {
+    console.error("取得員工資料失敗:", error);
+  }
+})
+
+const fetchEmployees = async () => {
+  if (!selectedDepartment.value) return;
+
+  try {
+    const res = await axios.get(
+      `${path}/api/schedule/dep/${selectedDepartment.value.departmentId}`
+    );
+    employees.value = res.data; // 根據部門取得員工資料
+  } catch (error) {
+    console.error("取得員工資料失敗:", error);
+  }
+};
 
 
 const fetchAllSalaryData  = async () => {
@@ -118,6 +164,13 @@ const fetchAllSalaryData  = async () => {
 const filteredSalaryDetails = computed(() => {
 let filteredData = salaryDetails.value;
 
+if(selectedDepartment.value){
+  filteredData=filteredData.filter(detail => detail.department===selectedDepartment.value.departmentName)
+
+}
+if(selectedEmployee.value){
+  filteredData=filteredData.filter(detail => detail.employeeName===selectedEmployee.value)
+}
 // 篩選年份
 if (selectedYear.value) {
   filteredData = filteredData.filter(detail => detail.yearMonth.startsWith(selectedYear.value));
@@ -132,6 +185,9 @@ if (selectedMonth.value) {
 return filteredData;
 });
 
+const clearEmp=()=>{
+  selectedEmployee.value=null;
+}
 // 每當 selectedYear 或 selectedMonth 改變時，過濾資料
 const filterSalaryData = () => {
 // 觸發 Vue 重新計算過濾的資料
@@ -144,8 +200,11 @@ selectedMonth.value = 0; // 預設不篩選月份
 
 const resetFilters = () => {
 // 重設年份和月份
+selectedDepartment.value=null
+selectedEmployee.value=null
 selectedYear.value = null;
 selectedMonth.value = null;
+filterSalaryData()
 };
 
 const deleteSalaryDetail = async (id) => {

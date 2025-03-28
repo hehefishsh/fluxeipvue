@@ -65,12 +65,12 @@
           <option v-for="bonusOption in availableBonusOptions(index)" 
                   :key="bonusOption.salaryBonusId" 
                   :value="bonusOption">
-            {{ bonusOption.bonusType }}
+            {{ bonusOption.bonusType }}:{{ bonusOption.amount }}元
           </option>
         </select>
         <button type="button" @click="removeBonus(index)">移除</button>
       </div>
-      <button type="button" @click="addBonus">新增獎金/津貼</button>
+      <button type="button" @click="addBonus" class="px-4 py-2 border border-black text-sm text-gray-700 rounded-md hover:bg-gray-100 transition">新增獎金/津貼</button>
     </div>
 
     <!-- 年終獎金的輸入框只顯示一次，v-model 為 yearEndBonus -->
@@ -238,6 +238,7 @@ const fetchEarnedSalary=async()=>{
     // 呼叫加班減班時數 API
     const earnedSalaryResponse=await axios.post(`${path}/api/salary/earnedSalary`,payload);
     workData.value.earnedSalary=earnedSalaryResponse.data;
+    earnedSalary.value=workData.value.earnedSalary
     console.log(earnedSalaryResponse.data)
   }
   catch (error) {
@@ -311,4 +312,5 @@ border-radius: 8px;
 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 text-align: center;
 }
+
 </style>
