@@ -1,15 +1,19 @@
 <template>
   <div>
-    <div class="card card-default" id="expense-request-query">
+    <!-- 查詢費用資料 -->
+    <div class="card card-default" id="leave-request-query">
       <div class="card-header"></div>
       <div class="card-body py-0" data-simplebar>
+        <!-- 顯示錯誤信息 -->
         <div v-show="error" class="alert alert-danger" role="alert">
           {{ error }}
         </div>
+
+        <!-- 分類標籤 -->
         <div class="d-flex justify-content-between">
           <ul
             class="nav nav-pills mb-3 justify-content-between"
-            id="pills-tab12"
+            id="leave-tabs"
             role="tablist"
           >
             <li class="nav-item">
@@ -17,7 +21,6 @@
                 class="nav-link"
                 :class="{ active: activeTab === 'all' }"
                 @click="activeTab = 'all'"
-                href="#"
                 >全部</a
               >
             </li>
@@ -65,20 +68,21 @@
           </div>
         </div>
 
+        <!-- 篩選顯示對應的費用資料 -->
         <div class="tab-content mt-3">
           <div v-if="filteredExpenseRequests.length">
             <table class="table table-borderless table-thead-border">
               <thead>
                 <tr>
-                  <th>申請Id</th>
-                  <th>申請人</th>
-                  <th>費用類型</th>
-                  <th>金額</th>
-                  <th>說明</th>
-                  <th>申請時間</th>
-                  <th>附件</th>
-                  <th style="width: 5%">狀態</th>
-                  <th>其他</th>
+                  <th class="text">申請Id</th>
+                  <th class="text">申請人</th>
+                  <th class="text">請假類型</th>
+                  <th class="text">費用</th>
+                  <th class="text">說明</th>
+                  <th class="text">申請時間</th>
+                  <th class="text">附件</th>
+                  <th class="text">狀態</th>
+                  <th class="text">核准</th>
                 </tr>
               </thead>
               <tbody>
@@ -86,17 +90,19 @@
                   v-for="(expense, index) in filteredExpenseRequests"
                   :key="index"
                 >
-                  <td>{{ expense.expenseRequestId }}</td>
-                  <td>{{ expense.employeeName }}</td>
-                  <td>{{ expense.expenseType }}</td>
-                  <td class="highlinestar">NT$ {{ expense.amount }}元</td>
-                  <td>{{ expense.description }}</td>
-                  <td>{{ formatDate(expense.submittedAt) }}</td>
-                  <td>
+                  <td class="text">{{ expense.expenseRequestId }}</td>
+                  <td class="text">{{ expense.requestEmployeeName }}</td>
+                  <td class="text">{{ expense.expenseType }}</td>
+                  <td class="text highlinestar">NT${{ expense.amount }}元</td>
+                  <td class="text">{{ expense.description }}</td>
+                  <td class="text">
+                    {{ formatDateSecond(expense.submittedAt) }}
+                  </td>
+                  <td class="text">
                     <button
                       v-if="expense.attachmentName"
                       @click="
-                        downloadFile(
+                        downloadfile(
                           expense.attachmentName,
                           expense.attachmentPath
                         )
@@ -108,15 +114,23 @@
                     <span v-else>無</span>
                     {{ expense.attachmentName }}
                   </td>
-                  <td>{{ expense.status }}</td>
-                  <td>
+                  <td class="text">{{ expense.status }}</td>
+                  <td class="text">
                     <button
-                      class="badge badge-info"
-                      @click="showModal(expense)"
+                      class="badge badge-square badge-success"
+                      @click="showModal(expense, 'approve')"
                       data-toggle="modal"
                       data-target="#expenseRequestModal"
                     >
-                      查看詳情
+                      核可
+                    </button>
+                    <button
+                      class="badge badge-square badge-warning"
+                      @click="showModal(expense, 'reject')"
+                      data-toggle="modal"
+                      data-target="#expenseRequestModal"
+                    >
+                      否決
                     </button>
                   </td>
                 </tr>
@@ -124,13 +138,20 @@
             </table>
           </div>
           <div v-else>
-            <p class="text-center text-muted">無相關費用申請資料</p>
+            <p class="text-center text-muted">無相關請假資料</p>
           </div>
         </div>
+
         <div class="bg-white py-4"></div>
       </div>
     </div>
-    <ExpenseRequestDetails :expenseRequest="selectedExpenseRequest" />
+
+    <!-- 呼叫請假詳情元件並傳遞selectedLeaveRequest -->
+    <ExpenseRequestApprovalDetails
+      :expenseRequest="selectedExpenseRequest"
+      :actionType="actionType"
+      @update:expenseRequest="reloadData"
+    />
   </div>
 </template>
 
@@ -138,30 +159,47 @@
 import { ref, onMounted, computed } from "vue";
 import axiosapi from "@/plugins/axios.js";
 import useUserStore from "@/stores/user";
-import ExpenseRequestDetails from "./ExpenseRequestDetails.vue";
-import Swal from "sweetalert2";
+import ExpenseRequestApprovalDetails from "./ExpenseRequestApprovalDetails.vue";
+
 const user = useUserStore();
 const expenseRequestData = ref([]);
 const error = ref("");
-const activeTab = ref("all");
+const activeTab = ref("pending"); // 預設顯示 "待審核"
 const selectedExpenseRequest = ref(null);
+const actionType = ref("");
 
-const showModal = (expense) => {
+// 顯示請假詳情Modal
+const showModal = (expense, type) => {
   selectedExpenseRequest.value = expense;
+  actionType.value = type; // 設定是「核准」還是「否決」
 };
-
+const reloadData = async () => {
+  selectedExpenseRequest.value = null; // 確保 modal 關閉時清空選取
+  actionType.value = ""; // 清空 actionType
+  try {
+    const response = await axiosapi.get(
+      `/api/approval/expense/pending/${user.empId}`
+    );
+    expenseRequestData.value = response.data; // 更新列表
+  } catch (err) {
+    error.value = "無法獲取請假資料";
+  }
+};
+// 查詢請假資料
 onMounted(async () => {
   try {
     const response = await axiosapi.get(
-      `/api/expense-requests/employee/${user.empId}`
-    );
+      `/api/approval/expense/pending/${user.empId}`
+    ); // 查詢待審核的請假單
     expenseRequestData.value = response.data;
   } catch (err) {
-    error.value = "無法獲取費用申請資料";
+    error.value = "無法獲取請假資料";
   }
 });
 
+// 根據標籤篩選費用資料
 const filteredExpenseRequests = computed(() => {
+  if (!Array.isArray(expenseRequestData.value)) return [];
   if (activeTab.value === "all") return expenseRequestData.value;
   return expenseRequestData.value.filter((expense) => {
     switch (activeTab.value) {
@@ -194,15 +232,33 @@ const formatDate = (dateStr) => {
 
   const hours = String(date.getHours()).padStart(2, "0");
   const minutes = String(date.getMinutes()).padStart(2, "0");
+
+  return `${year}年${month}月${day}日 (${weekDay}) ${hours}:${minutes}`;
+};
+
+const formatDateSecond = (dateStr) => {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // 月份從0開始
+  const day = String(date.getDate()).padStart(2, "0");
+
+  // 取得星期幾的中文名稱
+  const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
+  const weekDay = weekdays[date.getDay()];
+
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
   const seconds = String(date.getSeconds()).padStart(2, "0");
 
   return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
 };
 
-function downloadFile(attachmentName, attachmentPath) {
+function downloadfile(attachmentName, attachmentPath) {
   axiosapi
     .get(`/api/expense-requests/attachments/${attachmentPath}`, {
-      responseType: "blob",
+      responseType: "blob", // 確保返回的是二進制數據
     })
     .then((response) => {
       const blob = new Blob([response.data], {
@@ -218,12 +274,17 @@ function downloadFile(attachmentName, attachmentPath) {
       window.URL.revokeObjectURL(url);
     })
     .catch((error) => {
-      Swal.fire({ title: "下載失敗: " + error.message, icon: "error" });
+      console.error("下載失敗", error);
     });
 }
 </script>
 
 <style scoped>
+/* .table {
+  table-layout: fixed;
+  width: 100%;
+} */
+
 .table td,
 .table th {
   word-wrap: break-word;

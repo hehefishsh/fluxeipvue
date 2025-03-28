@@ -38,15 +38,21 @@
                 </tr>
                 <tr>
                   <td>加班日期</td>
-                  <td>{{ formatDate(overtimeRequest.adjustmentDate) }}</td>
+                  <td class="highlinestar">
+                    {{ formatDate(overtimeRequest.adjustmentDate) }}
+                  </td>
                 </tr>
                 <tr>
                   <td>加減班時數</td>
                   <td>{{ overtimeRequest.hours }}</td>
                 </tr>
                 <tr>
-                  <td>調整原因</td>
+                  <td>原因</td>
                   <td>{{ overtimeRequest.reason }}</td>
+                </tr>
+                <tr>
+                  <td>申請時間</td>
+                  <td>{{ formatDateSecond(overtimeRequest.submittedAt) }}</td>
                 </tr>
                 <tr>
                   <td>狀態</td>
@@ -76,7 +82,7 @@
                   <td>{{ step.approverName }}</td>
                   <td>{{ step.status }}</td>
                   <td>{{ step.comment || "無" }}</td>
-                  <td>{{ formatDate(step.updatedAt) }}</td>
+                  <td>{{ formatDateSecond(step.updatedAt) }}</td>
                 </tr>
               </tbody>
             </table>
@@ -105,14 +111,40 @@ const props = defineProps({
 
 const approvalSteps = ref([]);
 
+// 簡單日期格式化函式，依需求調整格式
 const formatDate = (dateStr) => {
   if (!dateStr) return "";
   const date = new Date(dateStr);
-  return date.toLocaleString("zh-TW", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // 月份從0開始
+  const day = String(date.getDate()).padStart(2, "0");
+
+  // 取得星期幾的中文名稱
+  const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
+  const weekDay = weekdays[date.getDay()];
+
+  return `${year}年${month}月${day}日 (${weekDay})`;
+};
+
+// 簡單日期格式化函式，依需求調整格式
+const formatDateSecond = (dateStr) => {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // 月份從0開始
+  const day = String(date.getDate()).padStart(2, "0");
+
+  // 取得星期幾的中文名稱
+  const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
+  const weekDay = weekdays[date.getDay()];
+
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+
+  return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
 };
 
 const fetchApprovalSteps = async () => {
@@ -123,7 +155,7 @@ const fetchApprovalSteps = async () => {
     );
     approvalSteps.value = response.data;
   } catch (error) {
-    console.error("獲取審核步驟失敗", error);
+    console.error("取得審核步驟失敗", error);
   }
 };
 

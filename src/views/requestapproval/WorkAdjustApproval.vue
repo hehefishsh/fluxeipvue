@@ -73,10 +73,10 @@
                   <th class="text">申請Id</th>
                   <th class="text">申請人</th>
                   <th class="text">加減班類型</th>
-                  <th class="text">調整日期</th>
+                  <th class="text">加減班日期</th>
                   <th class="text">時數</th>
                   <th class="text">原因</th>
-                  <th class="text">提交時間</th>
+                  <th class="text">申請時間</th>
                   <th class="text">狀態</th>
                   <th class="text">核准</th>
                 </tr>
@@ -89,13 +89,13 @@
                   <td class="text">{{ adjustment.requestId }}</td>
                   <td class="text">{{ adjustment.requestEmployeeName }}</td>
                   <td class="text">{{ adjustment.type }}</td>
-                  <td class="text">
+                  <td class="text highlinestar">
                     {{ formatDate(adjustment.adjustmentDate) }}
                   </td>
                   <td class="text">{{ adjustment.hours }}</td>
                   <td class="text">{{ adjustment.reason }}</td>
                   <td class="text">
-                    {{ formatDateTime(adjustment.submittedAt) }}
+                    {{ formatDateSecond(adjustment.submittedAt) }}
                   </td>
                   <td class="text">{{ adjustment.status }}</td>
                   <td class="text">
@@ -167,7 +167,7 @@ const reloadData = async () => {
     );
     workAdjustRequestData.value = response.data; // 更新列表
   } catch (err) {
-    error.value = "無法獲取加減班資料";
+    error.value = "無法取得加減班資料";
   }
 };
 
@@ -179,7 +179,7 @@ onMounted(async () => {
     );
     workAdjustRequestData.value = response.data;
   } catch (err) {
-    error.value = "無法獲取加減班資料";
+    error.value = "無法取得加減班資料";
   }
 });
 
@@ -203,15 +203,40 @@ const filteredWorkAdjustRequests = computed(() => {
   });
 });
 
-// 日期格式化
+// 簡單日期格式化函式，依需求調整格式
 const formatDate = (dateStr) => {
   if (!dateStr) return "";
-  return new Date(dateStr).toLocaleDateString("zh-TW");
+  const date = new Date(dateStr);
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // 月份從0開始
+  const day = String(date.getDate()).padStart(2, "0");
+
+  // 取得星期幾的中文名稱
+  const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
+  const weekDay = weekdays[date.getDay()];
+
+  return `${year}年${month}月${day}日 (${weekDay})`;
 };
 
-const formatDateTime = (dateTimeStr) => {
-  if (!dateTimeStr) return "";
-  return new Date(dateTimeStr).toLocaleString("zh-TW");
+// 簡單日期格式化函式，依需求調整格式
+const formatDateSecond = (dateStr) => {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // 月份從0開始
+  const day = String(date.getDate()).padStart(2, "0");
+
+  // 取得星期幾的中文名稱
+  const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
+  const weekDay = weekdays[date.getDay()];
+
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+
+  return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
 };
 </script>
 

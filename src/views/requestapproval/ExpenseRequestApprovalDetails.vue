@@ -1,16 +1,16 @@
 <template>
   <div
-    v-if="workAdjustRequest"
+    v-if="expenseRequest"
     class="modal fade"
-    id="workAdjustModal"
+    id="expenseRequestModal"
     tabindex="-1"
-    aria-labelledby="workAdjustModalLabel"
+    aria-labelledby="expenseRequestModalLabel"
     aria-hidden="true"
   >
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="workAdjustModalLabel">加減班詳情</h5>
+          <h5 class="modal-title" id="expenseRequestModalLabel">費用詳情</h5>
           <button
             type="button"
             class="btn-close"
@@ -23,33 +23,44 @@
             <tbody>
               <tr>
                 <td>申請Id</td>
-                <td>{{ workAdjustRequest.requestId }}</td>
+                <td>{{ expenseRequest.expenseRequestId }}</td>
               </tr>
               <tr>
                 <td>申請人</td>
-                <td>{{ workAdjustRequest.requestEmployeeName }}</td>
+                <td>{{ expenseRequest.requestEmployeeName }}</td>
               </tr>
               <tr>
-                <td>加減班類型</td>
-                <td>{{ workAdjustRequest.type }}</td>
+                <td>請假類型</td>
+                <td>{{ expenseRequest.expenseType }}</td>
               </tr>
               <tr>
-                <td>加減班日期</td>
-                <td class="highlinestar">
-                  {{ formatDate(workAdjustRequest.adjustmentDate) }}
-                </td>
+                <td>費用</td>
+                <td class="highlinestar">NT${{ expenseRequest.amount }}元</td>
               </tr>
               <tr>
-                <td>時數</td>
-                <td>{{ workAdjustRequest.hours }}</td>
-              </tr>
-              <tr>
-                <td>原因</td>
-                <td>{{ workAdjustRequest.reason }}</td>
+                <td>說明</td>
+                <td>{{ expenseRequest.description }}</td>
               </tr>
               <tr>
                 <td>申請時間</td>
-                <td>{{ formatDateSecond(workAdjustRequest.submittedAt) }}</td>
+                <td>{{ formatDateSecond(expenseRequest.submittedAt) }}</td>
+              </tr>
+              <tr v-if="expenseRequest.attachmentName">
+                <td>附件</td>
+                <td>
+                  <button
+                    @click="
+                      downloadFile(
+                        expenseRequest.attachmentName,
+                        expenseRequest.attachmentPath
+                      )
+                    "
+                    class="badge badge-primary"
+                  >
+                    下載附件
+                  </button>
+                  {{ expenseRequest.attachmentName }}
+                </td>
               </tr>
             </tbody>
           </table>
@@ -70,14 +81,14 @@
           <button
             v-if="actionType === 'approve'"
             class="btn btn-success"
-            @click="approveWorkAdjust"
+            @click="approveExpense"
           >
             核准
           </button>
           <button
             v-if="actionType === 'reject'"
             class="btn btn-warning"
-            @click="rejectWorkAdjust"
+            @click="rejectExpense"
           >
             否決
           </button>
@@ -98,51 +109,37 @@
 import { ref } from "vue";
 import axiosapi from "@/plugins/axios.js";
 import Swal from "sweetalert2";
-
-const comment = ref("");
+const comment = ref(""); // 新增評論變數
 const props = defineProps({
-  workAdjustRequest: Object,
+  expenseRequest: Object,
   actionType: String,
 });
 
-const emit = defineEmits(["update:workAdjustRequest"]);
+const emit = defineEmits(["update:expenseRequest"]);
 
 const closeModal = () => {
-  emit("update:workAdjustRequest", null);
-  comment.value = "";
-  // 手動關閉 Bootstrap modal (Bootstrap 4 寫法)
-  const modal = document.getElementById("workAdjustModal");
+  emit("update:expenseRequest", null);
+  comment.value = ""; // 清空評論
+
+  // 手動關閉 Bootstrap modal
+  const modal = document.getElementById("expenseRequestModal");
   if (modal) {
     modal.classList.remove("show");
     modal.setAttribute("aria-hidden", "true");
     modal.style.display = "none";
-    // 移除 modal-backdrop
+
+    // 手動移除 modal-backdrop，避免畫面卡住
     const backdrops = document.getElementsByClassName("modal-backdrop");
     while (backdrops.length > 0) {
       backdrops[0].parentNode.removeChild(backdrops[0]);
     }
+
+    // 讓 body 滾動恢復
     document.body.classList.remove("modal-open");
     document.body.style.overflow = "auto";
   }
 };
 
-// 簡單日期格式化函式，依需求調整格式
-const formatDate = (dateStr) => {
-  if (!dateStr) return "";
-  const date = new Date(dateStr);
-
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0"); // 月份從0開始
-  const day = String(date.getDate()).padStart(2, "0");
-
-  // 取得星期幾的中文名稱
-  const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
-  const weekDay = weekdays[date.getDay()];
-
-  return `${year}年${month}月${day}日 (${weekDay})`;
-};
-
-// 簡單日期格式化函式，依需求調整格式
 const formatDateSecond = (dateStr) => {
   if (!dateStr) return "";
   const date = new Date(dateStr);
@@ -162,25 +159,25 @@ const formatDateSecond = (dateStr) => {
   return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
 };
 
-const approveWorkAdjust = async () => {
-  await reviewWorkAdjust("核准");
+const approveExpense = async () => {
+  await reviewExpense("核准"); // 1 代表核准
 };
 
-const rejectWorkAdjust = async () => {
-  await reviewWorkAdjust("未核准");
+const rejectExpense = async () => {
+  await reviewExpense("未核准"); // 2 代表否決
 };
 
-const reviewWorkAdjust = async (status) => {
-  if (!props.workAdjustRequest) return;
+const reviewExpense = async (status) => {
+  if (!props.expenseRequest) return;
   try {
     const response = await axiosapi.put(
-      `/api/approval/workadjust/step/${props.workAdjustRequest.stepId}/review`,
+      `/api/approval/expense/step/${props.expenseRequest.stepId}/review`,
       null,
       {
         params: {
-          approverId: props.workAdjustRequest.approverId,
+          approverId: props.expenseRequest.approverId,
           status: status,
-          comment: comment.value,
+          comment: comment.value, // 傳遞評論
         },
       }
     );
@@ -200,6 +197,29 @@ const reviewWorkAdjust = async (status) => {
       closeModal();
     });
   }
+};
+
+const downloadFile = (attachmentName, attachmentPath) => {
+  axiosapi
+    .get(`/api/expense-requests/attachments/${attachmentPath}`, {
+      responseType: "blob",
+    })
+    .then((response) => {
+      const blob = new Blob([response.data], {
+        type: response.headers["content-type"],
+      });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = decodeURIComponent(attachmentName);
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    })
+    .catch((error) => {
+      console.error("下載失敗", error);
+    });
 };
 </script>
 
