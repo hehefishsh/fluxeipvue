@@ -1,16 +1,16 @@
 <template>
   <div
-    v-if="workAdjustRequest"
+    v-if="missingPunchRequest"
     class="modal fade"
-    id="workAdjustModal"
+    id="missingPunchModal"
     tabindex="-1"
-    aria-labelledby="workAdjustModalLabel"
+    aria-labelledby="missingPunchModalLabel"
     aria-hidden="true"
   >
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="workAdjustModalLabel">加減班詳情</h5>
+          <h5 class="modal-title" id="missingPunchModalLabel">補卡詳情</h5>
           <button
             type="button"
             class="btn-close"
@@ -23,33 +23,29 @@
             <tbody>
               <tr>
                 <td>申請Id</td>
-                <td>{{ workAdjustRequest.requestId }}</td>
+                <td>{{ missingPunchRequest.requestId }}</td>
               </tr>
               <tr>
                 <td>申請人</td>
-                <td>{{ workAdjustRequest.requestEmployeeName }}</td>
+                <td>{{ missingPunchRequest.requestEmployeeName }}</td>
               </tr>
               <tr>
-                <td>加減班類型</td>
-                <td>{{ workAdjustRequest.type }}</td>
+                <td>補卡類型</td>
+                <td>{{ missingPunchRequest.type }}</td>
               </tr>
               <tr>
-                <td>加減班日期</td>
+                <td>缺卡日期</td>
                 <td class="highlinestar">
-                  {{ formatDate(workAdjustRequest.adjustmentDate) }}
+                  {{ formatDate(missingPunchRequest.missingDate) }}
                 </td>
               </tr>
               <tr>
-                <td>時數</td>
-                <td>{{ workAdjustRequest.hours }}</td>
-              </tr>
-              <tr>
                 <td>原因</td>
-                <td>{{ workAdjustRequest.reason }}</td>
+                <td>{{ missingPunchRequest.reason }}</td>
               </tr>
               <tr>
-                <td>申請時間</td>
-                <td>{{ formatDateSecond(workAdjustRequest.submittedAt) }}</td>
+                <td>提交時間</td>
+                <td>{{ formatDateSecond(missingPunchRequest.submittedAt) }}</td>
               </tr>
             </tbody>
           </table>
@@ -70,14 +66,14 @@
           <button
             v-if="actionType === 'approve'"
             class="btn btn-success"
-            @click="approveWorkAdjust"
+            @click="approveMissingPunch"
           >
             核准
           </button>
           <button
             v-if="actionType === 'reject'"
             class="btn btn-warning"
-            @click="rejectWorkAdjust"
+            @click="rejectMissingPunch"
           >
             否決
           </button>
@@ -101,17 +97,17 @@ import Swal from "sweetalert2";
 
 const comment = ref("");
 const props = defineProps({
-  workAdjustRequest: Object,
+  missingPunchRequest: Object,
   actionType: String,
 });
 
-const emit = defineEmits(["update:workAdjustRequest"]);
+const emit = defineEmits(["update:missingPunchRequest"]);
 
 const closeModal = () => {
-  emit("update:workAdjustRequest", null);
+  emit("update:missingPunchRequest", null);
   comment.value = "";
   // 手動關閉 Bootstrap modal (Bootstrap 4 寫法)
-  const modal = document.getElementById("workAdjustModal");
+  const modal = document.getElementById("missingPunchModal");
   if (modal) {
     modal.classList.remove("show");
     modal.setAttribute("aria-hidden", "true");
@@ -161,24 +157,23 @@ const formatDateSecond = (dateStr) => {
 
   return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
 };
-
-const approveWorkAdjust = async () => {
-  await reviewWorkAdjust("核准");
+const approveMissingPunch = async () => {
+  await reviewMissingPunch("核准");
 };
 
-const rejectWorkAdjust = async () => {
-  await reviewWorkAdjust("未核准");
+const rejectMissingPunch = async () => {
+  await reviewMissingPunch("未核准");
 };
 
-const reviewWorkAdjust = async (status) => {
-  if (!props.workAdjustRequest) return;
+const reviewMissingPunch = async (status) => {
+  if (!props.missingPunchRequest) return;
   try {
     const response = await axiosapi.put(
-      `/api/approval/workadjust/step/${props.workAdjustRequest.stepId}/review`,
+      `/api/approval/missingpunch/step/${props.missingPunchRequest.stepId}/review`,
       null,
       {
         params: {
-          approverId: props.workAdjustRequest.approverId,
+          approverId: props.missingPunchRequest.approverId,
           status: status,
           comment: comment.value,
         },

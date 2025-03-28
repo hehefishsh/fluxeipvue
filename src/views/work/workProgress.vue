@@ -14,12 +14,12 @@
       <span class="nav-text">新增工作</span>
     </RouterLink>
   </div>
-   <h2 v-if="check">查無資料</h2>
+    <h2 v-if="check">查無資料</h2>
     <div class="accordion accordion-shadow" id="accordionShadow">
         <div class="card"  v-for="work in works" :key="work.workprogressId">
             <div class="card-header" :id="'headingShadow'+work.workprogressId">
                 <h2 class="mb-0">
-                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse" :data-target="'#collapseShadow'+work.workprogressId" aria-expanded="false" :aria-controls="'collapseShadow'+work.workprogressId">{{work.workName}}
+                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse" :data-target="'#collapseShadow'+work.workprogressId" aria-expanded="false" :aria-controls="'collapseShadow'+work.workprogressId">{{work.workName}}     {{ work.status.statusName }}
                     </button>
                 </h2>
             </div>
@@ -30,6 +30,10 @@
                     <p class="card-text pb-4 pt-1" v-if="work.finishDate==null">完成日期 : 尚未完成</p>
                     <p class="card-text pb-4 pt-1" v-if="work.finishDate!=null">完成日期 : {{formatDate(work.finishDate)}}</p>
                     <p class="card-text pb-4 pt-1">負責人 : {{work.supervisor.employeeName}}</p>
+                    完成進度 :<div class="progress mb-3">
+                     <div class="progress-bar" role="progressbar" :style="{ width: work.progress + '%' }" :aria-valuenow="work.progress"  aria-valuemin="0"
+                    aria-valuemax="100">{{work.progress}}%
+                    </div></div>
                     <RouterLink :to="`/work/progress/detail/${work.workprogressId}`" class="btn btn-primary btn-sm">查看</RouterLink>
                 </div>
             </div>
@@ -52,6 +56,7 @@ async function find(){
     const response=await axiosapi.get("/workProgress/all");
     works.value=response.data
     check.value=false
+    console.log(works.value)
   }else if(worksearch.value==''&&status.value!=''){
     const response=await axiosapi.get(`/workProgress/findstatus/${status.value}`);
     works.value=response.data
@@ -80,6 +85,7 @@ async function find(){
 async function allwork() {
   const response = await axiosapi.get("/workProgress/all");
   works.value = response.data;
+  
 }
 
 onMounted(function () {

@@ -1,16 +1,16 @@
 <template>
   <div
     class="modal fade"
-    id="leaveRequestModal"
+    id="expenseRequestModal"
     tabindex="-1"
     role="dialog"
-    aria-labelledby="leaveRequestModalLabel"
+    aria-labelledby="expenseRequestModalLabel"
     aria-hidden="true"
   >
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">請假詳情</h5>
+          <h5 class="modal-title">費用申請詳情</h5>
           <button
             type="button"
             class="close"
@@ -21,60 +21,54 @@
           </button>
         </div>
         <div class="modal-body">
-          <div v-if="leaveRequest">
+          <div v-if="expenseRequest">
             <table class="table table-borderless">
               <tbody>
                 <tr>
                   <td>申請Id</td>
-                  <td>{{ leaveRequest.leaveRequestId }}</td>
+                  <td>{{ expenseRequest.expenseRequestId }}</td>
                 </tr>
                 <tr>
                   <td>申請人</td>
-                  <td>{{ leaveRequest.employeeName }}</td>
+                  <td>{{ expenseRequest.employeeName }}</td>
                 </tr>
                 <tr>
-                  <td>請假類型</td>
-                  <td>{{ leaveRequest.leaveType }}</td>
+                  <td>費用類型</td>
+                  <td>{{ expenseRequest.expenseType }}</td>
                 </tr>
                 <tr>
-                  <td>開始時間</td>
+                  <td>申請金額</td>
                   <td class="highlinestar">
-                    {{ formatDate(leaveRequest.startDatetime) }}
+                    NT$ {{ expenseRequest.amount }}元
                   </td>
                 </tr>
                 <tr>
-                  <td>結束時間</td>
-                  <td class="highlinestar">
-                    {{ formatDate(leaveRequest.endDatetime) }}
-                  </td>
+                  <td>說明</td>
+                  <td>{{ expenseRequest.description }}</td>
                 </tr>
                 <tr>
-                  <td>請假時數</td>
-                  <td>{{ leaveRequest.leaveHours }}</td>
-                </tr>
-                <tr>
-                  <td>請假原因</td>
-                  <td>{{ leaveRequest.reason }}</td>
+                  <td>申請時間</td>
+                  <td>{{ formatDateSecond(expenseRequest.submittedAt) }}</td>
                 </tr>
                 <tr>
                   <td>狀態</td>
-                  <td>{{ leaveRequest.status }}</td>
+                  <td>{{ expenseRequest.status }}</td>
                 </tr>
-                <tr v-if="leaveRequest.attachmentName">
+                <tr v-if="expenseRequest.attachmentName">
                   <td>附件</td>
                   <td>
                     <button
                       @click="
                         downloadFile(
-                          leaveRequest.attachmentName,
-                          leaveRequest.attachmentPath
+                          expenseRequest.attachmentName,
+                          expenseRequest.attachmentPath
                         )
                       "
                       class="badge badge-primary"
                     >
                       下載附件
                     </button>
-                    {{ leaveRequest.attachmentName }}
+                    {{ expenseRequest.attachmentName }}
                   </td>
                 </tr>
               </tbody>
@@ -107,7 +101,7 @@
             </table>
           </div>
           <div v-else>
-            <p>正在加載請假詳情...</p>
+            <p>正在加載費用申請詳情...</p>
           </div>
         </div>
         <div class="modal-footer">
@@ -125,30 +119,12 @@ import { ref, watch } from "vue";
 import axiosapi from "@/plugins/axios";
 
 const props = defineProps({
-  leaveRequest: Object,
+  expenseRequest: Object,
 });
 
 const approvalSteps = ref([]);
 
 // 簡單日期格式化函式，依需求調整格式
-const formatDate = (dateStr) => {
-  if (!dateStr) return "";
-  const date = new Date(dateStr);
-
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0"); // 月份從0開始
-  const day = String(date.getDate()).padStart(2, "0");
-
-  // 取得星期幾的中文名稱
-  const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
-  const weekDay = weekdays[date.getDay()];
-
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-
-  return `${year}年${month}月${day}日 (${weekDay}) ${hours}:${minutes}`;
-};
-
 const formatDateSecond = (dateStr) => {
   if (!dateStr) return "";
   const date = new Date(dateStr);
@@ -169,10 +145,10 @@ const formatDateSecond = (dateStr) => {
 };
 
 const fetchApprovalSteps = async () => {
-  if (!props.leaveRequest) return;
+  if (!props.expenseRequest) return;
   try {
     const response = await axiosapi.get(
-      `/api/approval/leave/steps/${props.leaveRequest.leaveRequestId}`
+      `/api/approval/expense/steps/${props.expenseRequest.expenseRequestId}`
     );
     approvalSteps.value = response.data;
   } catch (error) {
@@ -182,7 +158,7 @@ const fetchApprovalSteps = async () => {
 
 const downloadFile = (attachmentName, attachmentPath) => {
   axiosapi
-    .get(`/api/leave-requests/attachments/${attachmentPath}`, {
+    .get(`/api/expense-requests/attachments/${attachmentPath}`, {
       responseType: "blob",
     })
     .then((response) => {
@@ -204,7 +180,7 @@ const downloadFile = (attachmentName, attachmentPath) => {
 };
 
 watch(
-  () => props.leaveRequest,
+  () => props.expenseRequest,
   (newVal) => {
     if (newVal) fetchApprovalSteps();
   }

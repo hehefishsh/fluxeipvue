@@ -2,7 +2,7 @@
   <div>
     <MeetingForm
       :meetings="paginatedMeetings"
-      :employeeId="userStore.empId"
+      :employeeId="Number(userStore.empId)"
       :selectedStatus="selectedStatus"
       :current="currentPageForStatus"
       :pages="pagesForStatus"

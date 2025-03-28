@@ -1,16 +1,16 @@
 <template>
   <div
     class="modal fade"
-    id="leaveRequestModal"
+    id="missingPunchRequestModal"
     tabindex="-1"
     role="dialog"
-    aria-labelledby="leaveRequestModalLabel"
+    aria-labelledby="missingPunchRequestModalLabel"
     aria-hidden="true"
   >
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">請假詳情</h5>
+          <h5 class="modal-title">補卡申請詳情</h5>
           <button
             type="button"
             class="close"
@@ -21,61 +21,40 @@
           </button>
         </div>
         <div class="modal-body">
-          <div v-if="leaveRequest">
+          <div v-if="missingPunchRequest">
             <table class="table table-borderless">
               <tbody>
                 <tr>
                   <td>申請Id</td>
-                  <td>{{ leaveRequest.leaveRequestId }}</td>
+                  <td>{{ missingPunchRequest.missingPunchRequestId }}</td>
                 </tr>
                 <tr>
                   <td>申請人</td>
-                  <td>{{ leaveRequest.employeeName }}</td>
+                  <td>{{ missingPunchRequest.employeeName }}</td>
                 </tr>
                 <tr>
-                  <td>請假類型</td>
-                  <td>{{ leaveRequest.leaveType }}</td>
+                  <td>補卡類型</td>
+                  <td>{{ missingPunchRequest.clockType }}</td>
                 </tr>
                 <tr>
-                  <td>開始時間</td>
+                  <td>缺卡日期</td>
                   <td class="highlinestar">
-                    {{ formatDate(leaveRequest.startDatetime) }}
+                    {{ formatDate(missingPunchRequest.missingDate) }}
                   </td>
                 </tr>
                 <tr>
-                  <td>結束時間</td>
-                  <td class="highlinestar">
-                    {{ formatDate(leaveRequest.endDatetime) }}
+                  <td>原因</td>
+                  <td>{{ missingPunchRequest.reason }}</td>
+                </tr>
+                <tr>
+                  <td>申請時間</td>
+                  <td>
+                    {{ formatDateSecond(missingPunchRequest.submittedAt) }}
                   </td>
-                </tr>
-                <tr>
-                  <td>請假時數</td>
-                  <td>{{ leaveRequest.leaveHours }}</td>
-                </tr>
-                <tr>
-                  <td>請假原因</td>
-                  <td>{{ leaveRequest.reason }}</td>
                 </tr>
                 <tr>
                   <td>狀態</td>
-                  <td>{{ leaveRequest.status }}</td>
-                </tr>
-                <tr v-if="leaveRequest.attachmentName">
-                  <td>附件</td>
-                  <td>
-                    <button
-                      @click="
-                        downloadFile(
-                          leaveRequest.attachmentName,
-                          leaveRequest.attachmentPath
-                        )
-                      "
-                      class="badge badge-primary"
-                    >
-                      下載附件
-                    </button>
-                    {{ leaveRequest.attachmentName }}
-                  </td>
+                  <td>{{ missingPunchRequest.status }}</td>
                 </tr>
               </tbody>
             </table>
@@ -107,7 +86,7 @@
             </table>
           </div>
           <div v-else>
-            <p>正在加載請假詳情...</p>
+            <p>正在加載補卡詳情...</p>
           </div>
         </div>
         <div class="modal-footer">
@@ -125,7 +104,7 @@ import { ref, watch } from "vue";
 import axiosapi from "@/plugins/axios";
 
 const props = defineProps({
-  leaveRequest: Object,
+  missingPunchRequest: Object,
 });
 
 const approvalSteps = ref([]);
@@ -143,12 +122,10 @@ const formatDate = (dateStr) => {
   const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
   const weekDay = weekdays[date.getDay()];
 
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-
-  return `${year}年${month}月${day}日 (${weekDay}) ${hours}:${minutes}`;
+  return `${year}年${month}月${day}日 (${weekDay})`;
 };
 
+// 簡單日期格式化函式，依需求調整格式
 const formatDateSecond = (dateStr) => {
   if (!dateStr) return "";
   const date = new Date(dateStr);
@@ -169,42 +146,19 @@ const formatDateSecond = (dateStr) => {
 };
 
 const fetchApprovalSteps = async () => {
-  if (!props.leaveRequest) return;
+  if (!props.missingPunchRequest) return;
   try {
     const response = await axiosapi.get(
-      `/api/approval/leave/steps/${props.leaveRequest.leaveRequestId}`
+      `/api/approval/missingpunch/steps/${props.missingPunchRequest.missingPunchRequestId}`
     );
     approvalSteps.value = response.data;
   } catch (error) {
-    console.error("獲取審核步驟失敗", error);
+    console.error("取得審核步驟失敗", error);
   }
 };
 
-const downloadFile = (attachmentName, attachmentPath) => {
-  axiosapi
-    .get(`/api/leave-requests/attachments/${attachmentPath}`, {
-      responseType: "blob",
-    })
-    .then((response) => {
-      const blob = new Blob([response.data], {
-        type: response.headers["content-type"],
-      });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = decodeURIComponent(attachmentName);
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-    })
-    .catch((error) => {
-      console.error("下載失敗", error);
-    });
-};
-
 watch(
-  () => props.leaveRequest,
+  () => props.missingPunchRequest,
   (newVal) => {
     if (newVal) fetchApprovalSteps();
   }

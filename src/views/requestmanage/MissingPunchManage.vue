@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- 查詢加減班申請資料 -->
+    <!-- 查詢補卡申請資料 -->
     <div class="card card-default" id="overtime-request-query">
       <div class="card-header"></div>
       <div class="card-body py-0" data-simplebar>
@@ -33,17 +33,16 @@
           </div>
         </div>
 
-        <!-- 篩選顯示對應的加減班申請資料 -->
+        <!-- 篩選顯示對應的補卡申請資料 -->
         <div class="tab-content mt-3">
-          <div v-if="filteredOvertimeRequests.length">
+          <div v-if="filteredMissingPunchRequests.length">
             <table class="table table-borderless table-thead-border">
               <thead>
                 <tr>
                   <th>申請Id</th>
                   <th>申請人</th>
-                  <th>加減班類型</th>
-                  <th>加班日期</th>
-                  <th>時數</th>
+                  <th>補卡類型</th>
+                  <th>缺卡日期</th>
                   <th>原因</th>
                   <th>申請時間</th>
                   <th>狀態</th>
@@ -52,16 +51,15 @@
               </thead>
               <tbody>
                 <tr
-                  v-for="(request, index) in filteredOvertimeRequests"
+                  v-for="(request, index) in filteredMissingPunchRequests"
                   :key="index"
                 >
-                  <td>{{ request.workAdjustmentRequestId }}</td>
+                  <td>{{ request.missingPunchRequestId }}</td>
                   <td>{{ request.employeeName }}</td>
-                  <td>{{ request.adjustmentType }}</td>
+                  <td>{{ request.clockType }}</td>
                   <td class="highlinestar">
-                    {{ formatDate(request.adjustmentDate) }}
+                    {{ formatDate(request.missingDate) }}
                   </td>
-                  <td>{{ request.hours }}</td>
                   <td>{{ request.reason }}</td>
                   <td>{{ formatDateSecond(request.submittedAt) }}</td>
                   <td>{{ request.status }}</td>
@@ -70,7 +68,7 @@
                       class="badge badge-info"
                       @click="showModal(request)"
                       data-toggle="modal"
-                      data-target="#overtimeRequestModal"
+                      data-target="#missingPunchRequestModal"
                     >
                       查看詳情
                     </button>
@@ -80,13 +78,13 @@
             </table>
           </div>
           <div v-else>
-            <p class="text-center text-muted">無相關加減班申請資料</p>
+            <p class="text-center text-muted">無相關補卡申請資料</p>
           </div>
         </div>
         <div class="bg-white py-4"></div>
       </div>
     </div>
-    <WorkAdjustmentDetails :overtimeRequest="selectedOvertimeRequest" />
+    <MissingPunchDetails :missingPunchRequest="selectedMissingPunchRequest" />
   </div>
 </template>
 
@@ -94,13 +92,13 @@
 import { ref, onMounted, computed } from "vue";
 import axiosapi from "@/plugins/axios.js";
 import useUserStore from "@/stores/user";
-import WorkAdjustmentDetails from "./WorkAdjustmentDetails.vue";
+import MissingPunchDetails from "./MissingPunchDetails.vue";
 
 const user = useUserStore();
-const overtimeRequestData = ref([]);
+const missingPunchRequestData = ref([]);
 const error = ref("");
 const activeTab = ref("all");
-const selectedOvertimeRequest = ref(null);
+const selectedMissingPunchRequest = ref(null);
 
 const statuses = [
   { key: "all", label: "全部" },
@@ -111,23 +109,23 @@ const statuses = [
 ];
 
 const showModal = (request) => {
-  selectedOvertimeRequest.value = request;
+  selectedMissingPunchRequest.value = request;
 };
 
 onMounted(async () => {
   try {
     const response = await axiosapi.get(
-      `/api/work-adjustments/employee/${user.empId}`
+      `/api/missing-punch/employee/${user.empId}`
     );
-    overtimeRequestData.value = response.data;
+    missingPunchRequestData.value = response.data;
   } catch (err) {
-    error.value = "無法獲取加減班申請資料";
+    error.value = "無法取得補卡申請資料";
   }
 });
 
-const filteredOvertimeRequests = computed(() => {
-  if (activeTab.value === "all") return overtimeRequestData.value;
-  return overtimeRequestData.value.filter(
+const filteredMissingPunchRequests = computed(() => {
+  if (activeTab.value === "all") return missingPunchRequestData.value;
+  return missingPunchRequestData.value.filter(
     (request) =>
       request.status === statuses.find((s) => s.key === activeTab.value)?.label
   );

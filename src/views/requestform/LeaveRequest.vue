@@ -8,15 +8,24 @@
         <!-- 申請人 -->
         <div class="form-group">
           <label for="employee">申請人</label>
-          <input type="text" id="employee" class="form-control rounded-0" v-model="currentEmployeeName" readonly />
+          <input
+            type="text"
+            id="employee"
+            class="form-control rounded-0"
+            v-model="currentEmployeeName"
+            readonly
+          />
         </div>
 
         <!-- 請假類型 -->
         <div class="form-group">
-          <label for="leaveType">
-            <font color="red">*</font>請假類型
-          </label>
-          <select id="leaveType" class="form-control rounded-0" v-model="leaveRequest.leaveTypeId" required>
+          <label for="leaveType"> <font color="red">*</font>請假類型 </label>
+          <select
+            id="leaveType"
+            class="form-control rounded-0"
+            v-model="leaveRequest.leaveTypeId"
+            required
+          >
             <option v-for="type in leaveTypes" :key="type.id" :value="type.id">
               {{ type.typeName }}
             </option>
@@ -25,53 +34,75 @@
 
         <!-- 開始時間 -->
         <div class="form-group">
-          <label for="startTime">
-            <font color="red">*</font>開始時間
-          </label>
-          <input type="datetime-local" id="startTime" class="form-control rounded-0" v-model="leaveRequest.startTime"
-            required @change="validateDateRange" />
+          <label for="startTime"> <font color="red">*</font>開始時間 </label>
+          <input
+            type="datetime-local"
+            id="startTime"
+            class="form-control rounded-0"
+            v-model="leaveRequest.startTime"
+            required
+            @change="validateDateRange"
+          />
         </div>
 
         <!-- 結束時間 -->
         <div class="form-group">
-          <label for="endTime">
-            <font color="red">*</font>結束時間
-          </label>
-          <input type="datetime-local" id="endTime" class="form-control rounded-0" v-model="leaveRequest.endTime"
-            required @change="validateDateRange" />
+          <label for="endTime"> <font color="red">*</font>結束時間 </label>
+          <input
+            type="datetime-local"
+            id="endTime"
+            class="form-control rounded-0"
+            v-model="leaveRequest.endTime"
+            required
+            @change="validateDateRange"
+          />
         </div>
 
         <!-- 請假時數 -->
         <div class="form-group">
-          <label for="leaveHours">
-            <font color="red">*</font>請假時數
-          </label>
+          <label for="leaveHours"> <font color="red">*</font>請假時數 </label>
           <div class="input-group">
-            <input type="number" id="leaveHours" class="form-control rounded-0" v-model="leaveRequest.leaveHours"
-              placeholder="小時" />
+            <input
+              type="number"
+              id="leaveHours"
+              class="form-control rounded-0"
+              v-model="leaveRequest.leaveHours"
+              placeholder="小時"
+            />
             <span class="input-group-text">小時</span>
           </div>
         </div>
 
-
         <!-- 請假原因 -->
         <div class="form-group">
-          <label for="reason">
-            <font color="red">*</font>請假原因
-          </label>
-          <textarea id="reason" class="form-control rounded-0" v-model="leaveRequest.reason" required></textarea>
+          <label for="reason"> <font color="red">*</font>請假原因 </label>
+          <textarea
+            id="reason"
+            class="form-control rounded-0"
+            v-model="leaveRequest.reason"
+            required
+            maxlength="200"
+          ></textarea>
+          <small class="form-text text-muted">最多可輸入 200 字。</small>
         </div>
 
         <!-- 附件 -->
         <div class="form-group">
           <label for="attachments">附件</label>
-          <input type="file" id="attachments" class="form-control rounded-0" @change="handleFileUpload" />
+          <input
+            type="file"
+            id="attachments"
+            class="form-control rounded-0"
+            @change="handleFileUpload"
+          />
         </div>
 
         <!-- 按鈕區 -->
         <div class="form-footer">
           <button type="submit" class="btn btn-secondary btn-pill">提交</button>
-          <button type="button" @click="goBack" class="btn btn-light btn-pill">取消</button>
+          <button type="button" @click="goBack" class="btn btn-light btn-pill">
+            取消
+          </button>
         </div>
       </form>
     </div>
@@ -79,57 +110,57 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, computed } from 'vue'
-import axiosapi from '@/plugins/axios.js'
-import useUserStore from '@/stores/user.js'
+import { reactive, ref, onMounted, computed } from "vue";
+import axiosapi from "@/plugins/axios.js";
+import useUserStore from "@/stores/user.js";
 
 // 取得使用者資訊
-const userStore = useUserStore()
-const currentEmployeeName = computed(() => userStore.empName)
-const currentEmployeeId = computed(() => userStore.empId) // 假設有 empId
+const userStore = useUserStore();
+const currentEmployeeName = computed(() => userStore.empName);
+const currentEmployeeId = computed(() => userStore.empId); // 假設有 empId
 
 // 表單資料
 const leaveRequest = reactive({
   employee_id: currentEmployeeId.value, // 自動填入使用者 ID
   leaveTypeId: null,
-  startTime: '',
-  endTime: '',
+  startTime: "",
+  endTime: "",
   leaveHours: 0,
-  reason: '',
-  attachments: null
-})
+  reason: "",
+  attachments: null,
+});
 
 // 取得請假類型
-const leaveTypes = ref([])
+const leaveTypes = ref([]);
 
 onMounted(async () => {
   try {
     // 取得請假類型清單
-    const typeResponse = await axiosapi.get('/api/types/category/leave_type')
-    leaveTypes.value = typeResponse.data
+    const typeResponse = await axiosapi.get("/api/types/category/leave_type");
+    leaveTypes.value = typeResponse.data;
   } catch (error) {
-    console.error('Error fetching leave types:', error)
+    console.error("Error fetching leave types:", error);
   }
-})
+});
 // 驗證選擇的日期範圍（不能跨月）
 function validateDateRange() {
-  if (!leaveRequest.startTime || !leaveRequest.endTime) return
+  if (!leaveRequest.startTime || !leaveRequest.endTime) return;
 
-  const start = new Date(leaveRequest.startTime)
-  const end = new Date(leaveRequest.endTime)
+  const start = new Date(leaveRequest.startTime);
+  const end = new Date(leaveRequest.endTime);
 
   if (start.getMonth() !== end.getMonth()) {
     Swal.fire({
-      title: '錯誤!',
-      text: '請假期間不能跨月，請重新選擇日期。',
-      icon: 'error',
-      confirmButtonText: '確定'
-    })
-    leaveRequest.endTime = ''
-    return
+      title: "錯誤!",
+      text: "請假期間不能跨月，請重新選擇日期。",
+      icon: "error",
+      confirmButtonText: "確定",
+    });
+    leaveRequest.endTime = "";
+    return;
   }
 
-  updateLeaveHours()
+  updateLeaveHours();
 }
 
 function updateLeaveHours() {
@@ -178,85 +209,81 @@ function updateLeaveHours() {
   leaveRequest.leaveHours = Math.ceil(totalMinutes / 60);
 }
 
-
-
 // 處理附件上傳
 function handleFileUpload(event) {
-  leaveRequest.attachments = event.target.files[0]
+  leaveRequest.attachments = event.target.files[0];
 }
 
 // 提交請假申請
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
 async function submitLeaveRequest() {
   if (leaveRequest.leaveHours === 0) {
     Swal.fire({
-      title: '錯誤!',
-      text: '請假時數不能為 0 小時，請重新選擇時間。',
-      icon: 'error',
-      confirmButtonText: '確定'
+      title: "錯誤!",
+      text: "請假時數不能為 0 小時，請重新選擇時間。",
+      icon: "error",
+      confirmButtonText: "確定",
     });
     return; // 阻止表單提交
   }
   const formData = new FormData();
 
   // 添加其他表單欄位資料
-  formData.append('employeeId', leaveRequest.employee_id);
-  formData.append('leaveTypeId', leaveRequest.leaveTypeId);
-  formData.append('startDatetime', leaveRequest.startTime);
-  formData.append('endDatetime', leaveRequest.endTime);
-  formData.append('leaveHours', leaveRequest.leaveHours);
-  formData.append('statusId', 4);  // 假設 4 是申請中的狀態 ID
-  formData.append('reason', leaveRequest.reason);
+  formData.append("employeeId", leaveRequest.employee_id);
+  formData.append("leaveTypeId", leaveRequest.leaveTypeId);
+  formData.append("startDatetime", leaveRequest.startTime);
+  formData.append("endDatetime", leaveRequest.endTime);
+  formData.append("leaveHours", leaveRequest.leaveHours);
+  formData.append("statusId", 4); // 假設 4 是申請中的狀態 ID
+  formData.append("reason", leaveRequest.reason);
 
   // 添加附件檔案
   if (leaveRequest.attachments) {
-    formData.append('attachments', leaveRequest.attachments);
+    formData.append("attachments", leaveRequest.attachments);
   }
 
   try {
     // 使用 FormData 發送請求
-    await axiosapi.post('/api/leave-requests', formData, {
+    await axiosapi.post("/api/leave-requests", formData, {
       headers: {
-        'Content-Type': 'multipart/form-data'
-      }
+        "Content-Type": "multipart/form-data",
+      },
     });
 
     // 成功後顯示提示
     Swal.fire({
-      title: '成功!',
-      text: '請假申請提交成功！',
-      icon: 'success',
-      confirmButtonText: 'OK'
+      title: "成功!",
+      text: "請假申請提交成功！",
+      icon: "success",
+      confirmButtonText: "OK",
     }).then(() => {
       // 跳轉到首頁
-      window.location.href = '/';
-    })
+      window.location.href = "/";
+    });
   } catch (error) {
     // 錯誤處理
     if (error.response && error.response.data) {
-      const errorMessage = error.response.data || '提交失敗';
+      const errorMessage = error.response.data || "提交失敗";
       Swal.fire({
-        title: '錯誤!',
+        title: "錯誤!",
         text: errorMessage,
-        icon: 'error',
-        confirmButtonText: '重新提交'
+        icon: "error",
+        confirmButtonText: "重新提交",
       });
     } else {
       Swal.fire({
-        title: '錯誤!',
-        text: '提交請假申請時發生未知錯誤',
-        icon: 'error',
-        confirmButtonText: '重新提交'
+        title: "錯誤!",
+        text: "提交請假申請時發生未知錯誤",
+        icon: "error",
+        confirmButtonText: "重新提交",
       });
     }
   }
 }
 
-
-
 // 返回上一頁
 function goBack() {
-  window.history.back()
+  window.history.back();
 }
 </script>

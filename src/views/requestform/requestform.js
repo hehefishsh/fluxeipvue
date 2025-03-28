@@ -1,6 +1,7 @@
 import LeaveRequest from "./LeaveRequest.vue";
 import WorkAdjustRequest from "./WorkAdjustRequest.vue";
 import ExpenseRequest from "./ExpenseRequest.vue";
+import MissingPunchRequest from "./MissingPunchRequest.vue";
 
 const requestformRoutes = {
   path: "/requestform",
@@ -18,6 +19,12 @@ const requestformRoutes = {
       name: "requestform-workadjust-link",
       component: WorkAdjustRequest,
       meta: { title: '加減班申請' },
+    },
+    {
+      path: "missingpunch",
+      name: "requestform-missingpunch-link",
+      component: MissingPunchRequest,
+      meta: { title: '補卡申請' },
     },
     {
       path: "expense",
