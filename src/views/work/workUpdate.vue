@@ -2,12 +2,12 @@
     <div class="card card-default form-container">
 
             <h3 class="form-title">工作內容</h3>
-            工作名稱<input v-model="work.workName" placeholder="輸入名稱" class="input-field" required  />
-            開始日期<input type="date" v-model="work.createDate" class="custom-select my-1 mr-sm-2 w-auto" required />
-            預計完成日期<input type="date" v-model="work.expectedFinishDate" class="custom-select my-1 mr-sm-2 w-auto" required />
-            完成日期<input type="date" v-model="work.finishDate" class="custom-select my-1 mr-sm-2 w-auto" required />
-            狀態<select v-model="work.status" required >
-                            <option v-for="sta in statusSelect"  :value="work.status">
+            工作名稱<input v-model="work.workName" placeholder="輸入名稱" class="input-field" />
+            開始日期<input type="date" v-model="work.createDate" class="custom-select my-1 mr-sm-2 w-auto"/>
+            預計完成日期<input type="date" v-model="work.expectedFinishDate" class="custom-select my-1 mr-sm-2 w-auto"/>
+            完成日期<input type="date" v-model="work.finishDate" class="custom-select my-1 mr-sm-2 w-auto"/>
+            狀態<select v-model="work.status" @change="workreview(work.status)">
+                            <option v-for="sta in statusSelect"  :value="sta">
                                 {{ sta }}
                             </option>
                         </select>
@@ -15,7 +15,7 @@
             <h3 class="form-title">分配工作</h3>
             <div v-for="(content, index) in contents" :key="index" class="content-group">
                 <div class="content-wrapper">
-                項目名稱<input v-model="content.taskName" :placeholder="'輸入名稱 '" class="input-field" />
+                項目名稱 {{ index+1 }}<input v-model="content.taskName" :placeholder="'輸入名稱 '" class="input-field" />
 
                 工作內容<input
                     v-model="content.taskContent" 
@@ -27,11 +27,11 @@
                             </option>
                         </select>
                 
-                開始日期<input type="date"  v-model="content.createDate" required  />
-                預計完成日期<input type="date"  v-model="content.expectedFinishDate"  required />
-                完成日期<input type="date"  v-model="content.finishDate"  required />
-                狀態<select v-model="content.status" required >
-                    <option v-for="sta in statusSelect"  :value="content.status">
+                開始日期<input type="date"  v-model="content.createDate" class="custom-select my-1 mr-sm-2 w-auto"/>
+                預計完成日期<input type="date"  v-model="content.expectedFinishDate" class="custom-select my-1 mr-sm-2 w-auto"/>
+                完成日期<input type="date"  v-model="content.finishDate" class="custom-select my-1 mr-sm-2 w-auto"/>
+                狀態<select v-model="content.status" @change="review(content.status)">
+                    <option v-for="sta in statusSelect"  :value="sta">
                         {{ sta }}
                     </option>
                 </select>
@@ -43,8 +43,8 @@
                 <button type="button" @click="addField" class="add-button">新增交辦事項</button>
           
                 <!-- 送出按鈕 -->
-                <div style="text-align: right;">
-                  <button @click="submit" class="btn btn-secondary btn-pill">修改</button>
+                <div style="text-align: right;" class="fixed-button">
+                  <button @click="submit" class="btn btn-secondary btn-pill" >修改</button>
                 </div>
     </div>
 </template>
@@ -66,12 +66,16 @@ const statusSelect=ref(["已完成","未完成"])
 async function findWork(){
     const response=await axiosapi.get(`/work/taskassign/${workId}`);
     work.value=response.data.workprogress
+    work.value.status=work.value.status.statusName
     work.value.createDate=formatDate(work.value.createDate)
     work.value.expectedFinishDate=formatDate(work.value.expectedFinishDate)
     work.value.finishDate=formatDate(work.value.finishDate)
     contents.value=response.data.taskassign
     
     contents.value = response.data.taskassign.map(item => {
+        item.employee=item.assign.employeeName
+        item.status=item.status.statusName
+        item.reveiew=employeeId
     // 格式化每個日期欄位
         if (item.createDate) {
             item.createDate = formatDate(item.createDate); // 將格式化後的日期設回到 item 中
@@ -84,12 +88,11 @@ async function findWork(){
         }
         return item;
     });
-
-    console.log(contents.value)
+    console.log(work.value)
 }
 
-// const router = useRouter();
-// // 使用 useRoute 獲取當前路由
+const router = useRouter();
+// 使用 useRoute 獲取當前路由
 // const route = useRoute();
 
 
@@ -103,50 +106,93 @@ const contents = ref([
         finishDate:"",
         employee:"" ,
         reveiew: employeeId,  
-        status:"未完成",
+        status:"",
         taskId:""
     }
 ]);
 
-// async function submit() {
-//   if(new Date(work.value.createDate) > new Date(work.value.expectedFinishDate)){
-//     Swal.fire({
-//                 title:"工作的開始日期比預計完成日期晚",
-//                 icon:"warning"
-//             })
-//             return;
-//   }
-//   for (let task of contents.value) {
-//       console.log(new Date(task.createDate) > new Date(task.expectedFinishDate));  // 列印每個 taskassign 的員工名稱
-//       if(new Date(task.createDate) > new Date(task.expectedFinishDate)){
-//         Swal.fire({
-//                 title:"分配工作的開始日期比預計完成日期晚",
-//                 icon:"warning"
-//             })
-//             return;
-//           }
-//     };
-//     const workRequest = {
-//       supervisorId: employeeId,
-//       workName: work.value.workName,
-//       createDate: work.value.createDate,
-//       expectedFinishdate: work.value.expectedFinishDate,
-//       taskassigns: contents.value,  // 這是一個對象或數組，會被自動轉換成 JSON 字符串
-//     };
-//     const response = await axiosapi.post("/workProgress/create", workRequest);
-//     if(response.data){
-//               Swal.fire({
-//                   title:"新增成功",
-//                   icon:"success"
-//               })
-//               router.push("/work/progress");
-//           }else{
-//               Swal.fire({
-//                   title:"新增失敗",
-//                   icon:"warning"
-//               })
-//           }
-// }
+async function submit() {
+    if(new Date(work.value.createDate) > new Date(work.value.expectedFinishDate)){
+        Swal.fire({
+                    title:"工作的開始日期比預計完成日期晚",
+                    icon:"warning"
+                })
+                return;
+    }
+    for (let [index, task] of contents.value.entries()) {
+        if(new Date(task.createDate) > new Date(task.expectedFinishDate)){
+            Swal.fire({
+                    title:`項目${index+1}的開始日期比預計完成日期晚`,
+                    icon:"warning"
+                })
+                return;
+            }
+        if(task.createDate==''){
+            Swal.fire({
+                    title:`項目${index+1}請輸入交辦事項的創建日期`,
+                    icon:"warning"
+                })
+            return;
+            }
+        if(task.employee==''){
+            Swal.fire({
+                    title:`項目${index+1}請輸入交辦事項的員工`,
+                    icon:"warning"
+            })
+            return;
+        }
+        if(task.expectedFinishDate==''){
+            Swal.fire({
+                    title:`項目${index+1}請輸入交辦事項的預計完成日期`,
+                    icon:"warning"
+            })
+            return;
+        }
+        if(task.taskContent==''){
+            Swal.fire({
+                    title:`項目${index+1}請輸入交辦事項的內容`,
+                    icon:"warning"
+            })
+            return;
+        }
+        if(task.taskName==''){
+            Swal.fire({
+                    title:`項目${index+1}請輸入交辦事項的名稱`,
+                    icon:"warning"
+            })
+            return;
+        }
+    };
+    const workRequest = {
+        workId:workId,
+        workName: work.value.workName,
+        createDate: work.value.createDate,
+        expectedFinishdate: work.value.expectedFinishDate,
+        finishdate: work.value.finishDate,
+        status:work.value.status,
+        taskassigns: contents.value,  // 這是一個對象或數組，會被自動轉換成 JSON 字符串
+    };
+    console.log(workRequest)
+    const response = await axiosapi.post("/workProgress/update", workRequest);
+    if(response.data){
+        Swal.fire({
+            title:"新增成功",
+            icon:"success"
+        })
+        router.push(`/work/progress/detail/${workId}`);
+    }else{
+        Swal.fire({
+            title:"新增失敗",
+            icon:"warning"
+        })
+    }
+}
+
+function workreview(data){
+    if(data=="已完成"){
+        work.value.finishDate=getTodayDate()
+    }
+}
 
 // **新增欄位**
 function addField() {
@@ -198,6 +244,18 @@ function getTodayDate() {
 </script>
 
 <style scoped>
+.fixed-button {
+    position: fixed;
+    bottom: 20px; /* 按鈕離底部 20px */
+    right: 20px;  /* 按鈕離右邊 20px */
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10%;
+    /* font-size: 16px; */
+    cursor: pointer;
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
+    transition: background-color 0.3s ease;
+}
   /* 表單容器 */
   .form-container {
     max-width: 600px;

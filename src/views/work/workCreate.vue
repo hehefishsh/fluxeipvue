@@ -79,7 +79,6 @@ async function submit() {
             return;
   }
   for (let task of contents.value) {
-      console.log(task);  // 列印每個 taskassign 的員工名稱
       if(new Date(task.createDate) > new Date(task.expectedFinishDate)){
         Swal.fire({
                 title:"分配工作的開始日期比預計完成日期晚",

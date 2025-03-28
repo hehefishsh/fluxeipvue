@@ -57,7 +57,7 @@
                                     <th class="text">開始時間</th>
                                     <th class="text">預計結束時間</th>
                                     <th class="text">結束時間</th>
-                                    <th class="text" v-if="status=='待審核'">審核</th>
+                                    <th class="text" v-if="status=='待審核'||status=='已完成'">審核</th>
                                     <th class="text"></th>
                                 </tr>
                             </thead>
@@ -73,6 +73,9 @@
                                     <td class="text" v-else>未完成</td>
                                     <td class="text" v-if="status=='待審核'">
                                         <button class="badge badge-square badge-success" @click="review(task.taskId,'已完成')">完成</button>
+                                        <button class="badge badge-square badge-warning" @click="review(task.taskId,'未完成')">重做</button>
+                                    </td>
+                                    <td class="text" v-if="status=='已完成'">
                                         <button class="badge badge-square badge-warning" @click="review(task.taskId,'未完成')">重做</button>
                                     </td>
                                     <td class="text"><i class="mdi mdi-pencil mdi-24px" @click="openModal(task.taskId)"></i></td>
@@ -194,6 +197,7 @@ async function review(data,review){
     const response =await axiosapi.put(`/taskassign/update/${data}/${review}`);
     if(response){
         findtaskAssign(status.value)
+        findwork()
     }
 }
 
@@ -270,7 +274,7 @@ function getTodayDate() {
 }
 </script>
     
-<style>
+<style  scoped>
 .fixed-button {
     position: fixed;
     bottom: 20px; /* 按鈕離底部 20px */
