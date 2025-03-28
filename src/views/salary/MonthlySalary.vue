@@ -32,13 +32,13 @@
     </div>
 
     <div>
-      <label>遲到時數：(半小時)</label>
-      <input type="number" v-model="lateHours" required disabled/>
+      <label>遲到時數：(小時)</label>
+      <input type="number" v-model="displayLateHours" required disabled/>
     </div>
 
     <div>
-      <label>早退時數：(半小時)</label>
-      <input type="number" v-model="earlyLeaveHours" required disabled/>
+      <label>早退時數：(小時)</label>
+      <input type="number" v-model="displayEarlyLeaveHours" required disabled/>
     </div>
 
     <div>
@@ -83,7 +83,7 @@
 </template>
     
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted,computed } from 'vue';
 import axios from 'axios';
 const path = import.meta.env.VITE_API_URL;
 import Swal from 'sweetalert2';
@@ -107,8 +107,13 @@ const employeeSalaryData = ref(null); // 存儲員工薪資數據
 const workData = ref({
   totalWorkHours: 0,
   leaveDays: 0,
-  lateEarlyHours: { lateHour: 0, earlyLeaveHour: 0 }
+  lateEarlyHours: { lateHour: 0, earlyLeaveHour: 0 },
+  overtimeHours:0
 });
+
+// 顯示的數值為後端數據除以 2
+const displayLateHours = computed(() => lateHours.value / 2);
+const displayEarlyLeaveHours = computed(() => earlyLeaveHours.value / 2);
 
 const fetchBonusOptions = async () => {
   try {
@@ -191,12 +196,15 @@ const fetchWorkData = async () => {
     // 假設回傳的 `lateEarlyResponse.data` 是一個 map 包含 `lateHour` 和 `earlyLeaveHour`
     workData.value.lateEarlyHours.lateHour = lateEarlyResponse.data.lateHour;
     workData.value.lateEarlyHours.earlyLeaveHour = lateEarlyResponse.data.earlyLeaveHour;
-
+    // 呼叫加班減班時數 API
+    const overtimeResponse=await axios.get(`${path}/api/salary/overtimeMinus?yearMonth=${yearMonth}&empId=${empId}`);
+    workData.value.overtimeHours=overtimeResponse.data.overtimeHours;
     // 將結果顯示在表單中
     totalHours.value = workData.value.totalWorkHours;
     leaveHours.value = workData.value.leaveDays;
     lateHours.value = workData.value.lateEarlyHours.lateHour;
     earlyLeaveHours.value = workData.value.lateEarlyHours.earlyLeaveHour;
+    overtimeHours.value=workData.value.overtimeHours;
   } catch (error) {
     console.error("獲取工作資料失敗", error);
   }
