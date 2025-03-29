@@ -4,6 +4,7 @@ import { ref, computed } from "vue";
 const useUserStore = defineStore(
   "user",
   function () {
+    const empDep = ref("");
     const empId = ref("");
     const empName = ref("");
     const empPhoto = ref("");
@@ -21,6 +22,7 @@ const useUserStore = defineStore(
     }
 
     function clear() {
+      empDep.value = "";
       empId.value = "";
       empName.value = "";
       empPhoto.value = "";
@@ -30,6 +32,7 @@ const useUserStore = defineStore(
     }
 
     function set(data) {
+      empDep.value = data.empDep;
       empId.value = data.empId;
       empName.value = data.empName;
       empPhoto.value = data.empPhoto;
@@ -47,6 +50,7 @@ const useUserStore = defineStore(
     }
 
     return {
+      empDep,
       roleName,
       empId,
       empName,
@@ -64,7 +68,7 @@ const useUserStore = defineStore(
   {
     persist: {
       storage: sessionStorage,
-      paths: ["empId", "empName", "empPhoto", "token", "roleName"],
+      paths: ["empId", "empName", "empPhoto", "token", "roleName", "empDep"],
     },
   }
 );

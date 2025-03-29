@@ -31,7 +31,7 @@
                       </thead>
                       <tbody>
                         <tr
-                          v-for="task in taskassign" :key="task.taskId">
+                          v-for="task in taskassign" :key="task.taskId" v-if="taskassign[0]!=null">
                           <td class="text">{{ task.taskName }}</td>
                           <td class="text">{{ task.taskContent }}</td>
                           <td class="text">{{ formatDate(task.createDate) }}</td>
@@ -44,6 +44,7 @@
                           <td class="text" v-if="status=='待審核'"><button class="badge badge-square badge-success" @click="review(task.taskId,'未完成')">收回審核</button>
                           </td>
                         </tr>
+                        <tr v-else><td colspan="7" class="text-center"><h3>暫無資料</h3></td></tr>
                       </tbody>
                     </table>
                   </div>

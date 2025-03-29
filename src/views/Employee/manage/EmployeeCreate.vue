@@ -2,13 +2,12 @@
         <div class="form-group">
                         <label for="employeeName">員工姓名</label>
                         <input type="text" class="form-control rounded-0" id="employeeName" placeholder="姓名"
-                            v-model="employee.employeeName" required />
+                            v-model="employee.employeeName"/>
                     </div>
         
         <div class="form-group">
                         <label for="departmentId">部門</label>
-                        <select class="form-control rounded-0" id="departmentId" v-model="employee.departmentName"
-                            required @change="positionFind">
+                        <select class="form-control rounded-0" id="departmentId" v-model="employee.departmentName" @change="positionFind">
                             <option v-for="department in departments" :key="department.departmentName"
                                 :value="department.departmentName">
                                 {{ department.departmentName }}
@@ -17,8 +16,7 @@
         </div>
         <div class="form-group">
                         <label for="departmentId">職位</label>
-                        <select class="form-control rounded-0" id="positionId" v-model="employee.positionName"
-                            required>
+                        <select class="form-control rounded-0" id="positionId" v-model="employee.positionName">
                             <option v-for="position in positions" :key="position.positionName"
                                 :value="position.positionName">
                                 {{ position.positionName }}
@@ -27,8 +25,11 @@
         </div>
         <div class="form-group">
                         <label for="startDate">入職時間</label>
-                        <input type="date" id="startDate" v-model="employee.hireDate" class="custom-select my-1 mr-sm-2 w-auto"
-                            required />
+                        <input type="date" id="startDate" v-model="employee.hireDate" class="custom-select my-1 mr-sm-2 w-auto"/>
+        </div>
+        <div class="form-group">
+                        <label for="startDate">生日</label>
+                        <input type="date" id="startDate" v-model="employee.birthday" class="custom-select my-1 mr-sm-2 w-auto"/>
         </div>
         <div>
         <label for="email">電子郵件:</label>
@@ -100,6 +101,7 @@ const employee=ref({
     gender:"",
     phone:"",
     identityCard:"",
+    birthday:"",
     hireDate:"",
     departmentName:"",
     positionName:"",
@@ -189,7 +191,17 @@ async function positionFind(){
 }
 
 function submit(){
-    console.log(employee.value)
+    Swal.fire({
+        title: "處理中",
+        text: "請稍後...",
+        icon: "info",
+        showCancelButton: false,
+        showConfirmButton: false,
+        allowOutsideClick: false,  // 禁止點擊外部關閉提示框
+        didOpen: () => {
+          Swal.showLoading();  // 顯示進度條
+        }
+    });
     axiosapi.post("/employee/create",employee.value)
     .then(function(response){
         if(response.data.success){

@@ -25,10 +25,8 @@
 
             <!-- 有的子目錄的導引欄--員工管理 -->
             <li class="has-sub expand" :class="{
-              active: /^\/employee\/manage(\/.*)?$/.test(route.path),
-            }" v-if="
-              user.roleName === '最高管理員' || user.roleName === '人資主管'
-            ">
+              active: /^\/employee\/manage(\/.*)?$/.test(route.path),}" 
+              v-if="user.roleName === '最高管理員' || user.roleName === '人資主管'">
               <a class="sidenav-item-link" href="javascript:void(0)" data-toggle="collapse" data-target="#employee"
                 aria-expanded="false" aria-controls="employee">
                 <i class="mdi mdi-account-box-multiple"></i>
@@ -64,12 +62,12 @@
               </a>
               <ul class="collapse" id="work" data-parent="#sidebar-menu">
                 <div class="sub-menu">
-                  <li>
+                  <li v-if="user.roleName != '員工'">
                     <RouterLink class="sidenav-item-link" to="/work/progress">
                       <span class="nav-text">工作事項</span>
                     </RouterLink>
                   </li>
-                  <li>
+                  <li v-if="user.roleName != '員工'">
                     <RouterLink class="sidenav-item-link" to="/work/progress/create">
                       <span class="nav-text">新增工作</span>
                     </RouterLink>

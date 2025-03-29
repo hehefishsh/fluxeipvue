@@ -105,6 +105,17 @@ function openModal(){
 const disabled=ref(false)
 const check=ref({})
 async function submit(){
+  Swal.fire({
+        title: "處理中",
+        text: "請稍後...",
+        icon: "info",
+        showCancelButton: false,
+        showConfirmButton: false,
+        allowOutsideClick: false,  // 禁止點擊外部關閉提示框
+        didOpen: () => {
+          Swal.showLoading();  // 顯示進度條
+        }
+    });
   disabled.value=true;
   const form = new FormData();
   form.append("id",check.value.id);
@@ -157,6 +168,7 @@ async function login() {
         "Authorization"
       ] = `Bearer ${response.data.token}`;
       const emp = {
+        empDep:response.data.department,
         empId: response.data.employeeId,
         empName: response.data.employeeName,
         empPhoto: response.data.photo,

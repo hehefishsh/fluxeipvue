@@ -30,7 +30,7 @@
                 開始日期<input type="date"  v-model="content.createDate" class="custom-select my-1 mr-sm-2 w-auto"/>
                 預計完成日期<input type="date"  v-model="content.expectedFinishDate" class="custom-select my-1 mr-sm-2 w-auto"/>
                 完成日期<input type="date"  v-model="content.finishDate" class="custom-select my-1 mr-sm-2 w-auto"/>
-                狀態<select v-model="content.status" @change="review(content.status)">
+                狀態<select v-model="content.status" @change="review(content.status,index)">
                     <option v-for="sta in statusSelect"  :value="sta">
                         {{ sta }}
                     </option>
@@ -44,7 +44,9 @@
           
                 <!-- 送出按鈕 -->
                 <div style="text-align: right;" class="fixed-button">
-                  <button @click="submit" class="btn btn-secondary btn-pill" >修改</button>
+                  <button @click="submit" class="mb-1 btn btn-pill btn-info" >修改</button>
+                  <button @click="clean" class="mb-1 btn btn-outline-primary btn-pill" >重置</button>
+                  <button @click="deletework" class="mb-1 btn btn-pill btn-danger" >刪除</button>
                 </div>
     </div>
 </template>
@@ -69,9 +71,10 @@ async function findWork(){
     work.value.status=work.value.status.statusName
     work.value.createDate=formatDate(work.value.createDate)
     work.value.expectedFinishDate=formatDate(work.value.expectedFinishDate)
-    work.value.finishDate=formatDate(work.value.finishDate)
+    if(work.value.finishDate){
+        work.value.finishDate=formatDate(work.value.finishDate)
+    }
     contents.value=response.data.taskassign
-    
     contents.value = response.data.taskassign.map(item => {
         item.employee=item.assign.employeeName
         item.status=item.status.statusName
@@ -163,34 +166,72 @@ async function submit() {
             return;
         }
     };
-    const workRequest = {
-        workId:workId,
-        workName: work.value.workName,
-        createDate: work.value.createDate,
-        expectedFinishdate: work.value.expectedFinishDate,
-        finishdate: work.value.finishDate,
-        status:work.value.status,
-        taskassigns: contents.value,  // 這是一個對象或數組，會被自動轉換成 JSON 字符串
-    };
-    console.log(workRequest)
-    const response = await axiosapi.post("/workProgress/update", workRequest);
-    if(response.data){
-        Swal.fire({
-            title:"新增成功",
-            icon:"success"
-        })
-        router.push(`/work/progress/detail/${workId}`);
-    }else{
-        Swal.fire({
-            title:"新增失敗",
-            icon:"warning"
-        })
-    }
+    Swal.fire({
+        title:"確定要修改嗎?",
+        icon:"question",
+        showCancelButton: true,
+        confirmButtonText: '確認',
+        cancelButtonText: '取消'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            const workRequest = {
+                workId:workId,
+                workName: work.value.workName,
+                createDate: work.value.createDate,
+                expectedFinishdate: work.value.expectedFinishDate,
+                finishdate: work.value.finishDate,
+                status:work.value.status,
+                taskassigns: contents.value,  // 這是一個對象或數組，會被自動轉換成 JSON 字符串
+            };
+            console.log(workRequest)
+            const response = await axiosapi.post("/workProgress/update", workRequest);
+            if(response.data){
+                Swal.fire({
+                    title:"修改成功",
+                    icon:"success"
+                })
+                router.push(`/work/progress/detail/${workId}`);
+            }else{
+                Swal.fire({
+                    title:"新增失敗",
+                    icon:"warning"
+                })
+            }
+        }
+    })
+}
+
+async function deletework(){
+    Swal.fire({
+        title:"確定要刪除嗎?",
+        icon:"question",
+        showCancelButton: true,
+        confirmButtonText: '確認',
+        cancelButtonText: '取消'
+    }).then(async (result) => {
+        const response =await axiosapi.delete(`/workprogress/${workId}`);
+        if(response){
+            router.push("/work/progress");
+        }
+    })
+}
+
+function clean(){
+    findWork()
+    findEmp()
 }
 
 function workreview(data){
     if(data=="已完成"){
         work.value.finishDate=getTodayDate()
+    }
+}
+
+function review(data,index){
+    if(data=="已完成"){
+        contents.value[index].finishDate=getTodayDate()
+    }else{
+        contents.value[index].finishDate=''
     }
 }
 

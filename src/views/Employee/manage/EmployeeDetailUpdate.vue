@@ -149,19 +149,16 @@ async function submitForm(){
     formData.append("phone", employee.value.phone);
     formData.append("address", employee.value.address);
     formData.append("emergencyContact", employee.value.emergencyContact);
-    formData.append("emergencyPhone", employee.value.emergencyPhone);
-
+    formData.append("energencyPhone", employee.value.energencyPhone);
     const photoFile = document.getElementById('file').files[0];
     if (photoFile) {
         formData.append("photoFile", photoFile);
     }
-console.log(formData)
     const response = await axiosapi.post("/employee/detail/update", formData, {
             headers: {
                 "Content-Type": "multipart/form-data"
             }
         });
-        console.log(response.data);
         if(response.data){
             Swal.fire({
                 title:"修改成功",

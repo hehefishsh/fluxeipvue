@@ -78,6 +78,27 @@ async function submit() {
             })
             return;
   }
+  if(work.value.workName==null){
+    Swal.fire({
+                title:"請輸入工作的名稱",
+                icon:"warning"
+            })
+            return;
+  }
+  if(work.value.createDate==''){
+    Swal.fire({
+                title:"請輸入工作的開始日期",
+                icon:"warning"
+            })
+            return;
+  }
+  if(work.value.expectedFinishDate==''){
+    Swal.fire({
+                title:"請輸入工作的預計完成日期",
+                icon:"warning"
+            })
+            return;
+  }
   for (let task of contents.value) {
       if(new Date(task.createDate) > new Date(task.expectedFinishDate)){
         Swal.fire({
@@ -86,16 +107,16 @@ async function submit() {
             })
             return;
           }
-      if(task.createDate==''){
+      if(task.employee==''){
         Swal.fire({
-                title:"請輸入交辦事項的創建日期",
+                title:"請輸入交辦事項的員工",
                 icon:"warning"
         })
         return;
       }
-      if(task.employee==''){
+      if(task.createDate==''){
         Swal.fire({
-                title:"請輸入交辦事項的員工",
+                title:"請輸入交辦事項的創建日期",
                 icon:"warning"
         })
         return;

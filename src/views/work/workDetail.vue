@@ -24,7 +24,9 @@
                     </RouterLink>
                 </div>
             </div>
+            
             <div class="card-body py-0" data-simplebar>
+                <h4>工作進度{{work.progress}}%</h4>
                 <div class="progress mb-3">
                     <div class="progress-bar" role="progressbar" :style="{ width: work.progress + '%' }" :aria-valuenow="work.progress"  aria-valuemin="0"
                     aria-valuemax="100">{{work.progress}}%

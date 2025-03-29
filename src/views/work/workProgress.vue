@@ -3,11 +3,19 @@
     <div class="col-4">
       <input type="text" class="form-control" placeholder="搜尋工作..." v-model="worksearch" @input="find">
     </div>
-    <select v-model="status" @change="find">
-            <option value="">全部</option>
-            <!-- 使用v-for來動態顯示部門選項 -->
-            <option v-for="sta in statusSelect" :value="sta">
-              {{ sta }}
+    <div v-if="user.roleName == '最高管理員'">
+    部門查詢<select v-model="department" @change="dochangeDep()" >
+              <option value="">全部</option>
+              <option v-for="department in departments" :key="department.departmentName" :value="department.departmentName">
+                {{ department.departmentName }}
+              </option>
+            </select>
+    </div>
+    狀態查詢<select v-model="status" @change="find">
+              <option value="">全部</option>
+              <!-- 使用v-for來動態顯示部門選項 -->
+              <option v-for="sta in statusSelect" :value="sta">
+                {{ sta }}
             </option>
     </select>
     <RouterLink class="btn btn-primary btn-pill" to="/work/progress/create">
@@ -45,6 +53,7 @@
 import { ref, onMounted } from "vue";
 import axiosapi from "@/plugins/axios-login";
 import useUserStore from '@/stores/user';
+const user = useUserStore();
 const worksearch=ref("")
 const works=ref({});
 const check=ref(false)
@@ -52,44 +61,88 @@ const check=ref(false)
 const status=ref("")
 const statusSelect=ref(["未完成","已完成"])
 async function find(){
-  if(status.value==''&&worksearch.value==''){
+  if(user.roleName != '最高管理員'){
+    department.value=user.empDep
+  }
+  if(status.value==''&&worksearch.value==''&&department.value==''){
     const response=await axiosapi.get("/workProgress/all");
     works.value=response.data
     check.value=false
-    console.log(works.value)
-  }else if(worksearch.value==''&&status.value!=''){
+  }else if(worksearch.value==''&&status.value!=''&&department.value==''){
     const response=await axiosapi.get(`/workProgress/findstatus/${status.value}`);
     works.value=response.data
     check.value=false
     if (response.data.length === 0) {
         check.value=true
     }
-  }else if(worksearch.value!=''&&status.value==''){
+  }else if(worksearch.value!=''&&status.value==''&&department.value==''){
     const response=await axiosapi.get(`/workProgress/findname/${worksearch.value}`);
     works.value=response.data
     check.value=false
     if (response.data.length === 0) {
         check.value=true
     }
-  }else{
+  }else if(worksearch.value!=''&&status.value!=''&&department.value==''){
     const response=await axiosapi.get(`/workProgress/find/${status.value}/${worksearch.value}`);
     works.value=response.data
     check.value=false
     if (response.data.length === 0) {
         check.value=true
     }
+  }else if(worksearch.value==''&&status.value==''&&department.value!=''){
+    const response=await axiosapi.get(`/workProgress/finddepartment/${department.value}`);
+    works.value=response.data
+    check.value=false
+    if (response.data.length === 0) {
+        check.value=true
+    }
+  }else if(worksearch.value==''&&status.value!=''&&department.value!=''){
+    console.log(department.value+status.value)
+    const response=await axiosapi.get(`/workProgress/findDepAndSta/${department.value}/${status.value}`);
+    works.value=response.data
+    check.value=false
+    if (response.data.length === 0) {
+        check.value=true
+    }
+  }else if(worksearch.value!=''&&status.value==''&&department.value!=''){
+    const response=await axiosapi.get(`/workProgress/findDepAndName/${department.value}/${worksearch.value}`);
+    works.value=response.data
+    check.value=false
+    if (response.data.length === 0) {
+        check.value=true
+    }
+  }else{
+    const response=await axiosapi.get(`/workProgress/findDepAndStaAndName/${department.value}/${status.value}/${worksearch.value}`);
+    works.value=response.data
+    check.value=false
+    if (response.data.length === 0) {
+        check.value=true
+    }
   }
-  
 }
 
-async function allwork() {
-  const response = await axiosapi.get("/workProgress/all");
-  works.value = response.data;
-  
+function dochangeDep(){
+  status.value=''
+  find()
+}
+
+const department=ref("");
+const departments = ref([]);
+async function departmentFind(){
+  if(user.roleName != '最高管理員'){
+    department.value=user.empDep
+  }
+    try {
+    const response = await axiosapi.get("/department/find");  
+    departments.value = response.data;  
+    } catch (error) {
+    console.error("獲取部門資料失敗:", error);
+    }
 }
 
 onMounted(function () {
-  allwork();
+  find();
+  departmentFind()
 });
 
 function formatDate(date) {
