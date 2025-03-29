@@ -19,6 +19,8 @@
               :key="notify.id"
               class="notify-item"
               :class="{ unread: !notify.isRead }"
+              @click="handleNotifyClick(notify)"
+              style="cursor: pointer;"
             >
               <div class="message">{{ notify.message }}</div>
               <div class="time">{{ formatTime(notify.createTime) }}</div>
@@ -37,11 +39,13 @@
   import { ref, onMounted, onUnmounted } from 'vue';
   import axios from '@/plugins/axios-login';
   import useUserStore from '@/stores/user';
+  import { useRouter } from 'vue-router';
   
   const user = useUserStore();
   const dropdownVisible = ref(false);
   const notifyList = ref([]);
   const unreadCount = ref(0);
+  const router = useRouter();
   
   function toggleDropdown() {
     dropdownVisible.value = !dropdownVisible.value;
@@ -83,6 +87,40 @@
   function formatTime(str) {
     return new Date(str).toLocaleString();
   }
+
+//點擊通知方法
+async function  handleNotifyClick(notify) {
+
+    try{
+        await axios.put(`/api/notify/read/${notify.id}`);
+
+        notify.isRead = true;
+
+
+        const unreadList = notifyList.value.filter(function(n){
+            return !n.isRead;
+        })
+        unreadCount.value = unreadList.length;
+
+        if(notify.message.includes('會議')){
+            router.push('/meeting/create');
+        }
+
+    }catch(error){
+        console.error('點擊通知失敗',error);
+    }
+    
+}
+
+
+
+
+
+
+
+
+
+
   </script>
   
   <style scoped>
