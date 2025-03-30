@@ -106,6 +106,26 @@ async function  handleNotifyClick(notify) {
             router.push('/meeting/create');
         }
 
+        if(notify.message.includes('請假申請')){
+            router.push('/requestmanage/leave');
+        }
+
+        if(notify.message.includes('假單')){
+            router.push('/requestapproval/leave');
+        }
+
+        if (notify.message.includes('《減班》申請') || notify.message.includes('《加班》申請')) {
+            router.push('/requestmanage/workadjust');
+        }
+
+        if (notify.message.includes('加班申請單') || notify.message.includes('減班申請單')) {
+            router.push('/requestapproval/workadjust');
+        }
+
+
+
+        
+
     }catch(error){
         console.error('點擊通知失敗',error);
     }
