@@ -39,15 +39,15 @@
             <table class="table table-borderless table-thead-border">
               <thead>
                 <tr>
-                  <th>申請Id</th>
-                  <th>申請人</th>
-                  <th>加減班類型</th>
-                  <th>加班日期</th>
-                  <th>時數</th>
-                  <th>原因</th>
-                  <th>申請時間</th>
-                  <th>狀態</th>
-                  <th>其他</th>
+                  <th class="text">申請Id</th>
+                  <th class="text">申請人</th>
+                  <th class="text">加減班類型</th>
+                  <th class="text">加班日期</th>
+                  <th class="text">時數</th>
+                  <th class="text">原因</th>
+                  <th class="text">申請時間</th>
+                  <th class="text">狀態</th>
+                  <th class="text">其他</th>
                 </tr>
               </thead>
               <tbody>

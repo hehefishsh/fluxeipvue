@@ -11,52 +11,6 @@
 
         <!-- 分類標籤 -->
         <div class="d-flex justify-content-between">
-          <ul
-            class="nav nav-pills mb-3 justify-content-between"
-            id="workadjust-tabs"
-            role="tablist"
-          >
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'all' }"
-                @click="activeTab = 'all'"
-                >全部</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'pending' }"
-                @click="activeTab = 'pending'"
-                >待審核</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'reviewing' }"
-                @click="activeTab = 'reviewing'"
-                >審核中</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'approved' }"
-                @click="activeTab = 'approved'"
-                >已核決</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'rejected' }"
-                @click="activeTab = 'rejected'"
-                >未核准</a
-              >
-            </li>
-          </ul>
           <div>
             <RouterLink class="btn btn-outline-primary btn-pill ms-auto" to="/"
               >返回首頁</RouterLink
@@ -66,7 +20,7 @@
 
         <!-- 篩選顯示對應的加減班資料 -->
         <div class="tab-content mt-3">
-          <div v-if="filteredWorkAdjustRequests.length">
+          <div v-if="workAdjustRequestData.length">
             <table class="table table-borderless table-thead-border">
               <thead>
                 <tr>
@@ -83,7 +37,7 @@
               </thead>
               <tbody>
                 <tr
-                  v-for="(adjustment, index) in filteredWorkAdjustRequests"
+                  v-for="(adjustment, index) in workAdjustRequestData"
                   :key="index"
                 >
                   <td class="text">{{ adjustment.requestId }}</td>
@@ -147,7 +101,6 @@ import WorkAdjustApprovalDetails from "./WorkAdjustApprovalDetails.vue";
 const user = useUserStore();
 const workAdjustRequestData = ref([]);
 const error = ref("");
-const activeTab = ref("pending"); // 預設顯示 "待審核"
 const selectedWorkAdjustRequest = ref(null);
 const actionType = ref("");
 
@@ -181,26 +134,6 @@ onMounted(async () => {
   } catch (err) {
     error.value = "無法取得加減班資料";
   }
-});
-
-// 根據標籤篩選加減班資料
-const filteredWorkAdjustRequests = computed(() => {
-  if (!Array.isArray(workAdjustRequestData.value)) return [];
-  if (activeTab.value === "all") return workAdjustRequestData.value;
-  return workAdjustRequestData.value.filter((adjustment) => {
-    switch (activeTab.value) {
-      case "pending":
-        return adjustment.status === "待審核";
-      case "reviewing":
-        return adjustment.status === "審核中";
-      case "approved":
-        return adjustment.status === "已核決";
-      case "rejected":
-        return adjustment.status === "未核准";
-      default:
-        return true;
-    }
-  });
 });
 
 // 簡單日期格式化函式，依需求調整格式
