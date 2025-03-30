@@ -5,7 +5,6 @@
         <span v-if="unreadCount > 0" class="notify-badge">{{ unreadCount }}</span>
       </button>
   
-      <!-- Dropdown 從 body 中 teleport -->
       <Teleport to="body">
         <div v-if="dropdownVisible" class="notify-dropdown">
           <header class="dropdown-header">
@@ -20,7 +19,6 @@
               class="notify-item"
               :class="{ unread: !notify.isRead }"
               @click="handleNotifyClick(notify)"
-              style="cursor: pointer;"
             >
               <div class="message">{{ notify.message }}</div>
               <div class="time">{{ formatTime(notify.createTime) }}</div>
@@ -42,222 +40,206 @@
   import { useRouter } from 'vue-router';
   
   const user = useUserStore();
+  const router = useRouter();
+  
   const dropdownVisible = ref(false);
   const notifyList = ref([]);
   const unreadCount = ref(0);
-  const router = useRouter();
+  const previousIds = ref(new Set());
+  let pollingInterval = null;
   
   function toggleDropdown() {
     dropdownVisible.value = !dropdownVisible.value;
-    if (dropdownVisible.value) fetchNotifications();
+    if (dropdownVisible.value) {
+      fetchNotifications();
+    }
   }
   
-  // 初始化時載入通知數量（不開 dropdown）
   onMounted(() => {
-    fetchNotifications();
+    fetchNotifications(); // 初次載入
+    pollingInterval = setInterval(fetchNotifications, 5000);
     document.addEventListener('click', handleClickOutside);
   });
+  
   onUnmounted(() => {
+    clearInterval(pollingInterval);
     document.removeEventListener('click', handleClickOutside);
   });
   
   function handleClickOutside(e) {
     const dropdown = document.querySelector('.notify-dropdown');
     const btn = document.querySelector('.notify-btn');
-    if (
-      dropdown &&
-      !dropdown.contains(e.target) &&
-      btn &&
-      !btn.contains(e.target)
-    ) {
+    if (dropdown && !dropdown.contains(e.target) && btn && !btn.contains(e.target)) {
       dropdownVisible.value = false;
-    }
-  }
-  
-  async function fetchNotifications() {
-    try {
-      const res = await axios.get(`/api/notify/${user.empId}`);
-      notifyList.value = res.data || [];
-      unreadCount.value = notifyList.value.filter(n => !n.isRead).length;
-    } catch (err) {
-      console.error('通知讀取失敗', err);
     }
   }
   
   function formatTime(str) {
     return new Date(str).toLocaleString();
   }
-
-//點擊通知方法
-async function  handleNotifyClick(notify) {
-
-    try{
-        await axios.put(`/api/notify/read/${notify.id}`);
-
-        notify.isRead = true;
-
-
-        const unreadList = notifyList.value.filter(function(n){
-            return !n.isRead;
-        })
-        unreadCount.value = unreadList.length;
-
-        if(notify.message.includes('會議')){
-            router.push('/meeting/create');
-        }
-
-        if(notify.message.includes('請假申請')){
-            router.push('/requestmanage/leave');
-        }
-
-        if(notify.message.includes('假單')){
-            router.push('/requestapproval/leave');
-        }
-
-        if (notify.message.includes('《減班》申請') || notify.message.includes('《加班》申請')) {
-            router.push('/requestmanage/workadjust');
-        }
-
-        if (notify.message.includes('加班申請單') || notify.message.includes('減班申請單')) {
-            router.push('/requestapproval/workadjust');
-        }
-
-
-
-        
-
-    }catch(error){
-        console.error('點擊通知失敗',error);
+  
+  async function fetchNotifications() {
+    try {
+      const res = await axios.get(`/api/notify/${user.empId}`);
+      const newList = res.data || [];
+  
+      // 檢查是否有新通知
+      const currentIds = new Set(newList.map(n => n.id));
+      const newNotifies = newList.filter(n => !previousIds.value.has(n.id));
+  
+      if (newNotifies.length > 0) {
+        console.log('有新通知來了！', newNotifies);
+        // 這裡可以加 toast 通知提示
+      }
+  
+      notifyList.value = newList;
+      unreadCount.value = newList.filter(n => !n.isRead).length;
+      previousIds.value = currentIds;
+    } catch (err) {
+      console.error('通知讀取失敗', err);
     }
-    
-}
-
-
-
-
-
-
-
-
-
-
+  }
+  
+  async function handleNotifyClick(notify) {
+    try {
+      await axios.put(`/api/notify/read/${notify.id}`);
+      notify.isRead = true;
+  
+      unreadCount.value = notifyList.value.filter(n => !n.isRead).length;
+  
+      if (notify.message.includes('會議')) {
+        router.push('/meeting/create');
+      } else if (notify.message.includes('假單')) {
+        router.push('/requestapproval/leave');
+      } else if (notify.message.includes('請假申請')) {
+        router.push('/requestmanage/leave');
+      } else if (notify.message.includes('《減班》申請') || notify.message.includes('《加班》申請')) {
+        router.push('/requestmanage/workadjust');
+      } else if (notify.message.includes('加班單') || notify.message.includes('減班單')) {
+        router.push('/requestapproval/workadjust');
+      } else if (notify.message.includes('薪資查詢')) {
+        router.push('/salary/detail');
+      }
+  
+    } catch (error) {
+      console.error('點擊通知失敗', error);
+    }
+  }
   </script>
   
   <style scoped>
-  
   .notify-btn {
-  position: relative;
-  background: none;
-  border: none;
-  padding: 0;
-  margin: 0 1px;
-  cursor: pointer;
-}
-
-.notify-icon {
-  font-size: 30px;
-  color: #333;
-}
-
-.notify-badge {
-  position: absolute;
-  top: -2px;
-  right: -4px;
-  background: #f54281;
-  color: white;
-  border-radius: 50%;
-  padding: 1px 5px;
-  font-size: 10px;
-  font-weight: bold;
-  min-width: 16px;
-  height: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.notify-dropdown {
-  position: fixed;
-  top: 56px;
-  right: 16px;
-  width: 320px;
-  max-width: 90vw;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
-  z-index: 99999;
-  overflow: hidden;
-  font-size: 14.5px;
-}
-
-.dropdown-header {
-  background-color: #f8f9fa;
-  padding: 10px 14px;
-  font-weight: bold;
-  border-bottom: 1px solid #eee;
-}
-
-.dropdown-body {
-  max-height: 280px;
-  overflow-y: auto;
-}
-
-.notify-item {
-  padding: 12px 16px;
-  border-bottom: 1px solid #f4f4f4;
-  background-color: #fff7e0; /* 淡黃背景 */
-  margin: 6px 10px;
-  border-radius: 6px;
-}
-
-.notify-item.unread {
-  background-color: 	#D2E9FF;
-}
-
-.message {
-  margin-bottom: 4px;
-  line-height: 1.4;
-  color: #000;
-  font-weight: 500;
-}
-
-.message strong {
-  color: #000;
-  font-weight: bold;
-}
-
-.time {
-  font-size: 12px;
-  color: #444;
-}
-
-.empty {
-  text-align: center;
-  color: #aaa;
-  padding: 20px 12px;
-}
-
-.dropdown-footer {
-  padding: 8px;
-  text-align: center;
-  background-color: #f9f9f9;
-  border-top: 1px solid #eee;
-}
-
-.dropdown-footer button {
-  font-size: 12px;
-  padding: 4px 8px;
-  background: #f0f0f0;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.dropdown-footer button:hover {
-  background: #e0e0e0;
-}
-
-
+    position: relative;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0 1px;
+    cursor: pointer;
+  }
+  
+  .notify-icon {
+    font-size: 30px;
+    color: #333;
+  }
+  
+  .notify-badge {
+    position: absolute;
+    top: -2px;
+    right: -4px;
+    background: #f54281;
+    color: white;
+    border-radius: 50%;
+    padding: 1px 5px;
+    font-size: 10px;
+    font-weight: bold;
+    min-width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .notify-dropdown {
+    position: fixed;
+    top: 56px;
+    right: 16px;
+    width: 320px;
+    max-width: 90vw;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+    z-index: 99999;
+    overflow: hidden;
+    font-size: 14.5px;
+  }
+  
+  .dropdown-header {
+    background-color: #f8f9fa;
+    padding: 10px 14px;
+    font-weight: bold;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .dropdown-body {
+    max-height: 280px;
+    overflow-y: auto;
+  }
+  
+  .notify-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f4f4f4;
+    background-color: #fff7e0;
+    margin: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  .notify-item.unread {
+    background-color: #D2E9FF;
+  }
+  
+  .message {
+    margin-bottom: 4px;
+    line-height: 1.4;
+    color: #000;
+    font-weight: 500;
+  }
+  
+  .message strong {
+    color: #000;
+    font-weight: bold;
+  }
+  
+  .time {
+    font-size: 12px;
+    color: #444;
+  }
+  
+  .empty {
+    text-align: center;
+    color: #aaa;
+    padding: 20px 12px;
+  }
+  
+  .dropdown-footer {
+    padding: 8px;
+    text-align: center;
+    background-color: #f9f9f9;
+    border-top: 1px solid #eee;
+  }
+  
+  .dropdown-footer button {
+    font-size: 12px;
+    padding: 4px 8px;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  
+  .dropdown-footer button:hover {
+    background: #e0e0e0;
+  }
   </style>
   
