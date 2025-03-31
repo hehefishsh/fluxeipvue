@@ -194,11 +194,11 @@ h1 {
 
 /* 重設按鈕樣式 */
 .btn-reset {
-  background-color: #f44336;
+background-color: #2705e7;
 }
 
 .btn-reset:hover {
-  background-color: #e53935;
+background-color: #4f32f1;
 }
 
 /* 標籤文字樣式 */
