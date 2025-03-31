@@ -3,6 +3,7 @@ import useUserStore from "@/stores/user";
 import MonthlySalary from "./MonthlySalary.vue";
 import SalaryDetail from "./SalaryDetail.vue";
 import SalaryManage from "./SalaryManage.vue";
+import bonusSetting from "./bonusSetting.vue";
 
 const adminRoles = ["最高管理員", "次等管理員"]; // 管理員角色
 const userRoles = ["行政主管", "人資主管", "業務主管", "技術主管"]; // 普通角色
@@ -61,6 +62,20 @@ const salaryRoutes = {
             name: "salary-detail-link",
             component: SalaryDetail,
             meta: { title: '薪資明細' }
+        },
+        {
+            path: "bonus",
+            name: "salary-bonus-link",
+            component: bonusSetting,
+            meta: { title: '獎金津貼' },
+            beforeEnter: (to, from, next) => {
+                const userStore = useUserStore();
+                if ([...salarySettingRole].includes(userStore.roleName)) {
+                    next(); // 所有指定角色均允許訪問
+                } else {
+                    next("/403"); // 未授權角色禁止
+                }
+            },
         },
     ],
 };
