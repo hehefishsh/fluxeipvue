@@ -7,61 +7,29 @@
           {{ error }}
         </div>
         <div class="d-flex justify-content-between">
-          <ul
-            class="nav nav-pills mb-3 justify-content-between"
-            id="pills-tab12"
-            role="tablist"
-          >
+          <ul class="nav nav-pills mb-3 justify-content-between" id="pills-tab12" role="tablist">
             <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'all' }"
-                @click="activeTab = 'all'"
-                href="#"
-                >全部</a
-              >
+              <a class="nav-link" :class="{ active: activeTab === 'all' }" @click="activeTab = 'all'" href="#">全部</a>
             </li>
             <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'pending' }"
-                @click="activeTab = 'pending'"
-                href="#"
-                >待審核</a
-              >
+              <a class="nav-link" :class="{ active: activeTab === 'pending' }" @click="activeTab = 'pending'"
+                href="#">待審核</a>
             </li>
             <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'reviewing' }"
-                @click="activeTab = 'reviewing'"
-                href="#"
-                >審核中</a
-              >
+              <a class="nav-link" :class="{ active: activeTab === 'reviewing' }" @click="activeTab = 'reviewing'"
+                href="#">審核中</a>
             </li>
             <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'approved' }"
-                @click="activeTab = 'approved'"
-                href="#"
-                >已核決</a
-              >
+              <a class="nav-link" :class="{ active: activeTab === 'approved' }" @click="activeTab = 'approved'"
+                href="#">已核決</a>
             </li>
             <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'rejected' }"
-                @click="activeTab = 'rejected'"
-                href="#"
-                >未核准</a
-              >
+              <a class="nav-link" :class="{ active: activeTab === 'rejected' }" @click="activeTab = 'rejected'"
+                href="#">未核准</a>
             </li>
           </ul>
           <div>
-            <RouterLink class="btn btn-outline-primary btn-pill ms-auto" to="/"
-              >返回首頁</RouterLink
-            >
+            <RouterLink class="btn btn-outline-primary btn-pill ms-auto" to="/">返回首頁</RouterLink>
           </div>
         </div>
 
@@ -79,13 +47,11 @@
                   <th class="text">附件</th>
                   <th class="text" style="width: 5%">狀態</th>
                   <th class="text">其他</th>
+                  <th class="text">操作</th>
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  v-for="(expense, index) in filteredExpenseRequests"
-                  :key="index"
-                >
+                <tr v-for="(expense, index) in filteredExpenseRequests" :key="index">
                   <td>{{ expense.expenseRequestId }}</td>
                   <td>{{ expense.employeeName }}</td>
                   <td>{{ expense.expenseType }}</td>
@@ -93,16 +59,12 @@
                   <td>{{ expense.description }}</td>
                   <td>{{ formatDate(expense.submittedAt) }}</td>
                   <td>
-                    <button
-                      v-if="expense.attachmentName"
-                      @click="
-                        downloadFile(
-                          expense.attachmentName,
-                          expense.attachmentPath
-                        )
-                      "
-                      class="badge badge-primary"
-                    >
+                    <button v-if="expense.attachmentName" @click="
+                      downloadFile(
+                        expense.attachmentName,
+                        expense.attachmentPath
+                      )
+                      " class="badge badge-primary">
                       下載附件
                     </button>
                     <span v-else>無</span>
@@ -110,13 +72,15 @@
                   </td>
                   <td>{{ expense.status }}</td>
                   <td>
-                    <button
-                      class="badge badge-info"
-                      @click="showModal(expense)"
-                      data-toggle="modal"
-                      data-target="#expenseRequestModal"
-                    >
+                    <button class="badge badge-info" @click="showModal(expense)" data-toggle="modal"
+                      data-target="#expenseRequestModal">
                       查看詳情
+                    </button>
+                  </td>
+                  <td class="text">
+                    <button v-if="expense.status === '待審核'" class="badge badge-danger"
+                      @click="deleteExpenseRequest(expense.expenseRequestId)">
+                      刪除
                     </button>
                   </td>
                 </tr>
@@ -157,7 +121,7 @@ onMounted(async () => {
     );
     expenseRequestData.value = response.data;
   } catch (err) {
-    error.value = "無法獲取費用申請資料";
+    error.value = "無法取得費用申請資料";
   }
 });
 
@@ -221,6 +185,55 @@ function downloadFile(attachmentName, attachmentPath) {
       Swal.fire({ title: "下載失敗: " + error.message, icon: "error" });
     });
 }
+
+// 刪除費用資料
+const deleteExpenseRequest = async (expenseRequestId) => {
+  const result = await Swal.fire({
+    title: "您確定要刪除此費用申請單嗎？",
+    text: "此操作無法撤回！",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "確定",
+    cancelButtonText: "取消",
+  });
+
+  if (result.isConfirmed) {
+    try {
+      const response = await axiosapi.delete(`/api/expense-requests/${expenseRequestId}`);
+      if (response.status === 204) {
+        Swal.fire({
+          title: "刪除成功",
+          icon: "success",
+        });
+        // 重新載入資料
+        reloadData();
+      } else {
+        Swal.fire({
+          title: "刪除失敗",
+          icon: "error",
+        });
+      }
+    } catch (err) {
+      Swal.fire({
+        title: "刪除失敗",
+        text: err.message,
+        icon: "error",
+      });
+    }
+  }
+};
+
+// 重新載入費用申請資料
+const reloadData = async () => {
+  try {
+    const response = await axiosapi.get(`/api/expense-requests/employee/${user.empId}`);
+    expenseRequestData.value = response.data;
+  } catch (err) {
+    error.value = "無法取得費用申請資料";
+  }
+};
 </script>
 
 <style scoped>

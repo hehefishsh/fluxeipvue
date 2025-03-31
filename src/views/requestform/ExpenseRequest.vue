@@ -2,35 +2,23 @@
   <div class="card card-default" id="expense-request">
     <div class="card-header">
       <h2>費用申請</h2>
+      <button type="button" @click="fillDemoData" class="badge badge-pill badge-info">Demo</button>
     </div>
     <div class="card-body py-0" data-simplebar>
       <form @submit.prevent="submitExpenseRequest" class="form-group">
         <!-- 申請人（自動填入） -->
         <div class="form-group">
           <label for="employee">申請人</label>
-          <input
-            type="text"
-            id="employee"
-            class="form-control rounded-0"
-            v-model="currentEmployeeName"
-            readonly
-          />
+          <input type="text" id="employee" class="form-control rounded-0" v-model="currentEmployeeName" readonly />
         </div>
 
         <!-- 費用類型 -->
         <div class="form-group">
-          <label for="expenseType"> <font color="red">*</font>費用類型 </label>
-          <select
-            id="expenseType"
-            class="form-control rounded-0"
-            v-model="expenseRequest.expenseTypeId"
-            required
-          >
-            <option
-              v-for="type in expenseTypes"
-              :key="type.id"
-              :value="type.id"
-            >
+          <label for="expenseType">
+            <font color="red">*</font>費用類型
+          </label>
+          <select id="expenseType" class="form-control rounded-0" v-model="expenseRequest.expenseTypeId" required>
+            <option v-for="type in expenseTypes" :key="type.id" :value="type.id">
               {{ type.typeName }}
             </option>
           </select>
@@ -38,43 +26,30 @@
 
         <!-- 費用金額 -->
         <div class="form-group">
-          <label for="amount"> <font color="red">*</font>費用金額 </label>
+          <label for="amount">
+            <font color="red">*</font>費用金額
+          </label>
           <div class="input-group">
-            <input
-              type="number"
-              id="amount"
-              class="form-control rounded-0"
-              v-model.number="expenseRequest.amount"
-              placeholder="金額"
-              required
-              min="1"
-            />
+            <input type="number" id="amount" class="form-control rounded-0" v-model.number="expenseRequest.amount"
+              placeholder="金額" required min="1" />
             <span class="input-group-text">元</span>
           </div>
         </div>
 
         <!-- 描述 -->
         <div class="form-group">
-          <label for="description"> <font color="red">*</font>說明 </label>
-          <textarea
-            id="description"
-            class="form-control rounded-0"
-            v-model="expenseRequest.description"
-            required
-            maxlength="200"
-          ></textarea>
+          <label for="description">
+            <font color="red">*</font>說明
+          </label>
+          <textarea id="description" class="form-control rounded-0" v-model="expenseRequest.description" required
+            maxlength="200"></textarea>
           <small class="form-text text-muted">最多可輸入 200 字。</small>
         </div>
 
         <!-- 附件 -->
         <div class="form-group">
           <label for="attachments">附件</label>
-          <input
-            type="file"
-            id="attachments"
-            class="form-control rounded-0"
-            @change="handleFileUpload"
-          />
+          <input type="file" id="attachments" class="form-control rounded-0" @change="handleFileUpload" />
         </div>
 
         <!-- 按鈕區 -->
@@ -175,6 +150,18 @@ async function submitExpenseRequest() {
       confirmButtonText: "重新提交",
     });
   }
+}
+
+// Demo 鈕
+function fillDemoData() {
+  const businessExpense = expenseTypes.value.find(type => type.typeName === "差旅費用");
+  if (businessExpense) {
+    expenseRequest.expenseTypeId = businessExpense.id;
+  }
+
+  expenseRequest.amount = 15000;
+  expenseRequest.description = "0410台北出差費用";
+
 }
 
 // 返回上一頁

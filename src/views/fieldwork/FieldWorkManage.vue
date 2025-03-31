@@ -10,46 +10,21 @@
         </div>
 
         <div class="d-flex justify-content-between">
-          <ul
-            class="nav nav-pills mb-3 justify-content-between"
-            id="pills-tab12"
-            role="tablist"
-          >
+          <ul class="nav nav-pills mb-3 justify-content-between" id="pills-tab12" role="tablist">
             <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'all' }"
-                @click="activeTab = 'all'"
-                href="#"
-                >全部</a
-              >
+              <a class="nav-link" :class="{ active: activeTab === 'all' }" @click="activeTab = 'all'" href="#">全部</a>
             </li>
             <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'unrecord' }"
-                @click="activeTab = 'unrecord'"
-                href="#"
-                >未填寫</a
-              >
+              <a class="nav-link" :class="{ active: activeTab === 'unrecord' }" @click="activeTab = 'unrecord'"
+                href="#">未填寫</a>
             </li>
             <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'uncompleted' }"
-                @click="activeTab = 'uncompleted'"
-                href="#"
-                >更新中</a
-              >
+              <a class="nav-link" :class="{ active: activeTab === 'uncompleted' }" @click="activeTab = 'uncompleted'"
+                href="#">更新中</a>
             </li>
             <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'completed' }"
-                @click="activeTab = 'completed'"
-                href="#"
-                >已完成</a
-              >
+              <a class="nav-link" :class="{ active: activeTab === 'completed' }" @click="activeTab = 'completed'"
+                href="#">已完成</a>
             </li>
           </ul>
           <div>
@@ -76,10 +51,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  v-for="(record, index) in filteredFieldWorkRecords"
-                  :key="index"
-                >
+                <tr v-for="(record, index) in filteredFieldWorkRecords" :key="index">
                   <td>{{ record.recordId }}</td>
                   <td>{{ record.employeeId }}-{{ record.employeeName }}</td>
                   <td class="highlinestar">
@@ -90,24 +62,16 @@
                   <td>{{ record.purpose }}</td>
                   <td>{{ record.status }}</td>
                   <td>
-                    <button
-                      v-if="record.status !== '已完成'"
-                      class="badge badge-secondary"
-                      @click="showUpdateModal(record)"
-                      data-toggle="modal"
-                      data-target="#fieldWorkUpdateModal"
-                    >
-                      更新
-                    </button>
-                    <button
-                      v-else
-                      class="badge badge-info"
-                      @click="showDetailModal(record)"
-                      data-toggle="modal"
-                      data-target="#fieldWorkDetailModal"
-                    >
-                      查看詳情
-                    </button>
+                    <h5>
+                      <button v-if="record.status !== '已完成'" class="badge badge-secondary"
+                        @click="showUpdateModal(record)" data-toggle="modal" data-target="#fieldWorkUpdateModal">
+                        更新
+                      </button>
+                      <button v-else class="badge badge-info" @click="showDetailModal(record)" data-toggle="modal"
+                        data-target="#fieldWorkDetailModal">
+                        查看詳情
+                      </button>
+                    </h5>
                   </td>
                 </tr>
               </tbody>
@@ -120,10 +84,7 @@
         <div class="bg-white py-4"></div>
       </div>
     </div>
-    <FieldWorkUpdateModal
-      :fieldWorkRecord="selectedFieldWorkRecord"
-      @update:fieldWorkRecord="reloadData"
-    />
+    <FieldWorkUpdateModal :fieldWorkRecord="selectedFieldWorkRecord" @update:fieldWorkRecord="reloadData" />
     <FieldWorkDetailModal :fieldWorkRecord="selectedFieldWorkRecord" />
   </div>
 </template>

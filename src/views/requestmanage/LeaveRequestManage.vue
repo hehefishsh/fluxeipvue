@@ -13,67 +13,32 @@
         </div>
         <!-- 分類標籤 -->
         <div class="d-flex justify-content-between">
-          <ul
-            class="nav nav-pills mb-3 justify-content-between"
-            id="pills-tab12"
-            role="tablist"
-          >
+          <ul class="nav nav-pills mb-3 justify-content-between" id="pills-tab12" role="tablist">
             <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'all' }"
-                @click="activeTab = 'all'"
-                id="pills-home-tab"
-                data-toggle="pill"
-                href="#pills-home-custom-pill"
-                role="tab"
-                aria-controls="pills-home"
-                aria-selected="true"
-                >全部</a
-              >
+              <a class="nav-link" :class="{ active: activeTab === 'all' }" @click="activeTab = 'all'"
+                id="pills-home-tab" data-toggle="pill" href="#pills-home-custom-pill" role="tab"
+                aria-controls="pills-home" aria-selected="true">全部</a>
             </li>
             <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'pending' }"
-                @click="activeTab = 'pending'"
-                href="#"
-                >待審核</a
-              >
+              <a class="nav-link" :class="{ active: activeTab === 'pending' }" @click="activeTab = 'pending'"
+                href="#">待審核</a>
             </li>
             <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'reviewing' }"
-                @click="activeTab = 'reviewing'"
-                href="#"
-                >審核中</a
-              >
+              <a class="nav-link" :class="{ active: activeTab === 'reviewing' }" @click="activeTab = 'reviewing'"
+                href="#">審核中</a>
             </li>
             <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'approved' }"
-                @click="activeTab = 'approved'"
-                href="#"
-                >已核決</a
-              >
+              <a class="nav-link" :class="{ active: activeTab === 'approved' }" @click="activeTab = 'approved'"
+                href="#">已核決</a>
             </li>
             <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'rejected' }"
-                @click="activeTab = 'rejected'"
-                href="#"
-                >未核准</a
-              >
+              <a class="nav-link" :class="{ active: activeTab === 'rejected' }" @click="activeTab = 'rejected'"
+                href="#">未核准</a>
             </li>
           </ul>
           <!-- 返回首頁按鈕，靠右對齊 -->
           <div>
-            <RouterLink class="btn btn-outline-primary btn-pill ms-auto" to="/"
-              >返回首頁</RouterLink
-            >
+            <RouterLink class="btn btn-outline-primary btn-pill ms-auto" to="/">返回首頁</RouterLink>
           </div>
         </div>
 
@@ -99,13 +64,11 @@
                   <th class="text">附件</th>
                   <th class="text">狀態</th>
                   <th class="text">其他</th>
+                  <th class="text">操作</th>
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  v-for="(leave, index) in filteredLeaveRequests"
-                  :key="index"
-                >
+                <tr v-for="(leave, index) in filteredLeaveRequests" :key="index">
                   <td class="text">{{ leave.leaveRequestId }}</td>
                   <td class="text">{{ leave.employeeName }}</td>
                   <td class="text">{{ leave.leaveType }}</td>
@@ -121,13 +84,9 @@
                     {{ formatDateSecond(leave.submittedAt) }}
                   </td>
                   <td class="text">
-                    <button
-                      v-if="leave.attachmentName"
-                      @click="
-                        downloadfile(leave.attachmentName, leave.attachmentPath)
-                      "
-                      class="badge badge-primary"
-                    >
+                    <button v-if="leave.attachmentName" @click="
+                      downloadfile(leave.attachmentName, leave.attachmentPath)
+                      " class="badge badge-primary">
                       下載附件
                     </button>
                     <span v-else>無</span>
@@ -136,13 +95,15 @@
                   <td class="text">{{ leave.status }}</td>
                   <td class="text">
                     <!-- <RouterLink :to="`/requestmanage/leave-request-details/${leave.leaveRequestId}`" >查看詳情</RouterLink> -->
-                    <button
-                      class="badge badge-info"
-                      @click="showModal(leave)"
-                      data-toggle="modal"
-                      data-target="#leaveRequestModal"
-                    >
+                    <button class="badge badge-info" @click="showModal(leave)" data-toggle="modal"
+                      data-target="#leaveRequestModal">
                       查看詳情
+                    </button>
+                  </td>
+                  <td class="text">
+                    <button v-if="leave.status === '待審核'" class="badge badge-danger"
+                      @click="deleteLeaveRequest(leave.leaveRequestId)">
+                      刪除
                     </button>
                   </td>
                 </tr>
@@ -187,7 +148,7 @@ onMounted(async () => {
     );
     leaveRequestData.value = response.data;
   } catch (err) {
-    error.value = "無法獲取請假資料";
+    error.value = "無法取得請假資料";
   }
 });
 
@@ -280,6 +241,55 @@ function downloadfile(attachmentName, attachmentPath) {
       });
     });
 }
+
+// 刪除請假資料
+const deleteLeaveRequest = async (leaveRequestId) => {
+  const result = await Swal.fire({
+    title: "您確定要刪除此請假單嗎？",
+    text: "此操作無法撤回！",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "確定",
+    cancelButtonText: "取消",
+  });
+
+  if (result.isConfirmed) {
+    try {
+      const response = await axiosapi.delete(`/api/leave-requests/${leaveRequestId}`);
+      if (response.status === 204) {
+        Swal.fire({
+          title: "刪除成功",
+          icon: "success",
+        });
+        // 重新載入資料
+        reloadData();
+      } else {
+        Swal.fire({
+          title: "刪除失敗",
+          icon: "error",
+        });
+      }
+    } catch (err) {
+      Swal.fire({
+        title: "刪除失敗",
+        text: err.message,
+        icon: "error",
+      });
+    }
+  }
+};
+
+// 重新載入請假資料
+const reloadData = async () => {
+  try {
+    const response = await axiosapi.get(`/api/leave-requests/employee/${user.empId}`);
+    leaveRequestData.value = response.data;
+  } catch (err) {
+    error.value = "無法取得請假資料";
+  }
+};
 </script>
 
 <style scoped>
