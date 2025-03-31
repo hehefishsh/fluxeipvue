@@ -16,8 +16,7 @@
 
         <div class="mb-3">
           <label class="form-label">部門：</label>
-          <select class="form-select" v-model="departmentName">
-            <option value="">選擇部門</option>
+          <select class="form-select" v-model="departmentName" disabled>
             <option v-for="dep in departments" :key="dep.departmentId" :value="dep.departmentName">
               {{ dep.departmentName }}
             </option>
@@ -46,7 +45,7 @@
     
 <script setup>
 import axios from "axios";
-import { ref,onMounted } from "vue";
+import { ref,onMounted,watch } from "vue";
 import { useRouter } from "vue-router";
 import Swal from "sweetalert2";
 
@@ -58,8 +57,10 @@ const startTime=ref("")
 const finishTime=ref("")
 const departmentName = ref("");
 const departments = ref([]);
+const contacts = ref([]);
 const path = import.meta.env.VITE_API_URL;
-
+import useUserStore from "@/stores/user";
+const userStore=useUserStore()
 
 onMounted(async () => {
     try {
@@ -68,6 +69,18 @@ onMounted(async () => {
     } catch (error) {
     console.error("取得部門資料失敗:", error);
     }
+    try {
+    const res = await axios.get(`${path}/api/contacts`);
+    contacts.value = res.data; // 取得班別資料    
+  } catch (error) {
+    console.error("取得員工資料失敗:", error);
+  }
+});
+watch(contacts, (newContacts) => {
+const contact = newContacts.find((emp) => emp.empId === userStore.empId);
+const department= departments.value.find(dep => dep.departmentName === contact.department);
+departmentName.value=department.departmentName
+console.log(departmentName)
 });
 const saveShiftType = async () => {
   try {

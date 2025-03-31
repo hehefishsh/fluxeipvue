@@ -1,4 +1,6 @@
 <template>
+      <div class="container">
+
   <form @submit.prevent="submitForm">
     <div>
         <label class="form-label">選擇部門：</label>
@@ -63,12 +65,12 @@
           <option v-for="bonusOption in availableBonusOptions(index)" 
                   :key="bonusOption.salaryBonusId" 
                   :value="bonusOption">
-            {{ bonusOption.bonusType }}
+            {{ bonusOption.bonusType }}:{{ bonusOption.amount }}元
           </option>
         </select>
         <button type="button" @click="removeBonus(index)">移除</button>
       </div>
-      <button type="button" @click="addBonus">新增獎金/津貼</button>
+      <button type="button" @click="addBonus" class="px-4 py-2 border border-black text-sm text-gray-700 rounded-md hover:bg-gray-100 transition">新增獎金/津貼</button>
     </div>
 
     <!-- 年終獎金的輸入框只顯示一次，v-model 為 yearEndBonus -->
@@ -76,10 +78,13 @@
       <label>年終獎金：</label>
       <input type="number" v-model="yearEndBonus" placeholder="請輸入年終獎金" />
     </div>
-
+    <div>
+      <label>實得薪資：</label>
+      <input type="number" v-model="earnedSalary" required disabled/>
+    </div>
     <button type="submit">提交</button>
   </form>
-
+      </div>
 </template>
     
 <script setup>
@@ -101,6 +106,7 @@ const healthInsurance = ref(0);
 const bonusOptions = ref([]);
 const selectedBonuses = ref([]);
 const yearEndBonus = ref(0);  // 年終獎金的變數，預設為 0
+const earnedSalary=ref(0)
 const departments = ref([]); // 部門列表
 const selectedDepartment = ref(""); // 已選擇的部門
 const employeeSalaryData = ref(null); // 存儲員工薪資數據
@@ -108,7 +114,8 @@ const workData = ref({
   totalWorkHours: 0,
   leaveDays: 0,
   lateEarlyHours: { lateHour: 0, earlyLeaveHour: 0 },
-  overtimeHours:0
+  overtimeHours:0,
+  earnedSalary:0
 });
 
 // 顯示的數值為後端數據除以 2
@@ -176,7 +183,6 @@ const fetchInsurance = async (salary) => {
 };
 
 const fetchWorkData = async () => {
-    console.log(selectedMonth.value)
   if (!selectedEmployee.value || !selectedMonth.value) return;
   
   try {
@@ -199,17 +205,46 @@ const fetchWorkData = async () => {
     // 呼叫加班減班時數 API
     const overtimeResponse=await axios.get(`${path}/api/salary/overtimeMinus?yearMonth=${yearMonth}&empId=${empId}`);
     workData.value.overtimeHours=overtimeResponse.data.overtimeHours;
+
     // 將結果顯示在表單中
     totalHours.value = workData.value.totalWorkHours;
     leaveHours.value = workData.value.leaveDays;
     lateHours.value = workData.value.lateEarlyHours.lateHour;
     earlyLeaveHours.value = workData.value.lateEarlyHours.earlyLeaveHour;
     overtimeHours.value=workData.value.overtimeHours;
+    fetchEarnedSalary();
   } catch (error) {
     console.error("獲取工作資料失敗", error);
   }
 };
-
+const fetchEarnedSalary=async()=>{
+  const bonuses = selectedBonuses.value
+    .filter(bonus => bonus?.salaryBonusId !== 'year-end-bonus')  // 假設年終獎金的 ID 是 'yearEnd'
+    .map(bonus => bonus?.salaryBonusId);
+  try{
+    const payload = {
+    employeeId: selectedEmployee.value,
+    yearMonth: selectedMonth.value,
+    monthlyRegularHours: totalHours.value,  // 薪資中的總工時
+    overtimeHours: overtimeHours.value,
+    lateHours: lateHours.value,
+    earlyLeaveHours: earlyLeaveHours.value,
+    leaveDays: leaveHours.value,  // 請假時數
+    healthInsurance: healthInsurance.value,
+    laborInsurance: laborInsurance.value,
+    bonuses: bonuses ,  // 獎金ID列表
+    yearEnd: yearEndBonus.value  // 年終獎金
+  };
+    // 呼叫加班減班時數 API
+    const earnedSalaryResponse=await axios.post(`${path}/api/salary/earnedSalary`,payload);
+    workData.value.earnedSalary=earnedSalaryResponse.data;
+    earnedSalary.value=workData.value.earnedSalary
+    console.log(earnedSalaryResponse.data)
+  }
+  catch (error) {
+    console.error("獲取earnedSalary失敗", error);
+  }
+}
 const availableBonusOptions = (index) => {
   return bonusOptions.value.filter(option => 
     !selectedBonuses.value.some((b, i) => b?.salaryBonusId === option.salaryBonusId && i !== index)
@@ -246,11 +281,10 @@ const submitForm = async () => {
     bonuses: bonuses ,  // 獎金ID列表
     yearEnd: yearEndBonus.value  // 年終獎金
   };
-  console.log(payload)
   try {
     const response = await axios.post(`${path}/api/salary/detail`, payload);
 await Swal.fire({
-    title: "更新成功!",
+    title: response.data.message,
     icon: "success",
     confirmButtonText: "確定",
   });
@@ -268,5 +302,15 @@ onMounted(fetchBonusOptions);
 </script>
     
 <style scoped>
-    
+    /* 通用容器設置 */
+.container {
+  width: fit-content; /* 容器寬度自適應 */
+margin: 20px auto;
+padding: 20px;
+background-color: #f9f9f9;
+border-radius: 8px;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+text-align: center;
+}
+
 </style>
