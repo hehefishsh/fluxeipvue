@@ -26,10 +26,10 @@
           </button>
         </div>
 
-        <div v-if="errorMessage" class="alert alert-danger">
+        <div v-if="errorMessage" class="alert alert-danger m-5 text-center">
           {{ errorMessage }}
         </div>
-        <div v-if="message" class="alert alert-success">{{ message }}</div>
+        <div v-if="message" class="alert alert-success m-5 text-center">{{ message }}</div>
 
         <br />
         <div>
