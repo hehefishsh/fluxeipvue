@@ -11,52 +11,6 @@
 
         <!-- 分類標籤 -->
         <div class="d-flex justify-content-between">
-          <ul
-            class="nav nav-pills mb-3 justify-content-between"
-            id="workadjust-tabs"
-            role="tablist"
-          >
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'all' }"
-                @click="activeTab = 'all'"
-                >全部</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'pending' }"
-                @click="activeTab = 'pending'"
-                >待審核</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'reviewing' }"
-                @click="activeTab = 'reviewing'"
-                >審核中</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'approved' }"
-                @click="activeTab = 'approved'"
-                >已核決</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'rejected' }"
-                @click="activeTab = 'rejected'"
-                >未核准</a
-              >
-            </li>
-          </ul>
           <div>
             <RouterLink class="btn btn-outline-primary btn-pill ms-auto" to="/"
               >返回首頁</RouterLink
@@ -66,7 +20,7 @@
 
         <!-- 篩選顯示對應的補卡資料 -->
         <div class="tab-content mt-3">
-          <div v-if="filteredMissingPunchRequests.length">
+          <div v-if="missingPunchRequestData.length">
             <table class="table table-borderless table-thead-border">
               <thead>
                 <tr>
@@ -82,7 +36,7 @@
               </thead>
               <tbody>
                 <tr
-                  v-for="(missingPunch, index) in filteredMissingPunchRequests"
+                  v-for="(missingPunch, index) in missingPunchRequestData"
                   :key="index"
                 >
                   <td class="text">{{ missingPunch.requestId }}</td>
@@ -145,7 +99,6 @@ import MissingPunchApprovalDetails from "./MissingPunchApprovalDetails.vue";
 const user = useUserStore();
 const missingPunchRequestData = ref([]);
 const error = ref("");
-const activeTab = ref("pending"); // 預設顯示 "待審核"
 const selectedMissingPunchRequest = ref(null);
 const actionType = ref("");
 
@@ -179,26 +132,6 @@ onMounted(async () => {
   } catch (err) {
     error.value = "無法取得補卡資料";
   }
-});
-
-// 根據標籤篩選補卡資料
-const filteredMissingPunchRequests = computed(() => {
-  if (!Array.isArray(missingPunchRequestData.value)) return [];
-  if (activeTab.value === "all") return missingPunchRequestData.value;
-  return missingPunchRequestData.value.filter((missingPunch) => {
-    switch (activeTab.value) {
-      case "pending":
-        return missingPunch.status === "待審核";
-      case "reviewing":
-        return missingPunch.status === "審核中";
-      case "approved":
-        return missingPunch.status === "已核決";
-      case "rejected":
-        return missingPunch.status === "未核准";
-      default:
-        return true;
-    }
-  });
 });
 
 // 簡單日期格式化函式，依需求調整格式

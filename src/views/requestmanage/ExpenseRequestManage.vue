@@ -70,15 +70,15 @@
             <table class="table table-borderless table-thead-border">
               <thead>
                 <tr>
-                  <th>申請Id</th>
-                  <th>申請人</th>
-                  <th>費用類型</th>
-                  <th>金額</th>
-                  <th>說明</th>
-                  <th>申請時間</th>
-                  <th>附件</th>
-                  <th style="width: 5%">狀態</th>
-                  <th>其他</th>
+                  <th class="text">申請Id</th>
+                  <th class="text">申請人</th>
+                  <th class="text">費用類型</th>
+                  <th class="text">金額</th>
+                  <th class="text">說明</th>
+                  <th class="text">申請時間</th>
+                  <th class="text">附件</th>
+                  <th class="text" style="width: 5%">狀態</th>
+                  <th class="text">其他</th>
                 </tr>
               </thead>
               <tbody>

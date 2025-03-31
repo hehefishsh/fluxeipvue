@@ -2,10 +2,7 @@
   <div>
     <!-- 查詢請假資料 -->
     <div class="card card-default" id="leave-request-query">
-      <div class="card-header">
-        <!-- <h2>請假資料查詢</h2> -->
-        <!-- <RouterLink class="btn btn-outline-primary btn-pill" to="/">返回首頁</RouterLink> -->
-      </div>
+      <div class="card-header"></div>
       <div class="card-body py-0" data-simplebar>
         <!-- 顯示錯誤信息 -->
         <div v-show="error" class="alert alert-danger" role="alert">
@@ -14,56 +11,6 @@
 
         <!-- 分類標籤 -->
         <div class="d-flex justify-content-between">
-          <ul
-            class="nav nav-pills mb-3 justify-content-between"
-            id="leave-tabs"
-            role="tablist"
-          >
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'all' }"
-                @click="activeTab = 'all'"
-                >全部</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'pending' }"
-                @click="activeTab = 'pending'"
-                href="#"
-                >待審核</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'reviewing' }"
-                @click="activeTab = 'reviewing'"
-                href="#"
-                >審核中</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'approved' }"
-                @click="activeTab = 'approved'"
-                href="#"
-                >已核決</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'rejected' }"
-                @click="activeTab = 'rejected'"
-                href="#"
-                >未核准</a
-              >
-            </li>
-          </ul>
           <div>
             <RouterLink class="btn btn-outline-primary btn-pill ms-auto" to="/"
               >返回首頁</RouterLink
@@ -73,7 +20,7 @@
 
         <!-- 篩選顯示對應的請假資料 -->
         <div class="tab-content mt-3">
-          <div v-if="filteredLeaveRequests.length">
+          <div v-if="leaveRequestData.length">
             <table class="table table-borderless table-thead-border">
               <thead>
                 <tr>
@@ -91,10 +38,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  v-for="(leave, index) in filteredLeaveRequests"
-                  :key="index"
-                >
+                <tr v-for="(leave, index) in leaveRequestData" :key="index">
                   <td class="text">{{ leave.leaveRequestId }}</td>
                   <td class="text">{{ leave.requestEmployeeName }}</td>
                   <td class="text">{{ leave.leaveType }}</td>
@@ -172,7 +116,6 @@ import LeaveRequestApprovalDetails from "./LeaveRequestApprovalDetails.vue";
 const user = useUserStore();
 const leaveRequestData = ref([]);
 const error = ref("");
-const activeTab = ref("pending"); // 預設顯示 "待審核"
 const selectedLeaveRequest = ref(null);
 const actionType = ref("");
 
@@ -189,6 +132,7 @@ const reloadData = async () => {
       `/api/approval/leave/pending/${user.empId}`
     );
     leaveRequestData.value = response.data; // 更新列表
+    console.log(leaveRequestData.value);
   } catch (err) {
     error.value = "無法獲取請假資料";
   }
@@ -205,25 +149,25 @@ onMounted(async () => {
   }
 });
 
-// 根據標籤篩選請假資料
-const filteredLeaveRequests = computed(() => {
-  if (!Array.isArray(leaveRequestData.value)) return [];
-  if (activeTab.value === "all") return leaveRequestData.value;
-  return leaveRequestData.value.filter((leave) => {
-    switch (activeTab.value) {
-      case "pending":
-        return leave.status === "待審核";
-      case "reviewing":
-        return leave.status === "審核中";
-      case "approved":
-        return leave.status === "已核決";
-      case "rejected":
-        return leave.status === "未核准";
-      default:
-        return true;
-    }
-  });
-});
+// // 根據標籤篩選請假資料
+// const filteredLeaveRequests = computed(() => {
+//   if (!Array.isArray(leaveRequestData.value)) return [];
+//   if (activeTab.value === "all") return leaveRequestData.value;
+//   return leaveRequestData.value.filter((leave) => {
+//     switch (activeTab.value) {
+//       case "pending":
+//         return leave.status === "待審核";
+//       case "reviewing":
+//         return leave.status === "審核中";
+//       case "approved":
+//         return leave.status === "已核決";
+//       case "rejected":
+//         return leave.status === "未核准";
+//       default:
+//         return true;
+//     }
+//   });
+// });
 
 // 簡單日期格式化函式，依需求調整格式
 const formatDate = (dateStr) => {

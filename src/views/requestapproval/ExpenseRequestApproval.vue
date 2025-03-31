@@ -11,56 +11,6 @@
 
         <!-- 分類標籤 -->
         <div class="d-flex justify-content-between">
-          <ul
-            class="nav nav-pills mb-3 justify-content-between"
-            id="leave-tabs"
-            role="tablist"
-          >
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'all' }"
-                @click="activeTab = 'all'"
-                >全部</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'pending' }"
-                @click="activeTab = 'pending'"
-                href="#"
-                >待審核</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'reviewing' }"
-                @click="activeTab = 'reviewing'"
-                href="#"
-                >審核中</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'approved' }"
-                @click="activeTab = 'approved'"
-                href="#"
-                >已核決</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === 'rejected' }"
-                @click="activeTab = 'rejected'"
-                href="#"
-                >未核准</a
-              >
-            </li>
-          </ul>
           <div>
             <RouterLink class="btn btn-outline-primary btn-pill ms-auto" to="/"
               >返回首頁</RouterLink
@@ -70,7 +20,7 @@
 
         <!-- 篩選顯示對應的費用資料 -->
         <div class="tab-content mt-3">
-          <div v-if="filteredExpenseRequests.length">
+          <div v-if="expenseRequestData.length">
             <table class="table table-borderless table-thead-border">
               <thead>
                 <tr>
@@ -86,10 +36,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  v-for="(expense, index) in filteredExpenseRequests"
-                  :key="index"
-                >
+                <tr v-for="(expense, index) in expenseRequestData" :key="index">
                   <td class="text">{{ expense.expenseRequestId }}</td>
                   <td class="text">{{ expense.requestEmployeeName }}</td>
                   <td class="text">{{ expense.expenseType }}</td>
@@ -164,7 +111,6 @@ import ExpenseRequestApprovalDetails from "./ExpenseRequestApprovalDetails.vue";
 const user = useUserStore();
 const expenseRequestData = ref([]);
 const error = ref("");
-const activeTab = ref("pending"); // 預設顯示 "待審核"
 const selectedExpenseRequest = ref(null);
 const actionType = ref("");
 
@@ -195,26 +141,6 @@ onMounted(async () => {
   } catch (err) {
     error.value = "無法獲取請假資料";
   }
-});
-
-// 根據標籤篩選費用資料
-const filteredExpenseRequests = computed(() => {
-  if (!Array.isArray(expenseRequestData.value)) return [];
-  if (activeTab.value === "all") return expenseRequestData.value;
-  return expenseRequestData.value.filter((expense) => {
-    switch (activeTab.value) {
-      case "pending":
-        return expense.status === "待審核";
-      case "reviewing":
-        return expense.status === "審核中";
-      case "approved":
-        return expense.status === "已核決";
-      case "rejected":
-        return expense.status === "未核准";
-      default:
-        return true;
-    }
-  });
 });
 
 // 簡單日期格式化函式，依需求調整格式
