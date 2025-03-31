@@ -2,19 +2,14 @@
   <div class="card card-default" id="work-adjustment-request">
     <div class="card-header">
       <h2>加減班申請</h2>
+      <button type="button" @click="fillDemoData" class="badge badge-pill badge-info">Demo</button>
     </div>
     <div class="card-body py-0">
       <form @submit.prevent="submitWorkAdjustment" class="form-group">
         <!-- 申請人 -->
         <div class="form-group">
           <label for="employee">申請人</label>
-          <input
-            type="text"
-            id="employee"
-            class="form-control rounded-0"
-            v-model="currentEmployeeName"
-            readonly
-          />
+          <input type="text" id="employee" class="form-control rounded-0" v-model="currentEmployeeName" readonly />
         </div>
 
         <!-- 加減班類型 -->
@@ -22,17 +17,9 @@
           <label for="adjustmentType">
             <font color="red">*</font>加減班類型
           </label>
-          <select
-            id="adjustmentType"
-            class="form-control rounded-0"
-            v-model="adjustmentRequest.adjustmentTypeId"
-            required
-          >
-            <option
-              v-for="type in adjustmentTypes"
-              :key="type.id"
-              :value="type.id"
-            >
+          <select id="adjustmentType" class="form-control rounded-0" v-model="adjustmentRequest.adjustmentTypeId"
+            required>
+            <option v-for="type in adjustmentTypes" :key="type.id" :value="type.id">
               {{ type.typeName }}
             </option>
           </select>
@@ -43,54 +30,33 @@
           <label for="adjustmentDate">
             <font color="red">*</font>加減班日期
           </label>
-          <input
-            type="date"
-            id="adjustmentDate"
-            class="form-control rounded-0"
-            v-model="adjustmentRequest.adjustmentDate"
-            required
-          />
+          <input type="date" id="adjustmentDate" class="form-control rounded-0"
+            v-model="adjustmentRequest.adjustmentDate" required />
         </div>
 
         <!-- 時數 -->
         <div class="form-group">
-          <label for="hours"> <font color="red">*</font>加減班時數 </label>
-          <input
-            type="number"
-            id="hours"
-            class="form-control rounded-0"
-            v-model="adjustmentRequest.hours"
-            step="1"
-            min="1"
-            max="24"
-            @input="validateHours"
-            required
-          />
-          <small v-if="isHoursInvalid" class="text-danger"
-            >加減班時數不能超過 24 小時</small
-          >
+          <label for="hours">
+            <font color="red">*</font>加減班時數
+          </label>
+          <input type="number" id="hours" class="form-control rounded-0" v-model="adjustmentRequest.hours" step="1"
+            min="1" max="24" @input="validateHours" required />
+          <small v-if="isHoursInvalid" class="text-danger">加減班時數不能超過 24 小時</small>
         </div>
 
         <!-- 申請原因 -->
         <div class="form-group">
-          <label for="reason"> <font color="red">*</font>申請原因 </label>
-          <textarea
-            id="reason"
-            class="form-control rounded-0"
-            v-model="adjustmentRequest.reason"
-            required
-            maxlength="200"
-          ></textarea>
+          <label for="reason">
+            <font color="red">*</font>申請原因
+          </label>
+          <textarea id="reason" class="form-control rounded-0" v-model="adjustmentRequest.reason" required
+            maxlength="200"></textarea>
           <small class="form-text text-muted">最多可輸入 200 字。</small>
         </div>
 
         <!-- 按鈕區 -->
         <div class="form-footer">
-          <button
-            type="submit"
-            class="btn btn-secondary btn-pill"
-            :disabled="isHoursInvalid"
-          >
+          <button type="submit" class="btn btn-secondary btn-pill" :disabled="isHoursInvalid">
             提交
           </button>
           <button type="button" @click="goBack" class="btn btn-light btn-pill">
@@ -187,6 +153,18 @@ async function submitWorkAdjustment() {
       confirmButtonText: "重新提交",
     });
   }
+}
+
+// Demo 鈕
+function fillDemoData() {
+  const businessAdjustment = adjustmentTypes.value.find(type => type.typeName === "加班");
+  if (businessAdjustment) {
+    adjustmentRequest.adjustmentTypeId = businessAdjustment.id;
+  }
+  adjustmentRequest.hours = 1;
+  adjustmentRequest.adjustmentDate = "2025-04-15";
+  adjustmentRequest.reason = "加班";
+
 }
 
 // 返回上一頁

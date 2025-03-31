@@ -2,30 +2,22 @@
   <div class="card card-default" id="leave-request">
     <div class="card-header">
       <h2>請假申請</h2>
+      <button type="button" @click="fillDemoData" class="badge badge-pill badge-info">Demo</button>
     </div>
     <div class="card-body py-0" data-simplebar>
       <form @submit.prevent="submitLeaveRequest" class="form-group">
         <!-- 申請人 -->
         <div class="form-group">
           <label for="employee">申請人</label>
-          <input
-            type="text"
-            id="employee"
-            class="form-control rounded-0"
-            v-model="currentEmployeeName"
-            readonly
-          />
+          <input type="text" id="employee" class="form-control rounded-0" v-model="currentEmployeeName" readonly />
         </div>
 
         <!-- 請假類型 -->
         <div class="form-group">
-          <label for="leaveType"> <font color="red">*</font>請假類型 </label>
-          <select
-            id="leaveType"
-            class="form-control rounded-0"
-            v-model="leaveRequest.leaveTypeId"
-            required
-          >
+          <label for="leaveType">
+            <font color="red">*</font>請假類型
+          </label>
+          <select id="leaveType" class="form-control rounded-0" v-model="leaveRequest.leaveTypeId" required>
             <option v-for="type in leaveTypes" :key="type.id" :value="type.id">
               {{ type.typeName }}
             </option>
@@ -34,75 +26,57 @@
 
         <!-- 開始時間 -->
         <div class="form-group">
-          <label for="startTime"> <font color="red">*</font>開始時間 </label>
-          <input
-            type="datetime-local"
-            id="startTime"
-            class="form-control rounded-0"
-            v-model="leaveRequest.startTime"
-            required
-            @change="validateDateRange"
-          />
+          <label for="startTime">
+            <font color="red">*</font>開始時間
+          </label>
+          <input type="datetime-local" id="startTime" class="form-control rounded-0" v-model="leaveRequest.startTime"
+            required @change="validateDateRange" />
         </div>
 
         <!-- 結束時間 -->
         <div class="form-group">
-          <label for="endTime"> <font color="red">*</font>結束時間 </label>
-          <input
-            type="datetime-local"
-            id="endTime"
-            class="form-control rounded-0"
-            v-model="leaveRequest.endTime"
-            required
-            @change="validateDateRange"
-          />
+          <label for="endTime">
+            <font color="red">*</font>結束時間
+          </label>
+          <input type="datetime-local" id="endTime" class="form-control rounded-0" v-model="leaveRequest.endTime"
+            required @change="validateDateRange" />
         </div>
 
         <!-- 請假時數 -->
         <div class="form-group">
-          <label for="leaveHours"> <font color="red">*</font>請假時數 </label>
+          <label for="leaveHours">
+            <font color="red">*</font>請假時數
+          </label>
           <div class="input-group">
-            <input
-              type="number"
-              id="leaveHours"
-              class="form-control rounded-0"
-              v-model="leaveRequest.leaveHours"
-              placeholder="小時"
-            />
+            <input type="number" id="leaveHours" class="form-control rounded-0" v-model="leaveRequest.leaveHours"
+              placeholder="小時" />
             <span class="input-group-text">小時</span>
           </div>
         </div>
 
         <!-- 請假原因 -->
         <div class="form-group">
-          <label for="reason"> <font color="red">*</font>請假原因 </label>
-          <textarea
-            id="reason"
-            class="form-control rounded-0"
-            v-model="leaveRequest.reason"
-            required
-            maxlength="200"
-          ></textarea>
+          <label for="reason">
+            <font color="red">*</font>請假原因
+          </label>
+          <textarea id="reason" class="form-control rounded-0" v-model="leaveRequest.reason" required
+            maxlength="200"></textarea>
           <small class="form-text text-muted">最多可輸入 200 字。</small>
         </div>
 
         <!-- 附件 -->
         <div class="form-group">
           <label for="attachments">附件</label>
-          <input
-            type="file"
-            id="attachments"
-            class="form-control rounded-0"
-            @change="handleFileUpload"
-          />
+          <input type="file" id="attachments" class="form-control rounded-0" @change="handleFileUpload" />
         </div>
 
         <!-- 按鈕區 -->
         <div class="form-footer">
-          <button type="submit" class="btn btn-secondary btn-pill">提交</button>
-          <button type="button" @click="goBack" class="btn btn-light btn-pill">
+          <button type="submit" class="mr-1 btn btn-secondary btn-pill">提交</button>
+          <button type="button" @click="goBack" class="mr-1 btn btn-light btn-pill">
             取消
           </button>
+
         </div>
       </form>
     </div>
@@ -280,6 +254,20 @@ async function submitLeaveRequest() {
       });
     }
   }
+}
+
+// Demo 鈕
+function fillDemoData() {
+  const businessLeave = leaveTypes.value.find(type => type.typeName === "事假");
+  if (businessLeave) {
+    leaveRequest.leaveTypeId = businessLeave.id;
+  }
+
+  leaveRequest.startTime = "2025-04-15T08:00";
+  leaveRequest.endTime = "2025-04-15T17:00";
+  leaveRequest.reason = "私事待處理";
+
+  updateLeaveHours(); // 計算請假時數
 }
 
 // 返回上一頁

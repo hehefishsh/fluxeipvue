@@ -1,32 +1,26 @@
 <template>
-  <div
-    v-if="fieldWorkRecord"
-    class="modal fade"
-    id="fieldWorkUpdateModal"
-    tabindex="-1"
-    aria-labelledby="fieldWorkUpdateModalLabel"
-    aria-hidden="true"
-  >
+  <div v-if="fieldWorkRecord" class="modal fade" id="fieldWorkUpdateModal" tabindex="-1"
+    aria-labelledby="fieldWorkUpdateModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="fieldWorkUpdateModalLabel">
             外勤紀錄詳情
           </h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-            @click="closeModal"
-          ></button>
+
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+            @click="closeModal"></button>
         </div>
         <div class="modal-body">
+
           <table class="table table-borderless">
             <tbody>
               <tr>
                 <td>外勤紀錄ID</td>
-                <td>{{ fieldWorkRecord.recordId }}</td>
+                <td>{{ fieldWorkRecord.recordId }}
+                  <button type="button" @click="fillDemoData" class="mr-3 badge badge-pill badge-info"
+                    style="position: relative; float: right">Demo</button>
+                </td>
               </tr>
               <tr>
                 <td>記錄人</td>
@@ -47,33 +41,22 @@
               <tr>
                 <td>外勤地點</td>
                 <td>
-                  <textarea
-                    type="text"
-                    v-model="updatedFieldWork.location"
-                    class="form-control"
-                  ></textarea>
+                  <textarea type="text" v-model="updatedFieldWork.location" class="form-control"></textarea>
                   <small class="form-text text-muted">最多可輸入 50字。</small>
                 </td>
               </tr>
               <tr>
                 <td>外勤目的</td>
                 <td>
-                  <textarea
-                    type="text"
-                    v-model="updatedFieldWork.purpose"
-                    class="form-control"
-                    maxlength="200"
-                  ></textarea>
+                  <textarea type="text" v-model="updatedFieldWork.purpose" class="form-control"
+                    maxlength="200"></textarea>
                   <small class="form-text text-muted">最多可輸入 200字。</small>
                 </td>
               </tr>
               <tr>
                 <td>狀態</td>
                 <td>
-                  <select
-                    v-model="updatedFieldWork.status"
-                    class="form-control"
-                  >
+                  <select v-model="updatedFieldWork.status" class="form-control">
                     <option value="更新中">更新中</option>
                     <option value="已完成">已完成</option>
                   </select>
@@ -180,6 +163,14 @@ const updateFieldWorkRecord = async () => {
     });
   }
 };
+
+
+// Demo 流程填入
+function fillDemoData() {
+  updatedFieldWork.value.location = "高雄市政府";
+  updatedFieldWork.value.purpose = "辦理行政業務";
+}
+
 </script>
 
 <style scoped>

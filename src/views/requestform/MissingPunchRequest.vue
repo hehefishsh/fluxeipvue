@@ -2,6 +2,7 @@
   <div class="card card-default" id="work-adjustment-request">
     <div class="card-header">
       <h2>補卡申請</h2>
+      <button type="button" @click="fillDemoData" class="badge badge-pill badge-info">Demo</button>
     </div>
     <div class="card-body py-0">
       <form @submit.prevent="submitMissingPunch" class="form-group">
@@ -115,6 +116,18 @@ async function submitMissingPunch() {
       confirmButtonText: "重新提交",
     });
   }
+}
+
+// Demo 鈕
+function fillDemoData() {
+  const businessMissingPunch = clockTypes.value.find(type => type.typeName === "上班");
+  if (businessMissingPunch) {
+    missingPunchRequest.clockTypeId = businessMissingPunch.id;
+  }
+
+  missingPunchRequest.missingDate = "2025-04-15";
+  missingPunchRequest.reason = "忘記打卡";
+
 }
 
 // 返回上一頁

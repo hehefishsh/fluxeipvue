@@ -2,54 +2,38 @@
   <div class="card card-default" id="leave-request">
     <div class="card-header">
       <h2>設定員工自訂簽核流程</h2>
+      <div>
+        <button type="button" @click="fillDemoData2" class="mr-3 badge badge-pill badge-info">Demo(加班)</button>
+        <button type="button" @click="fillDemoData" class="badge badge-pill badge-info">Demo(補卡)</button>
+      </div>
+
     </div>
     <div class="card-body py-0" data-simplebar>
       <!-- 流程名稱輸入 -->
       <div>
         <h4><span class="badge badge-primary badge-pill">流程名稱</span></h4>
-        <input
-          v-model="flowName"
-          type="text"
-          placeholder="請輸入流程名稱"
-          class="form-control"
-          style="margin-top: 10px"
-          maxlength="20"
-        />
+        <input v-model="flowName" type="text" placeholder="請輸入流程名稱" class="form-control" style="margin-top: 10px"
+          maxlength="20" />
         <small class="form-text text-muted">最多可輸入 20字。</small>
       </div>
 
       <!-- 簽核步驟列表 -->
-      <div
-        v-for="(step, index) in approvalSteps"
-        :key="index"
-        class="step-group"
-      >
+      <div v-for="(step, index) in approvalSteps" :key="index" class="step-group">
         <h3>步驟 {{ index + 1 }}</h3>
 
         <!-- 申請類型選單（僅第一步可變更） -->
         <label>申請類型：</label>
-        <select
-          v-model="selectedCategory"
-          class="custom-select my-1 mr-sm-2"
-          @change="onCategoryChange"
-          :disabled="index !== 0"
-        >
-          <option
-            v-for="cat in applicationCategories"
-            :key="cat.value"
-            :value="cat.value"
-          >
+        <select v-model="selectedCategory" class="custom-select my-1 mr-sm-2" @change="onCategoryChange"
+          :disabled="index !== 0">
+          <option v-for="cat in applicationCategories" :key="cat.value" :value="cat.value">
             {{ cat.label }}
           </option>
         </select>
 
         <!-- 請求類型選單（根據所選申請類型取得的） -->
         <label>請求類型：</label>
-        <select
-          v-model="step.requestTypeId"
-          class="custom-select my-1 mr-sm-2"
-          :disabled="!requestTypes.length || index !== 0"
-        >
+        <select v-model="step.requestTypeId" class="custom-select my-1 mr-sm-2"
+          :disabled="!requestTypes.length || index !== 0">
           <option v-for="type in requestTypes" :key="type.id" :value="type.id">
             {{ type.typeName }}
           </option>
@@ -57,42 +41,23 @@
 
         <!-- 員工職位（第一步固定） -->
         <label>員工職位：</label>
-        <select
-          v-model="step.employeePositionId"
-          class="custom-select my-1 mr-sm-2"
-          :disabled="index !== 0"
-        >
-          <option
-            v-for="position in positions"
-            :key="position.positionId"
-            :value="position.positionId"
-          >
+        <select v-model="step.employeePositionId" class="custom-select my-1 mr-sm-2" :disabled="index !== 0">
+          <option v-for="position in positions" :key="position.positionId" :value="position.positionId">
             {{ position.positionName }}
           </option>
         </select>
 
         <!-- 簽核人職位（依照條件過濾） -->
         <label>簽核人職位：</label>
-        <select
-          v-model="step.approverPositionId"
-          class="custom-select my-1 mr-sm-2"
-          @change="handleApproverChange(index)"
-        >
-          <option
-            v-for="position in getAvailableApproverPositions(index)"
-            :key="position.positionId"
-            :value="position.positionId"
-          >
+        <select v-model="step.approverPositionId" class="custom-select my-1 mr-sm-2"
+          @change="handleApproverChange(index)">
+          <option v-for="position in getAvailableApproverPositions(index)" :key="position.positionId"
+            :value="position.positionId">
             {{ position.positionName }}
           </option>
         </select>
 
-        <button
-          type="button"
-          @click="removeStep(index)"
-          class="delete-button"
-          v-if="index !== 0"
-        >
+        <button type="button" @click="removeStep(index)" class="delete-button" v-if="index !== 0">
           刪除步驟
         </button>
       </div>
@@ -263,6 +228,15 @@ function getAvailableApproverPositions(stepIndex) {
       return positions.value.filter((p) => parseInt(p.positionId) < empPosId);
     }
   }
+}
+
+// Demo 流程填入
+function fillDemoData() {
+  flowName.value = "趙六補卡申請流程";
+}
+
+function fillDemoData2() {
+  flowName.value = "趙六加班申請流程";
 }
 
 // 送出表單
