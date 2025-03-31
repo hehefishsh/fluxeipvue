@@ -10,18 +10,10 @@
         </div>
 
         <div class="d-flex justify-content-between">
-          <ul
-            class="nav nav-pills mb-3 justify-content-between"
-            id="pills-tab12"
-            role="tablist"
-          >
+          <ul class="nav nav-pills mb-3 justify-content-between" id="pills-tab12" role="tablist">
             <li class="nav-item" v-for="status in statuses" :key="status.key">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === status.key }"
-                @click="activeTab = status.key"
-                href="#"
-              >
+              <a class="nav-link" :class="{ active: activeTab === status.key }" @click="activeTab = status.key"
+                href="#">
                 {{ status.label }}
               </a>
             </li>
@@ -48,13 +40,11 @@
                   <th class="text">申請時間</th>
                   <th class="text">狀態</th>
                   <th class="text">其他</th>
+                  <th class="text">操作</th>
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  v-for="(request, index) in filteredOvertimeRequests"
-                  :key="index"
-                >
+                <tr v-for="(request, index) in filteredOvertimeRequests" :key="index">
                   <td>{{ request.workAdjustmentRequestId }}</td>
                   <td>{{ request.employeeName }}</td>
                   <td>{{ request.adjustmentType }}</td>
@@ -66,13 +56,15 @@
                   <td>{{ formatDateSecond(request.submittedAt) }}</td>
                   <td>{{ request.status }}</td>
                   <td>
-                    <button
-                      class="badge badge-info"
-                      @click="showModal(request)"
-                      data-toggle="modal"
-                      data-target="#overtimeRequestModal"
-                    >
+                    <button class="badge badge-info" @click="showModal(request)" data-toggle="modal"
+                      data-target="#overtimeRequestModal">
                       查看詳情
+                    </button>
+                  </td>
+                  <td class="text">
+                    <button v-if="request.status === '待審核'" class="badge badge-danger"
+                      @click="deleteWorkAdjustRequest(request.workAdjustmentRequestId)">
+                      刪除
                     </button>
                   </td>
                 </tr>
@@ -95,6 +87,7 @@ import { ref, onMounted, computed } from "vue";
 import axiosapi from "@/plugins/axios.js";
 import useUserStore from "@/stores/user";
 import WorkAdjustmentDetails from "./WorkAdjustmentDetails.vue";
+import Swal from "sweetalert2";
 
 const user = useUserStore();
 const overtimeRequestData = ref([]);
@@ -121,7 +114,7 @@ onMounted(async () => {
     );
     overtimeRequestData.value = response.data;
   } catch (err) {
-    error.value = "無法獲取加減班申請資料";
+    error.value = "無法取得加減班申請資料";
   }
 });
 
@@ -168,6 +161,56 @@ const formatDateSecond = (dateStr) => {
 
   return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
 };
+
+// 刪除補卡申請資料
+const deleteWorkAdjustRequest = async (workAdjustmentRequestId) => {
+  const result = await Swal.fire({
+    title: "您確定要刪除此加減班申請單嗎？",
+    text: "此操作無法撤回！",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "確定",
+    cancelButtonText: "取消",
+  });
+
+  if (result.isConfirmed) {
+    try {
+      const response = await axiosapi.delete(`/api/work-adjustments/${workAdjustmentRequestId}`);
+      if (response.status === 204) {
+        Swal.fire({
+          title: "刪除成功",
+          icon: "success",
+        });
+        // 重新載入資料
+        reloadData();
+      } else {
+        Swal.fire({
+          title: "刪除失敗",
+          icon: "error",
+        });
+      }
+    } catch (err) {
+      Swal.fire({
+        title: "刪除失敗",
+        text: err.message,
+        icon: "error",
+      });
+    }
+  }
+};
+
+// 重新載入補卡申請資料
+const reloadData = async () => {
+  try {
+    const response = await axiosapi.get(`/api/work-adjustments/employee/${user.empId}`);
+    overtimeRequestData.value = response.data;
+  } catch (err) {
+    error.value = "無法取得加減班申請資料";
+  }
+};
+
 </script>
 
 <style scoped>

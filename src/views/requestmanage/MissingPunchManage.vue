@@ -10,18 +10,10 @@
         </div>
 
         <div class="d-flex justify-content-between">
-          <ul
-            class="nav nav-pills mb-3 justify-content-between"
-            id="pills-tab12"
-            role="tablist"
-          >
+          <ul class="nav nav-pills mb-3 justify-content-between" id="pills-tab12" role="tablist">
             <li class="nav-item" v-for="status in statuses" :key="status.key">
-              <a
-                class="nav-link"
-                :class="{ active: activeTab === status.key }"
-                @click="activeTab = status.key"
-                href="#"
-              >
+              <a class="nav-link" :class="{ active: activeTab === status.key }" @click="activeTab = status.key"
+                href="#">
                 {{ status.label }}
               </a>
             </li>
@@ -39,21 +31,19 @@
             <table class="table table-borderless table-thead-border">
               <thead>
                 <tr>
-                  <th>申請Id</th>
-                  <th>申請人</th>
-                  <th>補卡類型</th>
-                  <th>缺卡日期</th>
-                  <th>原因</th>
-                  <th>申請時間</th>
-                  <th>狀態</th>
-                  <th>其他</th>
+                  <th class="text">申請Id</th>
+                  <th class="text">申請人</th>
+                  <th class="text">補卡類型</th>
+                  <th class="text">缺卡日期</th>
+                  <th class="text">原因</th>
+                  <th class="text">申請時間</th>
+                  <th class="text">狀態</th>
+                  <th class="text">其他</th>
+                  <th class="text">操作</th>
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  v-for="(request, index) in filteredMissingPunchRequests"
-                  :key="index"
-                >
+                <tr v-for="(request, index) in filteredMissingPunchRequests" :key="index">
                   <td>{{ request.missingPunchRequestId }}</td>
                   <td>{{ request.employeeName }}</td>
                   <td>{{ request.clockType }}</td>
@@ -64,13 +54,15 @@
                   <td>{{ formatDateSecond(request.submittedAt) }}</td>
                   <td>{{ request.status }}</td>
                   <td>
-                    <button
-                      class="badge badge-info"
-                      @click="showModal(request)"
-                      data-toggle="modal"
-                      data-target="#missingPunchRequestModal"
-                    >
+                    <button class="badge badge-info" @click="showModal(request)" data-toggle="modal"
+                      data-target="#missingPunchRequestModal">
                       查看詳情
+                    </button>
+                  </td>
+                  <td class="text">
+                    <button v-if="request.status === '待審核'" class="badge badge-danger"
+                      @click="deleteMissingPunchRequest(request.missingPunchRequestId)">
+                      刪除
                     </button>
                   </td>
                 </tr>
@@ -93,6 +85,7 @@ import { ref, onMounted, computed } from "vue";
 import axiosapi from "@/plugins/axios.js";
 import useUserStore from "@/stores/user";
 import MissingPunchDetails from "./MissingPunchDetails.vue";
+import Swal from "sweetalert2";
 
 const user = useUserStore();
 const missingPunchRequestData = ref([]);
@@ -166,6 +159,57 @@ const formatDateSecond = (dateStr) => {
 
   return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
 };
+
+
+// 刪除補卡申請資料
+const deleteMissingPunchRequest = async (missingPunchRequestId) => {
+  const result = await Swal.fire({
+    title: "您確定要刪除此補卡申請單嗎？",
+    text: "此操作無法撤回！",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "確定",
+    cancelButtonText: "取消",
+  });
+
+  if (result.isConfirmed) {
+    try {
+      const response = await axiosapi.delete(`/api/missing-punch/${missingPunchRequestId}`);
+      if (response.status === 204) {
+        Swal.fire({
+          title: "刪除成功",
+          icon: "success",
+        });
+        // 重新載入資料
+        reloadData();
+      } else {
+        Swal.fire({
+          title: "刪除失敗",
+          icon: "error",
+        });
+      }
+    } catch (err) {
+      Swal.fire({
+        title: "刪除失敗",
+        text: err.message,
+        icon: "error",
+      });
+    }
+  }
+};
+
+// 重新載入補卡申請資料
+const reloadData = async () => {
+  try {
+    const response = await axiosapi.get(`/api/missing-punch/employee/${user.empId}`);
+    missingPunchRequestData.value = response.data;
+  } catch (err) {
+    error.value = "無法取得補卡申請資料";
+  }
+};
+
 </script>
 
 <style scoped>
