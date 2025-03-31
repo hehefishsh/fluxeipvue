@@ -24,7 +24,10 @@ import calendarRoutes from "@/views/calendar/calendar";
 
 
 const routes = [
+
   
+
+
   {
     path: "/",
     component: Home,
@@ -36,7 +39,7 @@ const routes = [
     component: Login,
     name: "login-link",
     meta: { title: "登入", hideNavbar: true },
-    },
+  },
   {
     path: "/403",
     component: Forbidden,
@@ -94,5 +97,6 @@ router.beforeEach((to, from, next) => {
     }
   }
 });
+
 
 export default router;
