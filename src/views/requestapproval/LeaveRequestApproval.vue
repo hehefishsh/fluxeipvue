@@ -12,9 +12,12 @@
         <!-- 分類標籤 -->
         <div class="d-flex justify-content-between">
           <div>
-            <RouterLink class="btn btn-outline-primary btn-pill ms-auto" to="/"
-              >返回首頁</RouterLink
-            >
+            <RouterLink class="btn btn-outline-primary btn-pill ms-auto" to="/">返回首頁</RouterLink>
+          </div>
+          <div>
+            <button v-if="leaveRequestData.length" class="btn btn-success btn-pill ms-2" @click="confirmApproveAll">
+              一鍵簽核
+            </button>
           </div>
         </div>
 
@@ -54,13 +57,9 @@
                     {{ formatDateSecond(leave.submittedAt) }}
                   </td>
                   <td class="text">
-                    <button
-                      v-if="leave.attachmentName"
-                      @click="
-                        downloadfile(leave.attachmentName, leave.attachmentPath)
-                      "
-                      class="badge badge-primary"
-                    >
+                    <button v-if="leave.attachmentName" @click="
+                      downloadfile(leave.attachmentName, leave.attachmentPath)
+                      " class="badge badge-primary">
                       下載附件
                     </button>
                     <span v-else>無</span>
@@ -68,20 +67,12 @@
                   </td>
                   <td class="text">{{ leave.status }}</td>
                   <td class="text">
-                    <button
-                      class="badge badge-square badge-success"
-                      @click="showModal(leave, 'approve')"
-                      data-toggle="modal"
-                      data-target="#leaveRequestModal"
-                    >
+                    <button class="badge badge-square badge-success" @click="showModal(leave, 'approve')"
+                      data-toggle="modal" data-target="#leaveRequestModal">
                       核可
                     </button>
-                    <button
-                      class="badge badge-square badge-warning"
-                      @click="showModal(leave, 'reject')"
-                      data-toggle="modal"
-                      data-target="#leaveRequestModal"
-                    >
+                    <button class="badge badge-square badge-warning" @click="showModal(leave, 'reject')"
+                      data-toggle="modal" data-target="#leaveRequestModal">
                       否決
                     </button>
                   </td>
@@ -99,11 +90,8 @@
     </div>
 
     <!-- 呼叫請假詳情元件並傳遞selectedLeaveRequest -->
-    <LeaveRequestApprovalDetails
-      :leaveRequest="selectedLeaveRequest"
-      :actionType="actionType"
-      @update:leaveRequest="reloadData"
-    />
+    <LeaveRequestApprovalDetails :leaveRequest="selectedLeaveRequest" :actionType="actionType"
+      @update:leaveRequest="reloadData" />
   </div>
 </template>
 
@@ -112,6 +100,7 @@ import { ref, onMounted, computed } from "vue";
 import axiosapi from "@/plugins/axios.js";
 import useUserStore from "@/stores/user";
 import LeaveRequestApprovalDetails from "./LeaveRequestApprovalDetails.vue";
+import Swal from "sweetalert2";
 
 const user = useUserStore();
 const leaveRequestData = ref([]);
@@ -149,25 +138,6 @@ onMounted(async () => {
   }
 });
 
-// // 根據標籤篩選請假資料
-// const filteredLeaveRequests = computed(() => {
-//   if (!Array.isArray(leaveRequestData.value)) return [];
-//   if (activeTab.value === "all") return leaveRequestData.value;
-//   return leaveRequestData.value.filter((leave) => {
-//     switch (activeTab.value) {
-//       case "pending":
-//         return leave.status === "待審核";
-//       case "reviewing":
-//         return leave.status === "審核中";
-//       case "approved":
-//         return leave.status === "已核決";
-//       case "rejected":
-//         return leave.status === "未核准";
-//       default:
-//         return true;
-//     }
-//   });
-// });
 
 // 簡單日期格式化函式，依需求調整格式
 const formatDate = (dateStr) => {
@@ -229,6 +199,54 @@ function downloadfile(attachmentName, attachmentPath) {
       console.error("下載失敗", error);
     });
 }
+
+// 顯示確認對話框
+const confirmApproveAll = () => {
+  Swal.fire({
+    title: "您確定要一鍵簽核所有請假單嗎？",
+    text: "這個操作無法撤回！",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "確定",
+    cancelButtonText: "取消",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      approveAllRequests(); // 確認後執行一鍵簽核
+    }
+  });
+};
+
+// 一鍵簽核請假申請
+const approveAllRequests = async () => {
+  try {
+    const response = await axiosapi.put(`/api/approval/leave/pending/${user.empId}/review`);
+
+    if (response.status === 200) {
+      Swal.fire({
+        icon: "success",
+        title: "一鍵簽核成功",
+        text: response.data,
+      }).then(() => {
+        reloadData(); // 重新載入資料
+      });
+    } else {
+      Swal.fire({
+        icon: "warning",
+        title: "一鍵簽核完成，但部分請假單可能未成功",
+        text: response.data,
+      });
+    }
+  } catch (error) {
+    Swal.fire({
+      icon: "error",
+      title: "一鍵簽核失敗",
+      text: "請稍後再試。",
+    });
+  }
+};
+
 </script>
 
 <style scoped>
