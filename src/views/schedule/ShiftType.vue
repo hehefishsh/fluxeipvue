@@ -79,6 +79,7 @@ async function deleteShiftType(id){
         if(result.isConfirmed){
             try{
                 const response=await axios.delete(`${path}/api/shiftType/${id}`);
+                console.log(response)
                 if(response.data.success){
                     await Swal.fire({
                         title:response.data.message,
