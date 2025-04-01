@@ -57,7 +57,7 @@
   
   onMounted(() => {
     fetchNotifications(); // 初次載入
-    pollingInterval = setInterval(fetchNotifications, 5000);
+    pollingInterval = setInterval(fetchNotifications, 3600000);
     document.addEventListener('click', handleClickOutside);
   });
   
@@ -119,6 +119,12 @@
         router.push('/requestapproval/workadjust');
       } else if (notify.message.includes('薪資查詢')) {
         router.push('/salary/detail');
+      }else if (notify.message.includes('費用》申請單')) {
+        router.push('/requestapproval/expense');
+      }else if (notify.message.includes('費用申請')) {
+        router.push('/requestmanage/expense');
+      }else if (notify.message.includes('交辦任務')) {
+        router.push('/work/taskprogress');
       }
   
     } catch (error) {
