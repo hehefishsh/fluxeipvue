@@ -125,6 +125,16 @@
         router.push('/requestmanage/expense');
       }else if (notify.message.includes('交辦任務')) {
         router.push('/work/taskprogress');
+      }else if (notify.message.includes('被退回')) {
+        router.push('/work/taskprogressㄟ');
+      }else if (notify.message.includes('工作分配')) {
+        router.push('/work/progress/detail/55');
+      }else if (notify.message.includes('補卡申請待審核')) {
+        router.push('/requestapproval/missingpunch');
+      }else if (notify.message.includes('《上班》')) {
+        router.push('/requestmanage/missingpunch');
+      }else if (notify.message.includes('《下班》')) {
+        router.push('/requestmanage/missingpunch');
       }
   
     } catch (error) {
