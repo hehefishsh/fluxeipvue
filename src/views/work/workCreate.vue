@@ -1,12 +1,15 @@
 <template>
     <div class="card card-default form-container">
-
-            <h3 class="form-title">工作內容</h3>
+      <div class="card-header">
+        <h3 class="form-title">工作內容</h3>
+        <button type="button" @click="Demo" class="badge badge-pill badge-info">Demo</button>
+      </div>
             工作名稱<input v-model="work.workName" placeholder="輸入名稱" class="input-field" required  />
             開始日期<input type="date" v-model="work.createDate" class="custom-select my-1 mr-sm-2 w-auto" required />
             預計完成日期<input type="date" v-model="work.expectedFinishDate" class="custom-select my-1 mr-sm-2 w-auto" required />
-
-            <h3 class="form-title">分配工作</h3>
+      <div class="card-header">
+        <h3 class="form-title">分配工作</h3>
+      </div>
             <div v-for="(content, index) in contents" :key="index" class="content-group">
                 <div class="content-wrapper">
                 項目名稱<input
@@ -179,6 +182,19 @@ function addField() {
         status:"未完成"
       });
     }
+
+function Demo(){
+  work.value.workName='報表製作'
+  work.value.expectedFinishDate='2025-04-25'
+  contents.value[0].taskName='美編'
+  contents.value[0].taskContent='美化排版'
+  contents.value[0].employee='小明'
+  contents.value[0].expectedFinishDate='2025-04-23'
+  contents.value[1].taskName='蒐集資料'
+  contents.value[1].taskContent='做成報表'
+  contents.value[1].employee='趙六'
+  contents.value[1].expectedFinishDate='2025-04-20'
+}
 
 // **刪除欄位**
 function removeField(index) {
