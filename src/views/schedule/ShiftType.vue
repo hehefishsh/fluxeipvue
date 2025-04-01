@@ -13,6 +13,7 @@
                 <th class="text">部門</th>
                 <th class="text">上班時間</th>
                 <th class="text">下班時間</th>
+                <th class="text">預計工時</th>
                 <th class="text">編輯</th>
               </tr>
             </thead>
@@ -23,6 +24,7 @@
                 <td class="text">{{ shiftType.departmentName }}</td>
                 <td class="text">{{ shiftType.startTime }}</td>
                 <td class="text">{{ shiftType.finishTime }}</td>
+                <td class="text">{{ shiftType.estimatedHours }}</td>
                 <td v-show="department.departmentName==shiftType.departmentName">
                     <!-- 編輯按鈕 -->
                 <RouterLink :to="`/schedule/shiftType/edit/${shiftType.shiftTypeId}`" class="btn btn-primary btn-sm">編輯</RouterLink>
