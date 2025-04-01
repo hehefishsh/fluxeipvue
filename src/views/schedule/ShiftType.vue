@@ -47,6 +47,8 @@
     
 <script setup>
 import { ref, onMounted,watch } from 'vue'
+import axiosapi from "@/plugins/axios.js";
+
 import axios from 'axios'
 import Swal from 'sweetalert2'
 const path = import.meta.env.VITE_API_URL;
@@ -61,7 +63,7 @@ const allShiftType = ref([])
 
 onMounted(async () => {
   try {
-    const response = await axios.get(`${path}/api/shiftType`)
+    const response = await axiosapi.get(`/api/shiftType`)
     allShiftType.value = response.data
   } catch (error) {
     console.error('Error fetching ShiftType:', error)
