@@ -173,36 +173,89 @@ const departmentName = department.departmentName;
     return options;
   }, {});
 
-  const { value: shiftTypeId } = await Swal.fire({
+  const { value: shiftTypeId, isConfirmed, isDenied } = await Swal.fire({
     title: "選擇班別",
+    input: "select",
+    inputOptions: shiftOptions,
+    inputPlaceholder: "選擇班別",
+    showCancelButton: true,
+    showDenyButton: true,    // 額外的第三個按鈕
+    confirmButtonText: "確定",
+    cancelButtonText: "取消",
+    denyButtonText: "自動新增整月" // 自訂第三個按鈕的文字
+  });
+
+  if (isConfirmed) {
+  if (!shiftTypeId) {
+    return Swal.fire("請選擇班別", "", "error");
+  }
+
+  const selectedShift = filteredShifts.find((shift) => shift.shiftTypeId == shiftTypeId);
+
+  if (!selectedShift) {
+    return Swal.fire("找不到選擇的班別", "", "error");
+  }
+
+  try {
+    await axios.post(`${path}/api/schedule`, {
+      employeeId: selectedEmployee.value,
+      date: info.dateStr,
+      shiftTypeId: selectedShift.shiftTypeId,
+      departmentName: departmentName,
+    });
+
+    Swal.fire("班表已新增", "", "success");
+    fetchSchedule(); // 重新載入班表
+  } catch (error) {
+    Swal.fire({
+      title: error.response?.data || "新增班表失敗",
+      icon: "error",
+    });
+  }
+}
+
+// 如果按「新增整個月」，再跳出一個 Swal 讓使用者選擇班別
+if (isDenied) {
+  const { value: monthShiftTypeId, isDismissed } = await Swal.fire({
+    title: "選擇班別（整個月）",
     input: "select",
     inputOptions: shiftOptions,
     inputPlaceholder: "選擇班別",
     showCancelButton: true,
   });
 
-  if (shiftTypeId) {
-try{
+    // 按「取消」時，直接 return，什麼都不做
+    if (isDismissed) {
+    return;
+  }
 
+  if (!monthShiftTypeId) {
+    return Swal.fire("請選擇班別", "", "error");
+  }
 
-const selectedShift = filteredShifts.find((shift) => shift.shiftTypeId == shiftTypeId);
+  const selectedShift = filteredShifts.find((shift) => shift.shiftTypeId == monthShiftTypeId);
 
-await axios.post(`${path}/api/schedule`, {
+  if (!selectedShift) {
+    return Swal.fire("找不到選擇的班別", "", "error");
+  }
+
+  try {
+    await axios.post(`${path}/api/schedule/month`, {
       employeeId: selectedEmployee.value,
       date: info.dateStr,
       shiftTypeId: selectedShift.shiftTypeId,
-      departmentName:departmentName,
+      departmentName: departmentName,
     });
 
-    Swal.fire("班表已新增", "", "success");
+    Swal.fire("整個月班表已新增", "", "success");
     fetchSchedule(); // 重新載入班表
-}catch(error){
-        Swal.fire({
-            title: error.response.data,
-            icon: "error",
-        });
-}
+  } catch (error) {
+    Swal.fire({
+      title: error.response?.data || "新增整個月班表失敗",
+      icon: "error",
+    });
   }
+}
 }
 
 
