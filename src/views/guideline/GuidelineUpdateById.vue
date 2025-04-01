@@ -130,8 +130,8 @@ async function submitForm() {
     guideline: guideline.value,
     contents: contents.value.map((content, index) => ({
       contentType: content.contentType,
-      textContent: content.textContent || "",
-      imageContent: content.contentType === "image" ? "" : content.imageContent,
+      textContent: content.contentType!=="image"?content.textContent : "",
+      imageContent: content.contentType === "image" ? content.imageContent : "",
     })),
   };
 
@@ -146,10 +146,16 @@ async function submitForm() {
 
   // **發送請求**
   try {
+    const formDataObject = {};
+
+    formData.forEach((value, key) => {
+    formDataObject[key] = value;
+});
+console.log("即將提交的資料:", formDataObject);
     const response = await axios.put(`${path}/api/guidelines/${guidelineId}`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
-    console.log("提交成功:", response.data);
+    console.log("提交成功:");
     router.push({ name: "guideline-all-link" });
   } catch (error) {
     console.error("提交失敗:", error);

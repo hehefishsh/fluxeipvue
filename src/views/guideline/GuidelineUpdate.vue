@@ -104,8 +104,8 @@ async function submitForm() {
     guideline: guideline.value,
     contents: contents.value.map((content, index) => ({
       contentType: content.contentType,
-      textContent: content.textContent || "",
-      imageContent: content.contentType === "image" ? "" : content.imageContent,
+      textContent: content.contentType!=="image"?content.textContent : "",
+      imageContent: content.contentType === "image" ? content.imageContent : "",
     })),
   };
 
