@@ -135,6 +135,8 @@
         router.push('/requestmanage/missingpunch');
       }else if (notify.message.includes('《下班》')) {
         router.push('/requestmanage/missingpunch');
+      }else if (notify.message.includes('班表已排定')) {
+        router.push('/schedule/detail');
       }
   
     } catch (error) {
