@@ -19,9 +19,7 @@
         </el-form-item>
 
 
-        <el-form-item label="內容">
-          <el-input v-model="meeting.notes" placeholder="請輸入會議內容"></el-input>
-        </el-form-item>
+  
         
   
         <el-form-item label="選擇日期">

@@ -53,7 +53,7 @@ function checkIsAdminComputed() {
 const isEmployee = computed(checkIsEmployee);
 
 function checkIsEmployee() {
-    return props.roleName === "員工";
+    return props.roleName === "員工" || props.roleName === "行政主管" || props.roleName === "人資主管" || props.roleName === "業務主管" || props.roleName === "技術主管";
 }
 
 
