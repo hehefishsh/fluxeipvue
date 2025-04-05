@@ -79,4 +79,28 @@ function checkIsEmployee() {
 .card:hover {
   transform: scale(1.02); 
 }
+
+.card-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+.card-text {
+  font-size: 0.95rem;
+  color: #555;
+  margin-bottom: 0.4rem;
+  letter-spacing: 0.3px;
+}
+
+.card-text.text-danger {
+  color: #e74c3c;
+  font-weight: 600;
+}
+
+.card-body {
+  font-family: "Noto Sans TC", "微軟正黑體", sans-serif;
+}
 </style>
