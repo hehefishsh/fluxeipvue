@@ -55,7 +55,7 @@
   
         <div class="d-flex justify-content-end">
           <el-button @click="close">取消</el-button>
-          <el-button type="primary" @click="reserveMeeting">送出預約</el-button>
+          <el-button class="custom-purple-btn" @click="reserveMeeting">送出預約</el-button>
         </div>
       </el-form>
     </el-dialog>
@@ -186,6 +186,16 @@ const reserveMeeting = () => {
 
 :deep(.el-input__wrapper.is-disabled) {
   cursor: text !important;
+}
+
+.custom-purple-btn {
+  background-color: #9e6de0;
+  border-color: #9e6de0;
+  color: #fff;
+}
+.custom-purple-btn:hover {
+  background-color: #875bcc;
+  border-color: #875bcc;
 }
 
 </style>
