@@ -330,7 +330,7 @@ async function handleReserve(meeting) {
     isReserveModalOpen.value = false;
 
   } catch (error) {
-    Swal.fire("錯誤", "預約失敗，請稍後再試", "error");
+    Swal.fire("錯誤", " 您選擇的時間內已有其他預約", "error");
   }
 }
 
