@@ -514,6 +514,19 @@
                       <span class="nav-text">預約列表</span>
                     </RouterLink>
                   </li>
+                  <li
+  :class="{ active: route.path === '/meeting/host'}"
+  v-if="!['最高管理員', '次等管理員'].includes(user.roleName)"
+>
+  <RouterLink class="sidenav-item-link" to="/meeting/host">
+    <span class="nav-text">主辦會議</span>
+  </RouterLink>
+</li>
+                  <li :class="{ active: route.path === '/meeting/invite'}">
+                    <RouterLink class="sidenav-item-link" to="/meeting/invite">
+                      <span class="nav-text">會議邀請</span>
+                    </RouterLink>
+                  </li>
                 </div>
               </ul>
             </li>
@@ -743,10 +756,12 @@
       <!-- ====================================
     ——— CONTENT WRAPPER
     ===================================== -->
-      <div class="content-wrapper">
+      <div class="content-wrapper" >
         <div class="content">
           <slot></slot>
         </div>
+
+        
 
         <!-- Footer -->
         <footer class="footer mt-auto">
