@@ -57,7 +57,7 @@
   
   onMounted(() => {
     fetchNotifications(); // 初次載入
-    pollingInterval = setInterval(fetchNotifications, 3600000);
+    pollingInterval = setInterval(fetchNotifications, 5000);
     document.addEventListener('click', handleClickOutside);
   });
   
