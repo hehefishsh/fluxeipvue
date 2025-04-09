@@ -194,6 +194,14 @@ function Demo(){
   contents.value[1].taskContent='做成報表'
   contents.value[1].employee='趙六'
   contents.value[1].expectedFinishDate='2025-04-20'
+  contents.value[2].taskName='蒐集資料'
+  contents.value[2].taskContent='做成報表'
+  contents.value[2].employee='大六'
+  contents.value[2].expectedFinishDate='2025-04-20'
+  contents.value[3].taskName='蒐集資料'
+  contents.value[3].taskContent='做成報表'
+  contents.value[3].employee='名五'
+  contents.value[3].expectedFinishDate='2025-04-20'
 }
 
 // **刪除欄位**

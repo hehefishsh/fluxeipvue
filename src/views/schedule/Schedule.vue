@@ -235,7 +235,7 @@ const departmentName = department.departmentName;
   } catch (error) {
     Swal.fire({
       title: error.response?.data || "新增班表失敗",
-      icon: "error",
+      icon: "warning",
     });
   }
 }
@@ -308,7 +308,7 @@ const departmentName = department.departmentName;
   } catch (error) {
     Swal.fire({
       title: error.response.data,
-      icon: "error",
+      icon: "warning",
     });
   }
 }
@@ -367,7 +367,7 @@ const departmentName = department.departmentName;
         Swal.fire("班表已更新", "", "success");
         fetchSchedule();
       } catch (error) {
-        Swal.fire("更新班表失敗", error.response.data, "error");
+        Swal.fire("更新班表失敗", error.response.data, "warning");
       }
     }
   } else {
